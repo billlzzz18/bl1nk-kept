@@ -1,0 +1,17 @@
+{
+  "pre-commit-test-guard": {
+    "enabled": true,
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python tools/pre_commit_guard.py",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
+}

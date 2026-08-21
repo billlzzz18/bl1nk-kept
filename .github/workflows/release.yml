@@ -1,0 +1,63 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Collect prior release versions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "release already exists for $TAG"
+            exit 1
+          fi
+          {
+            git tag --list 'v*' | grep -Fxv "$TAG" || true
+            gh release list --limit 1000 --json tagName --jq '.[].tagName' | grep -Fxv "$TAG" || true
+          } | sort -u > "$RUNNER_TEMP/existing-release-tags.txt"
+          cat "$RUNNER_TEMP/existing-release-tags.txt"
+
+      - name: Validate monotonic release contract
+        env:
+          TAG: ${{ github.ref_name }}
+        run: python3 tools/release_contract.py --tag "$TAG" --existing-tags-file "$RUNNER_TEMP/existing-release-tags.txt"
+
+      - name: Verify project quality
+        run: just check
+
+      - name: Build release source archives
+        run: python3 tools/package_source.py
+
+      - name: Publish source archives
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG" \
+            "dist/bl1nk-kept-${TAG#v}-source.zip" \
+            "dist/bl1nk-kept-${TAG#v}-source.tar.gz" \
+            --verify-tag \
+            --title "$TAG" \
+            --generate-notes

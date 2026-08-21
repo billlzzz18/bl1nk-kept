@@ -1,0 +1,31 @@
+# Rust build artifacts
+target/
+
+# Generated scale fixtures; release benchmark creates deterministic data in memory instead
+benchmarks/data_*.json
+benchmarks/*.csv
+
+# Local agent notes and transient terminal data
+.learnings/
+terminal_full_output/
+
+# Editor and operating-system artifacts
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local credentials and environment files
+.env
+.env.*
+!.env.example
+
+# Temporary benchmark exports
+*.profraw
+*.profdata
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo

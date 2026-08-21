@@ -1,0 +1,744 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "KeywordRegistry",
+  "type": "object",
+  "required": [
+    "groups",
+    "metadata",
+    "validation",
+    "version"
+  ],
+  "properties": {
+    "foundation": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/FoundationProfile"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/KeywordGroup"
+      }
+    },
+    "index": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/RegistryIndex"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "#/definitions/Metadata"
+    },
+    "searchPolicy": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/SearchPolicy"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "synonymSets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/SynonymSet"
+      }
+    },
+    "validation": {
+      "$ref": "#/definitions/ValidationConfig"
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "ClassificationPolicy": {
+      "type": "object",
+      "required": [
+        "eligibleThreshold",
+        "reviewThreshold"
+      ],
+      "properties": {
+        "eligibleThreshold": {
+          "type": "number",
+          "format": "double"
+        },
+        "reviewThreshold": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "CorpusManifest": {
+      "type": "object",
+      "required": [
+        "entries",
+        "revision"
+      ],
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CorpusManifestEntry"
+          }
+        },
+        "revision": {
+          "type": "string"
+        }
+      }
+    },
+    "CorpusManifestEntry": {
+      "type": "object",
+      "required": [
+        "contentSha256",
+        "id",
+        "license",
+        "sourceUri",
+        "split"
+      ],
+      "properties": {
+        "contentSha256": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "sourceUri": {
+          "type": "string"
+        },
+        "split": {
+          "type": "string"
+        }
+      }
+    },
+    "CustomFieldConfig": {
+      "type": "object",
+      "required": [
+        "description",
+        "enabled",
+        "maxOne"
+      ],
+      "properties": {
+        "customFieldSchema": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FieldSchema"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "examples": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": true
+        },
+        "maxOne": {
+          "type": "boolean"
+        }
+      }
+    },
+    "FieldSchema": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "description": {
+          "default": "",
+          "type": "string"
+        },
+        "itemType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "maxLength": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint",
+          "minimum": 0.0
+        },
+        "pattern": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "required": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "type": {
+          "type": "string"
+        },
+        "values": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "FoundationProfile": {
+      "description": "NOTE-001: profile ที่ตรึง normalization/classification/corpus revision เพื่อให้ผลตรวจซ้ำได้",
+      "type": "object",
+      "required": [
+        "createdAt",
+        "normalization",
+        "schemaVersion",
+        "updatedAt"
+      ],
+      "properties": {
+        "classificationPolicy": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ClassificationPolicy"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "corpusManifest": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/CorpusManifest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "glossaryTerms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GlossaryTerm"
+          }
+        },
+        "normalization": {
+          "$ref": "#/definitions/NormalizationProfile"
+        },
+        "provenanceRecords": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProvenanceRecord"
+          }
+        },
+        "regexRules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RegexRule"
+          }
+        },
+        "schemaVersion": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      }
+    },
+    "GlossaryTerm": {
+      "type": "object",
+      "required": [
+        "aliases",
+        "confidence",
+        "id",
+        "language",
+        "normalized",
+        "provenanceId",
+        "script",
+        "term"
+      ],
+      "properties": {
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "confidence": {
+          "type": "number",
+          "format": "double"
+        },
+        "id": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "normalized": {
+          "type": "string"
+        },
+        "provenanceId": {
+          "type": "string"
+        },
+        "script": {
+          "type": "string"
+        },
+        "term": {
+          "type": "string"
+        }
+      }
+    },
+    "GroupStats": {
+      "type": "object",
+      "required": [
+        "duplicateCount",
+        "extensionCounts",
+        "totalWeight"
+      ],
+      "properties": {
+        "duplicateCount": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0.0
+        },
+        "extensionCounts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "uint",
+            "minimum": 0.0
+          }
+        },
+        "totalWeight": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "KeywordGroup": {
+      "type": "object",
+      "required": [
+        "baseFieldsSchema",
+        "customFieldAllowed",
+        "description",
+        "entries",
+        "groupId",
+        "groupName"
+      ],
+      "properties": {
+        "baseFieldsSchema": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/FieldSchema"
+          }
+        },
+        "customFieldAllowed": {
+          "$ref": "#/definitions/CustomFieldConfig"
+        },
+        "description": {
+          "type": "string"
+        },
+        "entries": {
+          "type": "array",
+          "items": true
+        },
+        "groupId": {
+          "type": "string"
+        },
+        "groupName": {
+          "type": "string"
+        },
+        "groupStats": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GroupStats"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "Metadata": {
+      "type": "object",
+      "required": [
+        "description",
+        "lastUpdated",
+        "owner"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "entryCount": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint",
+          "minimum": 0.0
+        },
+        "lastUpdated": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "stats": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": true
+        },
+        "totalSize": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0.0
+        }
+      }
+    },
+    "NormalizationProfile": {
+      "description": "NOTE-001: policy ถูกบันทึกใน registry เพื่อให้ normalize ข้อมูลรอบหลังได้เหมือนรอบเดิม",
+      "type": "object",
+      "required": [
+        "casePolicy",
+        "encoding",
+        "scriptPolicy",
+        "unicodeForm",
+        "whitespacePolicy"
+      ],
+      "properties": {
+        "casePolicy": {
+          "type": "string"
+        },
+        "encoding": {
+          "type": "string"
+        },
+        "scriptPolicy": {
+          "type": "string"
+        },
+        "unicodeForm": {
+          "type": "string"
+        },
+        "whitespacePolicy": {
+          "type": "string"
+        }
+      }
+    },
+    "ProvenanceRecord": {
+      "type": "object",
+      "required": [
+        "contentSha256",
+        "id",
+        "license",
+        "sourceUri"
+      ],
+      "properties": {
+        "contentSha256": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "sourceUri": {
+          "type": "string"
+        }
+      }
+    },
+    "RegexRule": {
+      "type": "object",
+      "required": [
+        "description",
+        "id",
+        "pattern",
+        "scope",
+        "severity",
+        "testVectors"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "pattern": {
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/definitions/RegexScope"
+        },
+        "severity": {
+          "$ref": "#/definitions/RuleSeverity"
+        },
+        "testVectors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RegexTestVector"
+          }
+        }
+      }
+    },
+    "RegexScope": {
+      "type": "string",
+      "enum": [
+        "id",
+        "alias",
+        "description",
+        "path",
+        "filename",
+        "content"
+      ]
+    },
+    "RegexTestVector": {
+      "type": "object",
+      "required": [
+        "accepted",
+        "value"
+      ],
+      "properties": {
+        "accepted": {
+          "type": "boolean"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "RegistryIndex": {
+      "type": "object",
+      "required": [
+        "lastIndexed"
+      ],
+      "properties": {
+        "fuzzyMap": {
+          "default": {},
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "homographs": {
+          "default": {},
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "homophones": {
+          "default": {},
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "lastIndexed": {
+          "type": "string"
+        },
+        "semanticSynonyms": {
+          "default": {},
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "synonyms": {
+          "default": {},
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "RuleSeverity": {
+      "type": "string",
+      "enum": [
+        "info",
+        "warning",
+        "error"
+      ]
+    },
+    "SearchPolicy": {
+      "description": "NOTE-001: ค่าค้นหาเป็น policy ของเจ้าของ registry; default คงผลเดิมที่ผ่าน benchmark แล้วแต่ไม่บังคับทุก dataset",
+      "type": "object",
+      "required": [
+        "fuzzyCandidateLimit",
+        "fuzzyMinSimilarity",
+        "fuzzyNgramSize",
+        "maxFuzzyNgramPostings"
+      ],
+      "properties": {
+        "fuzzyCandidateLimit": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0.0
+        },
+        "fuzzyMinSimilarity": {
+          "type": "number",
+          "format": "double",
+          "maximum": 1.0,
+          "minimum": 0.0
+        },
+        "fuzzyNgramSize": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0.0
+        },
+        "maxFuzzyNgramPostings": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0.0
+        }
+      }
+    },
+    "SynonymSet": {
+      "type": "object",
+      "required": [
+        "term"
+      ],
+      "properties": {
+        "homographs": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "homophones": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "semanticSynonyms": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "synonyms": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "term": {
+          "type": "string"
+        }
+      }
+    },
+    "ValidationConfig": {
+      "type": "object",
+      "required": [
+        "errorMessages",
+        "rules"
+      ],
+      "properties": {
+        "errorMessages": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "rules": {
+          "$ref": "#/definitions/ValidationRules"
+        }
+      }
+    },
+    "ValidationRules": {
+      "type": "object",
+      "required": [
+        "aliasMaxLength",
+        "aliasMinLength",
+        "customFieldPerEntry",
+        "descriptionMaxLength",
+        "descriptionMinLength",
+        "requiredBaseFields"
+      ],
+      "properties": {
+        "aliasMaxLength": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0.0
+        },
+        "aliasMinLength": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0.0
+        },
+        "customFieldPerEntry": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0.0
+        },
+        "descriptionMaxLength": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0.0
+        },
+        "descriptionMinLength": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0.0
+        },
+        "requiredBaseFields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

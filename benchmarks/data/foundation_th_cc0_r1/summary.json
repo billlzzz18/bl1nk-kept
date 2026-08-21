@@ -1,0 +1,94 @@
+{
+  "corpus_revision": "foundation-th-cc0-r1",
+  "data_scope": "Public CC0 Thai word list; filenames and exact duplicate copies are deterministic derivatives for duplicate-engine regression. Results do not claim real-world file-distribution coverage.",
+  "repetitions": 7,
+  "word_limit": 10000,
+  "baseline_id": "baseline-t090-n2-p1024",
+  "selection_constraints": {
+    "maxFalsePositiveCount": 3,
+    "maxP95LatencyMs": 15807.562485,
+    "requiredStrata": [
+      "thai_wordlist_exact_name",
+      "thai_wordlist_near_name"
+    ]
+  },
+  "selected": {
+    "id": "t090-n3-p256",
+    "f1": 0.9914040114613181,
+    "falsePositiveCount": 3,
+    "p95LatencyMs": 2747.285428,
+    "meanCandidateCount": 1683875.0,
+    "coveredStrata": [
+      "thai_wordlist_exact_name",
+      "thai_wordlist_near_name"
+    ]
+  },
+  "candidates": [
+    {
+      "id": "baseline-t090-n2-p1024",
+      "f1": 0.9914040114613181,
+      "falsePositiveCount": 3,
+      "p95LatencyMs": 15807.562485,
+      "meanCandidateCount": 9229249.0,
+      "coveredStrata": [
+        "thai_wordlist_exact_name",
+        "thai_wordlist_near_name"
+      ]
+    },
+    {
+      "id": "t085-n2-p128",
+      "f1": 0.7119341563786008,
+      "falsePositiveCount": 140,
+      "p95LatencyMs": 1673.2386350000002,
+      "meanCandidateCount": 955637.0,
+      "coveredStrata": [
+        "thai_wordlist_exact_name",
+        "thai_wordlist_near_name"
+      ]
+    },
+    {
+      "id": "t085-n3-p128",
+      "f1": 0.6933867735470942,
+      "falsePositiveCount": 153,
+      "p95LatencyMs": 2159.503442,
+      "meanCandidateCount": 1349392.0,
+      "coveredStrata": [
+        "thai_wordlist_exact_name",
+        "thai_wordlist_near_name"
+      ]
+    },
+    {
+      "id": "t090-n3-p256",
+      "f1": 0.9914040114613181,
+      "falsePositiveCount": 3,
+      "p95LatencyMs": 2747.285428,
+      "meanCandidateCount": 1683875.0,
+      "coveredStrata": [
+        "thai_wordlist_exact_name",
+        "thai_wordlist_near_name"
+      ]
+    },
+    {
+      "id": "t095-n2-p256",
+      "f1": 0.7859649122807018,
+      "falsePositiveCount": 0,
+      "p95LatencyMs": 3687.4806599999997,
+      "meanCandidateCount": 2045833.0,
+      "coveredStrata": [
+        "thai_wordlist_exact_name",
+        "thai_wordlist_near_name"
+      ]
+    },
+    {
+      "id": "t095-n3-p1024",
+      "f1": 0.7859649122807018,
+      "falsePositiveCount": 0,
+      "p95LatencyMs": 12415.243955,
+      "meanCandidateCount": 7369839.0,
+      "coveredStrata": [
+        "thai_wordlist_exact_name",
+        "thai_wordlist_near_name"
+      ]
+    }
+  ]
+}

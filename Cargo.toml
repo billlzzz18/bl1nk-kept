@@ -1,0 +1,68 @@
+[workspace]
+members = [
+    "crate/kept-core",
+    "crate/kept-doc",
+    "crate/kept-cli",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.2.0"
+edition = "2021"
+authors = ["อาจารย์", "billlzzz26"]
+license = "MIT"
+
+[workspace.dependencies]
+# Common
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "=1.0.151"
+serde_yaml = "0.9"
+# NOTE-001: 0.8.23 แก้ compatibility กับ serde 1.0.229 ที่ทำให้ 0.8.19 compile ไม่ผ่านบน stable ปัจจุบัน
+toml = "=0.8.23"
+regex = "1.10"
+unicode-normalization = "0.1.25"
+thiserror = "1.0.69"
+anyhow = "=1.0.95"
+cpufeatures = "=0.2.16"
+sha2 = "=0.10.8"
+digest = "=0.10.7"
+block-buffer = "=0.10.4"
+crypto-common = "=0.1.6"
+indexmap = "1.9.3"
+hashbrown = "0.14.3"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.23", features = ["serde", "v4"] }
+tokio = { version = "1.52", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+clap = { version = "=4.4.18", features = ["derive"] }
+csv = "1.3"
+
+# Keyword / Search
+fuzzy-matcher = "0.3"
+schemars = "0.8"
+strsim = "0.11"
+walkdir = "2.5"
+dashmap = "6.1"
+# hashbrown = "0.15" (already pinned above)
+
+# Document / Markdown
+reqwest = { version = "0.13", features = ["json", "multipart"] }
+pulldown-cmark = "0.13"
+notify = "8"
+similar = "3"
+scraper = "0.27"
+lopdf = "0.42"
+docx-rs = "0.4"
+google-docs1 = "7"
+yup-oauth2 = "12.1"
+syntect = { version = "5", features = ["default"] }
+pmcp = "2.10"
+ratatui = "0.30"
+crossterm = "0.29"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true

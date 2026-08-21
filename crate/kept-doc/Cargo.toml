@@ -1,0 +1,55 @@
+[package]
+name = "kept-doc"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Document sync and conversion engine for Notion, Markdown, and more"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+serde_yaml.workspace = true
+toml.workspace = true
+csv.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+reqwest.workspace = true
+pulldown-cmark.workspace = true
+notify.workspace = true
+similar.workspace = true
+scraper.workspace = true
+lopdf.workspace = true
+docx-rs.workspace = true
+google-docs1.workspace = true
+yup-oauth2.workspace = true
+syntect.workspace = true
+async-trait = "0.1"
+unicode-width = "0.1"
+unicode-segmentation = "1.12"
+tokio-util = "0.7"
+tokio-retry = "0.3"
+governor = "0.10"
+futures = "0.3"
+hmac = "0.12"
+sha2 = "0.10"
+hex = "0.4"
+subtle = "2"
+pmcp = { workspace = true, optional = true }
+tracing.workspace = true
+tracing-subscriber.workspace = true
+# NOTE-001: ใช้เฉพาะ library renderer; ปิด CLI/PNG defaults เพื่อไม่ชนกับ clap ที่ CLI หลัก pin ไว้
+mermaid-rs-renderer = { version = "0.2.0", default-features = false }
+
+[[bin]]
+# NOTE-001: MCP server เป็น optional integration จึงต้องไม่ build ใน baseline ของ CLI หลัก
+name = "blink-md-mcp"
+path = "src/bin/blink-md-mcp.rs"
+required-features = ["mcp"]
+
+[features]
+default = []
+mcp = ["dep:pmcp"]

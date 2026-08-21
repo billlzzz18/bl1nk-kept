@@ -1,0 +1,15 @@
+# NOTE-001: Sprint 0 — ลดความล้มเหลวของ Cargo registry บนเครือข่ายที่ throughput ต่ำ
+[http]
+timeout = 600
+low-speed-limit = 1
+multiplexing = false
+
+[net]
+retry = 10
+
+git-fetch-with-cli = true
+
+[alias]
+fmt-check = "fmt --all -- --check"
+test-all = "test --workspace"
+lint = "clippy --workspace --all-targets -- -D warnings"

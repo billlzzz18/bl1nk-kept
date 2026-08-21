@@ -1,0 +1,30 @@
+[package]
+name = "kept-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Core logic for keyword validation, search, and filesystem analysis"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+serde_yaml.workspace = true
+regex.workspace = true
+unicode-normalization.workspace = true
+thiserror.workspace = true
+fuzzy-matcher.workspace = true
+schemars.workspace = true
+strsim.workspace = true
+walkdir.workspace = true
+tracing.workspace = true
+csv.workspace = true
+dashmap.workspace = true
+hashbrown.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
+chrono.workspace = true
+sha2 = "0.10.9"
+
+[dev-dependencies]
+jsonschema = { version = "0.49.9", default-features = false }

@@ -1,0 +1,34 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Rust tests
+        run: cargo test --workspace
+      - name: Rust lint
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: Repository contracts
+        run: python3 -m unittest tests/test_repository_contract.py tests/test_repository_tools.py
+      - name: Public schema drift
+        run: cargo run -q -p kept-core --example export_schema > /tmp/keyword-registry.schema.json && cmp -s /tmp/keyword-registry.schema.json schema/keyword-registry.schema.json
+      - name: Markdown links
+        run: python3 tools/check_markdown_links.py
+      - name: Version contract
+        run: python3 tools/check_version_contract.py

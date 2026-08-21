@@ -1,0 +1,19 @@
+{
+  "revision": "foundation-th-cc0-r1",
+  "entries": [
+    {
+      "id": "pythainlp-words-th",
+      "sourceUri": "https://raw.githubusercontent.com/PyThaiNLP/pythainlp/dev/pythainlp/corpus/words_th.txt",
+      "license": "CC0-1.0",
+      "contentSha256": "35f65d43ea83b5b981134d5edc3b9afcb64b4ba96146900fc4d312f2940c3265",
+      "split": "train"
+    },
+    {
+      "id": "pythainlp-stopwords-th",
+      "sourceUri": "https://raw.githubusercontent.com/PyThaiNLP/pythainlp/dev/pythainlp/corpus/stopwords_th.txt",
+      "license": "CC0-1.0",
+      "contentSha256": "da7fb61b346e4a7a2e6ad589bb27c291b2258351a2eff020f85fbc74b64abc73",
+      "split": "validation"
+    }
+  ]
+}

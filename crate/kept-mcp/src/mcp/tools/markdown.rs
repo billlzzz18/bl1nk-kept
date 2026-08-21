@@ -4,11 +4,11 @@ use async_trait::async_trait;
 use serde::Deserialize;
 use serde_json::{json, Value};
 
-use crate::api::markdown::{parse_markdown, ToMarkdown};
 use crate::mcp::core::{
     invalid_args, McpResult, RequestHandlerExtra, SchemaBuilder, ToolHandler, ToolInfo,
 };
-use crate::models::block::Block;
+use kept_doc::api::markdown::{parse_markdown, ToMarkdown};
+use kept_doc::models::block::Block;
 
 #[derive(Debug, Deserialize)]
 struct ParseMarkdownInput {

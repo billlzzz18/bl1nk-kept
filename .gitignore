@@ -6,7 +6,6 @@ benchmarks/data_*.json
 benchmarks/*.csv
 
 # Local agent notes and transient terminal data
-.learnings/
 terminal_full_output/
 
 # Editor and operating-system artifacts
@@ -29,3 +28,12 @@ terminal_full_output/
 __pycache__/
 *.pyc
 *.pyo
+.cursor/
+tmp4zpb3vx_/
+tmp9_xleu13/
+tmph0_ry3oy/
+tmpyt0svnk7/
+
+# Local editor MCP configs contain credentials; never commit
+.cursor/
+.agents/mcp_config.json

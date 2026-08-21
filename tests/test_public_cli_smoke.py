@@ -62,6 +62,8 @@ class PublicCliSmokeTests(unittest.TestCase):
             "doctor",
             "review",
             "duplicates",
+            "evidence",
+            "corpus",
         ):
             self.assertIn(command, result.stdout)
         self.assertNotIn("NOTE-001", result.stdout)
@@ -88,6 +90,8 @@ class PublicCliSmokeTests(unittest.TestCase):
             ("doctor", "--help"),
             ("review", "--help"),
             ("duplicates", "--help"),
+            ("evidence", "--help"),
+            ("corpus", "--help"),
         ):
             command_help = self.run_kept(*command, environment=environment)
             self.assertEqual(command_help.returncode, 0, command_help.stderr)
@@ -568,6 +572,38 @@ class PublicCliSmokeTests(unittest.TestCase):
             document = json.loads(ir_path.read_text(encoding="utf-8"))
             self.assertIn("metadata", document)
             self.assertEqual(document["blocks"][0]["type"], "heading")
+
+    def test_evidence_and_corpus_public_commands(self) -> None:
+        directory = ROOT / "target" / f"public-smoke-evidence-{os.getpid()}"
+        directory.mkdir(parents=True, exist_ok=True)
+        environment = os.environ.copy()
+        good = directory / "good.jsonl"
+        bad = directory / "bad.jsonl"
+        good.write_text('{"fixture":"good"}\n', encoding="utf-8")
+        bad.write_text('{"fixture":"bad"}\n', encoding="utf-8")
+        self_test = self.run_kept(
+            "evidence", "self-test", "--good-fixture", str(good),
+            "--bad-fixture", str(bad), "--require-no-mutation", environment=environment
+        )
+        self.assertEqual(self_test.returncode, 0, self_test.stderr)
+        self.assertIn("PASS", self_test.stdout)
+        # The safety gate must leave the fixtures untouched.
+        self.assertEqual(good.read_text(encoding="utf-8"), '{"fixture":"good"}\n')
+
+        corpus = directory / "corpus.jsonl"
+        corpus.write_text(
+            json.dumps({
+                "source": {"provenanceId": "smoke", "locator": "line=1"},
+                "context": {"fragmentHash": "a" * 64},
+                "candidate": "รายงาน", "normalizedCandidate": "รายงาน",
+                "assertionKind": "canonical",
+                "review": {"decision": "accepted", "reason": "smoke"},
+                "split": "build",
+            }, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
+        report = self.run_kept("corpus", "validate", str(corpus), "--report", "json", environment=environment)
+        self.assertEqual(report.returncode, 0, report.stderr)
+        self.assertEqual(json.loads(report.stdout)["accepted"], 1)
 
 
 if __name__ == "__main__":

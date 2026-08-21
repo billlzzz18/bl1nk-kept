@@ -154,6 +154,22 @@ kept search registry.json รายงาน --group product_terms
 kept search registry.json รายงาน --json
 ```
 
+## Evidence และ gold corpus แบบ offline
+
+คำสั่งกลุ่มนี้เก็บหลักฐานและ dictionary แบบตรวจสอบย้อนกลับได้ โดยไม่มีคำสั่ง promote หรือ mutation อัตโนมัติ.
+
+```bash
+kept evidence run --manifest run-manifest.json --raw-jsonl raw.jsonl --input source.md
+kept evidence rescore --offline --manifest run-manifest.json --raw-jsonl raw.jsonl --output rescore.jsonl
+kept evidence correct append --history corrections.jsonl --raw-jsonl raw.jsonl --subject-id a --decision eligible --reason reviewed
+kept evidence self-test --good-fixture good.jsonl --bad-fixture bad.jsonl --require-no-mutation
+kept corpus validate reviewed.jsonl --report json
+kept corpus snapshot save reviewed.jsonl gold.snapshot.json
+kept corpus replay gold.snapshot.json --json
+```
+
+`corpus replay` ใส่เฉพาะ assertion ที่ review เป็น `accepted` ลงใน `dictionary`; candidate ที่ `rejected` หรือยังไม่ผ่าน review จะไม่ถูก promote.
+
 ## แปลงเอกสาร
 
 `convert` แปลง Markdown เป็น Universal IR JSON เมื่อ output ลงท้ายด้วย `.json`. ผลลัพธ์เป็นไฟล์ใหม่ตาม path ที่ระบุ.
@@ -181,6 +197,8 @@ kept duplicates --help
 kept group --help
 kept search --help
 kept convert --help
+kept evidence --help
+kept corpus --help
 ```
 
 คำสั่ง compatibility จากรุ่นก่อนยังรับได้สำหรับ script เดิม แต่ไม่อยู่ในหน้า help หลักและไม่ใช่แนวทางเริ่มใช้งานใหม่.

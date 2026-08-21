@@ -45,6 +45,24 @@ pub struct UserConfig {
 pub struct ConfigDefaults {
     #[serde(default)]
     pub naming: NamingSettings,
+    #[serde(default)]
+    pub semantic: SemanticSearchSettings,
+}
+
+/// NOTE-001: ตั้งค่าผ่าน model ID และ endpoint; provider รองรับ "ollama" (default) และ "jina" เท่านั้น
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct SemanticSearchSettings {
+    #[serde(default)]
+    pub provider: Option<String>,
+    #[serde(default)]
+    pub endpoint: Option<String>,
+    #[serde(default)]
+    pub embedding_model_id: Option<String>,
+    #[serde(default)]
+    pub rerank_model_id: Option<String>,
+    #[serde(default)]
+    pub api_key: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -364,7 +382,10 @@ impl UserConfig {
         );
         Self {
             version: USER_CONFIG_VERSION,
-            defaults: ConfigDefaults { naming: defaults },
+            defaults: ConfigDefaults {
+                naming: defaults,
+                semantic: SemanticSearchSettings::default(),
+            },
             profiles,
             scopes: Vec::new(),
         }
@@ -378,6 +399,7 @@ impl UserConfig {
             )));
         }
         validate_naming_settings(&self.defaults.naming)?;
+        crate::semantic::validate_semantic_settings(&self.defaults.semantic)?;
         for (profile_id, profile) in &self.profiles {
             validate_naming_settings(&profile.naming).map_err(|error| {
                 PolicyError::InvalidConfig(format!("profile {profile_id}: {error}"))

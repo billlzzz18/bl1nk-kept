@@ -52,13 +52,15 @@
 | DATA-002 | Raw scan/Markdown/HTML/PDF + sidecar annotation ต้อง materialize เป็น dictionary หลัง review; fuzzy/hypothesis ห้าม promote เอง | `MISSING` | `TODO.md` P1 target only | Corpus and review workflow required |
 | DUP-001 | Duplicate mutation policy, allow-list, rollback, simulation แยกจาก scan/review/export | `NOT APPROVED` | `TODO.md` P0 and `SPEC.md` no-mutation boundary | Director approval before any mutation command |
 | DOC-001 | `get-start.md` ต้อง cover public commands และตัวอย่างต้องมี command-level proof | `COMPLETE` | get-start sections cover config, defaults, profile, scope, group, scan, review, find, duplicates, search and convert; `tests/test_public_cli_smoke.py` exercises their public paths | Expand immediately when a new public command is approved |
+| SEM-001 | เชื่อมต่อ provider สำหรับ embedding + rerank: รองรับ ollama (default) และ jina; model ID + endpoint + env override (KEPT_SEMANTIC_PROVIDER/ENDPOINT, KEPT_EMBEDDING_MODEL_ID, KEPT_RERANK_MODEL_ID, JINA_API_KEY); auto-pull model จาก Ollama เอง; error ชี้วิธีแก้เมื่อ provider ไม่พร้อมใช้ | `PARTIAL` | `kept-core::semantic` + `defaults.semantic.{provider,endpoint,embeddingModelId,rerankModelId,apiKey}`; red test -> 12/12 semantic tests; probe จริง: ollama auto-pull bge-m3 + embeddings=ok(1024d); **live rerank test ผ่าน**: llama-server (CPU build) + gpustack/bge-reranker-v2-m3-GGUF Q8_0 ที่ port 8012 -> `rerank=ok`, Thai query จัดอันดับถูกต้อง cross-lingual (relevant +4.96 / -0.12 vs irrelevant -8.6 / -11.0, ~738ms/4 docs) | Wire semantic re-rank เข้า `kept search` pipeline + CLI surface + docs ตาม ledger rule 6; **Director decision**: เริ่มจาก ollama+jina เพื่อทดสอบ แล้วค่อยเพิ่ม provider ทีละตัว (enum SemanticProvider คือจุดขยาย) |
+| ARCH-001 | kept-doc ห้ามมี binary ของตัวเอง; MCP server แยก crate เพื่อไม่ลาก dependency เกินความจำเป็น (Director: single CLI, แพ็กเกจเดียวหนึ่งหน้าที่) | `COMPLETE` | red test `test_kept_doc_is_a_pure_library_and_the_mcp_server_has_its_own_crate` -> ผ่าน; `bl1nk-kept-mcp` + legacy alias ย้ายไป `crate/kept-mcp`, pmcp/mcp feature ถูกถอดจาก kept-doc, `.vscode/mcp.json` ชี้ `-p kept-mcp`; `cargo run -p kept-mcp -- --check` OK; `just check` ผ่าน | kept-doc ต้องยังเป็น library ล้วงทุก session; ประเมิน bin ใหม่ทุกครั้งด้วย contract test เดียวกัน |
 
 ## Distinctions that must not be collapsed
 
 | Concept | Owner / purpose | Current state |
 |---|---|---|
 | `.learnings/` | Agent memory about failures and corrections | Retained; never product input |
-| `.agents/REQUIREMENTS.md` | Agent requirement coverage, status and evidence | This ledger; never product documentation |
+| `.agents/MEMORY.md` | Agent requirement coverage, status and evidence | This ledger; never product documentation |
 | `TODO.md` | Product backlog and active implementation checklist | Public project work source of truth |
 | Naming profile / scope | User config behavior for file naming analysis | Task-level defaults/profile/scope/override management complete; read-only review consumer |
 | Registry group | Grouping of keyword registry entries and `search --group` filter | Public group and group-field management complete; separate from naming config |

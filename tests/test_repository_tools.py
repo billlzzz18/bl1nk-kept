@@ -85,6 +85,31 @@ class RepositoryToolTests(unittest.TestCase):
             )
             self.assertIn("## [0.3.0]", (root / "CHANGELOG.md").read_text(encoding="utf-8"))
 
+    def test_version_updater_without_argument_increments_the_patch_release(self) -> None:
+        from tools.bump_version import update_version
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "Cargo.toml").write_text(
+                '[workspace.package]\nversion = "0.2.0"\n', encoding="utf-8"
+            )
+            (root / "SPEC.md").write_text(
+                "**Workspace package version:** `0.2.0`\n", encoding="utf-8"
+            )
+            (root / "CHANGELOG.md").write_text(
+                "# Changelog\n\n## [Unreleased]\n\n## [0.2.0]\n",
+                encoding="utf-8",
+            )
+
+            update_version(root)
+
+            self.assertIn('version = "0.2.1"', (root / "Cargo.toml").read_text(encoding="utf-8"))
+            self.assertIn(
+                "**Workspace package version:** `0.2.1`",
+                (root / "SPEC.md").read_text(encoding="utf-8"),
+            )
+            self.assertIn("## [0.2.1]", (root / "CHANGELOG.md").read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -7,6 +7,7 @@ pub mod policy;
 pub mod scanner;
 pub mod schema;
 pub mod search;
+pub mod semantic;
 pub mod validator;
 
 pub use analyzer::RegistryAnalyzer;

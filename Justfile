@@ -1,5 +1,8 @@
+[unix]
 set shell := ["bash", "-cu"]
-set windows-shell := ["powershell.exe", "-NoProfile", "-Command"]
+
+[windows]
+set shell := ["powershell.exe", "-NoProfile", "-Command"]
 
 python := if os() == "windows" { "python" } else { "python3" }
 
@@ -37,8 +40,9 @@ links:
 version-check:
     {{python}} tools/check_version_contract.py
 
-version-bump version:
-    {{python}} tools/bump_version.py {{version}}
+# Bump the workspace version. With no argument it increments the patch release.
+version-bump new_version="":
+    {{python}} tools/bump_version.py {{new_version}}
 
 check: fmt test clippy repo-contract cli-smoke schema-check links version-check
 

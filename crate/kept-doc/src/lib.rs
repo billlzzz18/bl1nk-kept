@@ -5,7 +5,7 @@
 //! ## Quick Start
 //!
 //! ```ignore
-//! use blink_md::NotionClient;
+//! use kept_doc::NotionClient;
 //!
 //! #[tokio::main]
 //! async fn main() {
@@ -27,8 +27,6 @@ pub mod client;
 pub mod converter;
 pub mod error;
 pub mod ir;
-#[cfg(feature = "mcp")]
-pub mod mcp;
 pub mod models;
 pub mod sync;
 

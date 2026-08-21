@@ -162,14 +162,20 @@ impl ConverterRegistry {
     }
 }
 
+pub mod docx;
 pub mod filter;
 pub mod github_markdown;
 pub mod lark_sheets;
 pub mod markdown;
 pub mod markdown_frontmatter;
 pub mod notion;
+pub mod obsidian_base;
+pub mod pdf;
 
+pub use docx::DocxAdapter;
 pub use filter::{Filter, FilterPipeline, MarkdownAlertFilter, ThaiSanitizationFilter};
+pub use obsidian_base::ObsidianBaseAdapter;
+pub use pdf::PdfAdapter;
 
 // --- Blanket Implementations for M2 ---
 

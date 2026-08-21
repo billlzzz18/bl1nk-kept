@@ -1,9 +1,7 @@
-//! Shared building blocks for the unified blink-md MCP server.
+//! Shared building blocks for the unified bl1nk-kept MCP server.
 //!
-//! Previously this lived in a separate `mcp-core` workspace crate. It now
-//! ships as an in-crate module so the whole project builds as a single crate
-//! with one MCP server binary (`blink-md-mcp`) instead of one binary per
-//! platform.
+//! Ships as an in-crate module so the whole project builds as a single crate
+//! with one MCP server binary (`bl1nk-kept-mcp`).
 
 use serde_json::{json, Value};
 

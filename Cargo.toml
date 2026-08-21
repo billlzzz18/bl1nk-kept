@@ -3,6 +3,7 @@ members = [
     "crate/kept-core",
     "crate/kept-doc",
     "crate/kept-cli",
+    "crate/kept-mcp",
 ]
 resolver = "2"
 

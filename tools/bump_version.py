@@ -8,6 +8,9 @@ SEMVER_PATTERN = re.compile(r"\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-
 WORKSPACE_VERSION_PATTERN = re.compile(
     r"(?ms)(\[workspace\.package\][^\[]*?^version\s*=\s*)\"[^\"]+\""
 )
+WORKSPACE_VERSION_VALUE_PATTERN = re.compile(
+    r"(?ms)\[workspace\.package\][^\[]*?^version\s*=\s*\"([^\"]+)\""
+)
 SPEC_VERSION_PATTERN = re.compile(r"\*\*Workspace package version:\*\* `[^`]+`")
 UNRELEASED_PATTERN = re.compile(r"^## \[Unreleased\]\s*$", flags=re.MULTILINE)
 
@@ -19,7 +22,27 @@ def replace_once(text: str, pattern: re.Pattern[str], replacement: str, label: s
     return updated
 
 
-def update_version(root: Path, version: str) -> None:
+def current_workspace_version(root: Path) -> str:
+    manifest = (root / "Cargo.toml").read_text(encoding="utf-8")
+    match = WORKSPACE_VERSION_VALUE_PATTERN.search(manifest)
+    if match is None:
+        raise ValueError("cannot locate workspace package version")
+    return match.group(1)
+
+
+def next_patch_version(root: Path) -> str:
+    version = current_workspace_version(root)
+    core = version.split("+", 1)[0].split("-", 1)[0]
+    parts = core.split(".")
+    if len(parts) != 3 or not all(part.isdigit() for part in parts):
+        raise ValueError(f"cannot auto-increment non numeric release version: {version}")
+    parts[2] = str(int(parts[2]) + 1)
+    return ".".join(parts)
+
+
+def update_version(root: Path, version: str | None = None) -> str:
+    if not version:
+        version = next_patch_version(root)
     if not SEMVER_PATTERN.fullmatch(version):
         raise ValueError(f"version is not semantic version text: {version}")
 
@@ -52,15 +75,17 @@ def update_version(root: Path, version: str) -> None:
     manifest_path.write_text(manifest, encoding="utf-8")
     spec_path.write_text(spec, encoding="utf-8")
     changelog_path.write_text(changelog, encoding="utf-8")
+    return version
 
 
 def main() -> int:
-    if len(sys.argv) != 2:
-        print("usage: python3 tools/bump_version.py <semantic-version>")
+    if len(sys.argv) > 2:
+        print("usage: python3 tools/bump_version.py [<semantic-version>]")
         return 2
+    argument = sys.argv[1] if len(sys.argv) == 2 else ""
     root = Path(__file__).resolve().parents[1]
-    update_version(root, sys.argv[1])
-    print(f"version-updated={sys.argv[1]}")
+    resolved = update_version(root, argument)
+    print(f"version-updated={resolved}")
     return 0
 
 

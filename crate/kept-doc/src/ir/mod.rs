@@ -46,4 +46,6 @@ pub enum Platform {
     Sheets,
     Html,
     Docx,
+    Obsidian,
+    ObsidianBase,
 }

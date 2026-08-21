@@ -95,7 +95,7 @@ impl ThaiSanitizationFilter {
 }
 
 /// NOTE-001: M3 - MarkdownAlertFilter
-/// แปลง GitHub Alerts (> [!NOTE]) ให้เป็น IR Callout
+/// แปลง GitHub Alerts (> [!NOTE], > [!TIP], > [!IMPORTANT], > [!WARNING], > [!CAUTION]) ให้เป็น IR Callout
 pub struct MarkdownAlertFilter;
 
 impl Filter for MarkdownAlertFilter {
@@ -103,8 +103,123 @@ impl Filter for MarkdownAlertFilter {
         "MarkdownAlertFilter"
     }
 
-    fn apply(&self, _doc: &mut UniversalDocument) -> Result<(), ConvertError> {
-        // NOTE-001: ยังสงวนตำแหน่งใน pipeline ไว้; alert-to-callout จะทำใน Sprint ของ document conversion
+    fn apply(&self, doc: &mut UniversalDocument) -> Result<(), ConvertError> {
+        let mut new_blocks = Vec::with_capacity(doc.blocks.len());
+
+        for block in doc.blocks.drain(..) {
+            if let crate::ir::UniversalBlock::Quote { mut content, style } = block {
+                if let Some((icon, color, cleaned_first_block)) = Self::detect_alert(&content) {
+                    if let Some(first) = content.first_mut() {
+                        *first = cleaned_first_block;
+                    }
+                    new_blocks.push(crate::ir::UniversalBlock::Callout {
+                        icon: Some(icon.to_string()),
+                        color: Some(color.to_string()),
+                        content,
+                        style,
+                    });
+                    continue;
+                }
+                new_blocks.push(crate::ir::UniversalBlock::Quote { content, style });
+            } else {
+                new_blocks.push(block);
+            }
+        }
+
+        doc.blocks = new_blocks;
         Ok(())
+    }
+}
+
+impl MarkdownAlertFilter {
+    fn detect_alert(
+        content: &[crate::ir::UniversalBlock],
+    ) -> Option<(&'static str, &'static str, crate::ir::UniversalBlock)> {
+        if let Some(crate::ir::UniversalBlock::Paragraph {
+            content: inlines,
+            style,
+        }) = content.first()
+        {
+            if let Some(crate::ir::inline::InlineElement::TextRun {
+                content: text_str,
+                style: text_style,
+            }) = inlines.first()
+            {
+                let trimmed = text_str.trim_start();
+                let alerts = [
+                    ("[!NOTE]", "💡", "blue"),
+                    ("[!TIP]", "🎯", "green"),
+                    ("[!IMPORTANT]", "📌", "purple"),
+                    ("[!WARNING]", "⚠️", "yellow"),
+                    ("[!CAUTION]", "🛑", "red"),
+                ];
+
+                for (tag, icon, color) in alerts {
+                    if let Some(stripped) = trimmed.strip_prefix(tag) {
+                        let remainder = stripped.trim_start();
+                        let mut new_inlines = inlines.clone();
+                        if remainder.is_empty() && new_inlines.len() > 1 {
+                            new_inlines.remove(0);
+                        } else {
+                            new_inlines[0] = crate::ir::inline::InlineElement::TextRun {
+                                content: remainder.to_string(),
+                                style: text_style.clone(),
+                            };
+                        }
+
+                        return Some((
+                            icon,
+                            color,
+                            crate::ir::UniversalBlock::Paragraph {
+                                content: new_inlines,
+                                style: style.clone(),
+                            },
+                        ));
+                    }
+                }
+            }
+        }
+        None
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ir::{inline::text, UniversalBlock, UniversalDocument};
+
+    #[test]
+    fn test_markdown_alert_filter_converts_note_to_callout() {
+        let quote = UniversalBlock::Quote {
+            content: vec![UniversalBlock::Paragraph {
+                content: vec![text("[!NOTE] This is an important note.")],
+                style: None,
+            }],
+            style: None,
+        };
+
+        let mut doc = UniversalDocument {
+            metadata: Default::default(),
+            blocks: vec![quote],
+            styles: Default::default(),
+        };
+
+        let filter = MarkdownAlertFilter;
+        filter.apply(&mut doc).unwrap();
+
+        assert_eq!(doc.blocks.len(), 1);
+        if let UniversalBlock::Callout {
+            icon,
+            color,
+            content,
+            ..
+        } = &doc.blocks[0]
+        {
+            assert_eq!(icon.as_deref(), Some("💡"));
+            assert_eq!(color.as_deref(), Some("blue"));
+            assert_eq!(content.len(), 1);
+        } else {
+            panic!("Expected Callout block, got {:?}", doc.blocks[0]);
+        }
     }
 }

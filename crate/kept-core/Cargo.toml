@@ -22,6 +22,7 @@ csv.workspace = true
 dashmap.workspace = true
 hashbrown.workspace = true
 tokio.workspace = true
+reqwest.workspace = true
 anyhow.workspace = true
 chrono.workspace = true
 sha2 = "0.10.9"

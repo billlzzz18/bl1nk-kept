@@ -5,11 +5,11 @@ use serde::Deserialize;
 use serde_json::{json, Value};
 
 use super::serialize_document_response;
-use crate::converter::markdown::MarkdownConverter;
 use crate::mcp::core::{
     invalid_args, McpError, McpResult, RequestHandlerExtra, SchemaBuilder, ToolHandler, ToolInfo,
 };
-use crate::{FromPlatform, ToPlatform};
+use kept_doc::converter::markdown::MarkdownConverter;
+use kept_doc::{FromPlatform, ToPlatform};
 
 // NOTE: fetching a live page + its blocks lives in `notion_live.rs`
 // (`get_notion_page_blocks`) so it reuses the server-side `NotionClient` bound
@@ -57,7 +57,7 @@ impl ToolHandler for ConvertIrToMdTool {
     async fn handle(&self, args: Value, _extra: RequestHandlerExtra) -> McpResult<Value> {
         let input: IrJsonInput =
             serde_json::from_value(args).map_err(|e| invalid_args("Invalid arguments", e))?;
-        let doc: crate::UniversalDocument = serde_json::from_value(input.ir_json)
+        let doc: kept_doc::UniversalDocument = serde_json::from_value(input.ir_json)
             .map_err(|e| invalid_args("Invalid IR JSON", e))?;
         let md = MarkdownConverter::to_platform(&doc)
             .map_err(|e| McpError::validation(format!("Conversion failed: {e}")))?;

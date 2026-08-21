@@ -6,6 +6,7 @@
 
 ### Added
 
+- เพิ่มคำสั่ง read-only evidence/corpus foundation: `kept evidence run|rescore|correct append|self-test` และ `kept corpus validate|snapshot save|replay`; raw evidence และ hypothesis ไม่ถูก promote อัตโนมัติ.
 - เพิ่ม optional `searchPolicy` ใน public registry contract ให้เจ้าของ registry กำหนด `fuzzyMinSimilarity` (`0.0..=1.0`), candidate limit, n-gram size และ posting cap ได้ โดย registry ที่ไม่มี policy ใช้ default เดิม.
 - เพิ่ม task-first commands `kept scan`, `find`, `review`, `duplicates`, `search` และ `convert`; `scan` สร้างหรือ refresh persistent index, `review` อ่าน index เดียวกัน และ `find`/`duplicates` ไม่ scan ซ้ำ.
 - เพิ่ม persisted `ScanIssue` เพื่อให้ index บันทึก read/metadata diagnostics และ scan ข้ามจุดที่อ่านไม่ได้แทนการยกเลิกทั้งรอบ.

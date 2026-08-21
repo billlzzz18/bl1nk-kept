@@ -12,11 +12,11 @@ use async_trait::async_trait;
 use serde::Deserialize;
 use serde_json::{json, Value};
 
-use crate::api::trash::Resource;
-use crate::client::NotionClient;
 use crate::mcp::core::{
     invalid_args, McpError, McpResult, RequestHandlerExtra, SchemaBuilder, ToolHandler, ToolInfo,
 };
+use kept_doc::api::trash::Resource;
+use kept_doc::client::NotionClient;
 
 fn internal(e: impl std::fmt::Display) -> McpError {
     McpError::internal(e.to_string())

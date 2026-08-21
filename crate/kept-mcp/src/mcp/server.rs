@@ -1,25 +1,31 @@
-//! The unified blink-md MCP server.
+//! The unified bl1nk-kept MCP server.
 //!
-//! A single server exposes every tool that used to be split across the
-//! `notion`, `md`, `mmd` and `lark` MCP server binaries. The CLI entry point
-//! lives in `src/bin/blink-md-mcp.rs`.
+//! A single server exposes every tool across Search, Convert, Diff, Notion,
+//! Markdown, Lark, Obsidian Base, and Mermaid. The binary entry point
+//! lives in `src/bin/bl1nk-kept-mcp.rs`.
 
 use std::sync::Arc;
 
-use crate::client::NotionClient;
 use crate::mcp::core::{init_logging, Server, ServerCapabilities};
 use crate::mcp::tools;
+use kept_doc::client::NotionClient;
 
-/// Build the unified MCP server with all blink-md tools registered.
+/// Build the unified MCP server with all bl1nk-kept tools registered.
 ///
 /// Stateless conversion/rendering tools are always available. The live Notion
 /// API tools (search, get/create page, list children, trash) are registered
 /// only when `NOTION_TOKEN` is set, since they need an authenticated client.
 pub fn build() -> Result<Server, Box<dyn std::error::Error>> {
     let mut builder = Server::builder()
-        .name("blink-md-mcp")
+        .name("bl1nk-kept-mcp")
         .version(env!("CARGO_PKG_VERSION"))
         .capabilities(ServerCapabilities::tools_only())
+        // Unified Document & Table Pipelines
+        .tool("search_documents", tools::unified::SearchDocumentsTool)
+        .tool("convert_document", tools::unified::ConvertDocumentTool)
+        .tool("convert_table", tools::unified::ConvertTableTool)
+        .tool("diff_document", tools::unified::DiffDocumentTool)
+        .tool("diff_table", tools::unified::DiffTableTool)
         // Markdown
         .tool("parse_markdown", tools::markdown::ParseMarkdownTool)
         .tool("to_markdown", tools::markdown::ToMarkdownTool)
@@ -31,7 +37,11 @@ pub fn build() -> Result<Server, Box<dyn std::error::Error>> {
         .tool("csv_to_ir", tools::lark::CsvToIrTool)
         .tool("ir_to_csv", tools::lark::IrToCsvTool)
         .tool("list_lark_platforms", tools::lark::ListLarkPlatformsTool)
-        // Mermaid
+        // Mermaid & Semantic Diagram / Agent Graph
+        .tool(
+            "document_to_diagram",
+            tools::doc_to_diagram::DocumentToDiagramTool,
+        )
         .tool("render_mermaid_svg", tools::mermaid::RenderMermaidSvgTool)
         .tool("list_diagram_types", tools::mermaid::ListDiagramTypesTool);
 

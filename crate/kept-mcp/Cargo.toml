@@ -1,0 +1,24 @@
+[package]
+name = "kept-mcp"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Unified bl1nk-kept MCP server exposing document and table tools over stdio"
+
+[[bin]]
+name = "bl1nk-kept-mcp"
+path = "src/main.rs"
+
+[dependencies]
+kept-doc = { path = "../kept-doc" }
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
+async-trait = "0.1"
+pmcp.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+# NOTE-001: ใช้เฉพาะ library renderer; ปิด CLI/PNG defaults เพื่อไม่ชนกับ clap ที่ CLI หลัก pin ไว้
+mermaid-rs-renderer = { version = "0.2.0", default-features = false }

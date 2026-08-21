@@ -11,7 +11,8 @@
 | Crate | Product responsibility |
 |---|---|
 | `kept-core` | Registry model/migration/validation/search, filesystem scan/index/filter/treemap, duplicate detection, and Foundation data model |
-| `kept-doc` | Universal IR and offline document conversion primitives |
+| `kept-doc` | Universal IR and offline document conversion primitives (library only, no binaries) |
+| `kept-mcp` | `bl1nk-kept-mcp` stdio MCP server exposing document and table tools |
 | `kept-cli` | Supported `kept` command surface |
 
 The product inspects evidence, confidence, comparability, and gaps. It does not veto unrelated features and does not auto-promote fuzzy, synonym, transliteration, or hypothesis candidates into a dictionary.
@@ -59,6 +60,8 @@ Results distinguish `same_name`, `near_name`, `same_content`, and `hard_link`. T
 | `kept group field list/add/remove` | Manages group field schemas using validator-supported types; it preserves base search fields `id` and `aliases` |
 | `kept search <registry> <query>` | Searches a validated registry through the task-first command surface |
 | `kept convert <input> <output>` | Writes an explicit converted JSON or Markdown artifact |
+| `kept evidence run/rescore/correct/self-test` | Maintains offline evidence runs, preserved raw JSONL, append-only corrections, and no-mutation self-tests |
+| `kept corpus validate/snapshot/replay` | Validates provenance-linked assertions, saves deterministic snapshots, and materializes only accepted assertions into a dictionary |
 
 `config.yaml` is user-owned and follows the OS-appropriate configuration directory. Starter profiles are broad and scopes start empty. The owner can manage defaults, profiles, scopes, exceptions, per-scope overrides, aliases, filename-token shortcuts, variables, prefixes, similarity, transform rules, and constraints through the `config` command family. A naming scope must contain an absolute path selected by the user; `kept` does not infer a scope from a scan root. When a matching scope exists, `review` analyses the persisted index and reports violations, deterministic proposed targets, and target collisions. It does not rename files, rewrite scanned files, or create a rollback plan.
 

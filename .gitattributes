@@ -1,0 +1,4 @@
+# Corpus files are checksum-verified upstream artifacts; git must never touch their bytes.
+data/** -text
+
+.github/workflows/*.lock.yml linguist-generated=true

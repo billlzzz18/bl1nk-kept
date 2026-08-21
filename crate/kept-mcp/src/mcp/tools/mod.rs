@@ -4,11 +4,13 @@
 //! previously separate per-platform MCP server binaries; they now register
 //! into a single server (see [`crate::mcp::server`]).
 
+pub mod doc_to_diagram;
 pub mod lark;
 pub mod markdown;
 pub mod mermaid;
 pub mod notion;
 pub mod notion_live;
+pub mod unified;
 
 use serde_json::{json, Value};
 
@@ -16,7 +18,9 @@ use crate::mcp::core::{McpError, McpResult};
 
 /// NOTE-001: รักษา response contract `document` และ `block_count` ให้ conversion tools ทุก platform
 /// ใช้ serialization เดียวกัน เพื่อลดความเสี่ยงที่ schema ของ MCP แต่ละ adapter จะค่อย ๆ ต่างกัน
-pub(crate) fn serialize_document_response(document: &crate::UniversalDocument) -> McpResult<Value> {
+pub(crate) fn serialize_document_response(
+    document: &kept_doc::UniversalDocument,
+) -> McpResult<Value> {
     let document_value = serde_json::to_value(document)
         .map_err(|error| McpError::internal(format!("Serialization failed: {error}")))?;
     Ok(json!({
@@ -28,8 +32,8 @@ pub(crate) fn serialize_document_response(document: &crate::UniversalDocument) -
 #[cfg(test)]
 mod tests {
     use super::serialize_document_response;
-    use crate::converter::markdown::MarkdownConverter;
-    use crate::FromPlatform;
+    use kept_doc::converter::markdown::MarkdownConverter;
+    use kept_doc::FromPlatform;
 
     #[test]
     fn shared_document_response_serializes_document_and_block_count() {

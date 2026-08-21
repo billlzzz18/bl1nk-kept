@@ -98,6 +98,16 @@ enum Commands {
         #[arg(short = 'y', long, requires = "action")]
         yes: bool,
     },
+    /// Run the offline evidence and correction loop.
+    Evidence {
+        #[command(subcommand)]
+        cmd: EvidenceCommands,
+    },
+    /// Import, validate, snapshot, and replay reviewed gold assertions.
+    Corpus {
+        #[command(subcommand)]
+        cmd: CorpusCommands,
+    },
     #[command(hide = true)]
     /// Legacy compatibility: manage keyword registries and search.
     Registry {
@@ -435,6 +445,11 @@ enum DocCommands {
     },
 }
 
+mod corpus;
+mod evidence;
+use corpus::{handle_corpus, CorpusCommands};
+use evidence::{handle_evidence, EvidenceCommands};
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
@@ -495,6 +510,8 @@ async fn main() -> anyhow::Result<()> {
             action,
             yes,
         } => handle_task_duplicates(root, index, json, action, yes)?,
+        Commands::Evidence { cmd } => handle_evidence(cmd)?,
+        Commands::Corpus { cmd } => handle_corpus(cmd)?,
         Commands::Registry { cmd } => handle_registry(cmd)?,
         Commands::Fs { cmd } => handle_fs(cmd)?,
         Commands::Doc { cmd } => handle_doc(cmd).await?,

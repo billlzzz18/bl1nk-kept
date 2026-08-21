@@ -47,7 +47,7 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertFalse((ROOT / "scripts" / "create_evidence_gif.py").exists())
 
     def test_agent_requirement_ledger_is_retained_and_read_before_work(self) -> None:
-        ledger_path = ROOT / ".agents" / "REQUIREMENTS.md"
+        ledger_path = ROOT / ".agents" / "MEMORY.md"
         agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
 
         self.assertTrue(
@@ -55,7 +55,7 @@ class RepositoryContractTests(unittest.TestCase):
             "agent-only requirement ledger must survive between sessions",
         )
         self.assertIn("Requirement ID", ledger_path.read_text(encoding="utf-8"))
-        self.assertIn(".agents/REQUIREMENTS.md", agents)
+        self.assertIn(".agents/MEMORY.md", agents)
         self.assertIn("evidence", agents.lower())
 
     def test_agent_learning_remains_a_project_asset(self) -> None:
@@ -98,6 +98,24 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("## Why bl1nk-kept", readme)
         self.assertIn("## P0 — Repository operating baseline", todo)
         self.assertNotIn("completion report", todo.lower())
+
+    def test_kept_doc_is_a_pure_library_and_the_mcp_server_has_its_own_crate(self) -> None:
+        doc_manifest = (ROOT / "crate" / "kept-doc" / "Cargo.toml").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn(
+            "[[bin]]",
+            doc_manifest,
+            "kept-doc must not ship binaries; the user CLI lives in kept-cli and the MCP server in kept-mcp",
+        )
+        mcp_manifest_path = ROOT / "crate" / "kept-mcp" / "Cargo.toml"
+        self.assertTrue(mcp_manifest_path.is_file(), "kept-mcp crate must exist")
+        mcp_manifest = mcp_manifest_path.read_text(encoding="utf-8")
+        self.assertEqual(mcp_manifest.count("[[bin]]"), 1)
+        self.assertIn('name = "bl1nk-kept-mcp"', mcp_manifest)
+
+        workspace = (ROOT / "Cargo.toml").read_text(encoding="utf-8")
+        self.assertIn('"crate/kept-mcp"', workspace)
 
 
 if __name__ == "__main__":

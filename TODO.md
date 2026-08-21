@@ -1,10 +1,7 @@
-# bl1nk-kept TODO
-
-> **กติกา:** งานใหม่เพิ่มที่นี่พร้อม acceptance criteria. ทุก implementation ใช้ TDD: red test → minimal change → focused test → demonstration ของพฤติกรรมจริง → `just check`. เมื่อปิดงานให้ติ๊ก checkbox และบันทึกเฉพาะการเปลี่ยน public contract ใน `CHANGELOG.md`.
+# TODO
 
 ## P0 — Repository operating baseline
 
-- [x] Root source-of-truth: `SPEC.md`, `TODO.md`, `research/`, `schema/`, `benchmarks/`, `.agents/skills/` และ `.learnings/` มีหน้าที่แยกกัน
 - [x] Public registry schema generate จาก Rust model ที่ `schema/keyword-registry.schema.json`
 - [x] Schema drift check, Draft-07 consumer validation, runtime shared-fixture validation และ policy-boundary regression tests
 - [x] Project-local repository operating skill ที่ `.agents/skills/repository-operating-recovery/`
@@ -36,7 +33,7 @@
   - 10,000 provenance-linked reviewed assertions ครอบคลุม canonical/variant/synonym/homograph/homophone/semantic relation/transliteration/command/prohibition/named entity/numeral/ambiguity/negative/boundary
   - เก็บ raw scan/Markdown/HTML/PDF เป็น source evidence และใช้ sidecar annotation เมื่อแก้ source ไม่ได้
   - accepted review materialize เป็น dictionary; hypothesis/fuzzy candidate ห้าม promote อัตโนมัติ
-  - เพิ่ม CLI สำหรับ corpus import, validation report, snapshot save/load และ experiment replay โดยไม่เปิด automatic keyword mutation
+  - [x] เพิ่ม CLI สำหรับ corpus import, validation report, snapshot save/load และ experiment replay โดยไม่เปิด automatic keyword mutation
 - [ ] เพิ่ม anonymized real-world corpus เมื่อมี export ที่ตัดข้อมูลอ่อนไหวแล้ว
 
 ## P1 — Filesystem query and incremental index
@@ -47,10 +44,11 @@
 
 ## P2 — kept-doc fidelity and intake
 
-- [ ] MarkdownAlertFilter: GitHub Alerts → typed Universal IR `Callout` พร้อม fixtures
+- [x] MarkdownAlertFilter: GitHub Alerts → typed Universal IR `Callout` พร้อม fixtures
 - [ ] GitHub Flavored Markdown writer: quote/list/table/code/divider/image/link/nesting พร้อม golden round-trip และ explicit unsupported diagnostics
 - [ ] Notion converter fidelity: typed mapping/diagnostics, property mapping และ page/database mention resolution แบบไม่บังคับ network
 - [ ] Optional PDF inspector adapter: `kept doc inspect-pdf`, native-text Markdown, per-page provenance และ OCR opt-in; ใช้ `research/PDF_INSPECTOR_RESEARCH.md`
+  - library adapter (`kept-doc` `PdfAdapter`) เสร็จแล้ว; ยังขาด CLI command `kept doc inspect-pdf`, per-page provenance และ OCR opt-in
 - [ ] Review queue: duplicate groups, large files, scanned PDF pages, validation errors และ unsupported conversion
 
 ## P3 — Remote integration
@@ -63,4 +61,4 @@
 - [ ] Interactive TUI สำหรับ scan, review queue และ action plan บน model เดียวกับ CLI
 - [ ] MCP transport แยกจาก CLI core พร้อม schema/versioning, dry-run tools และ permission boundary
 - [ ] Thai synonym governance และ explain-search
-- [ ] Real-world benchmark corpus สำหรับ duplicate/search recall และ latency จาก distribution จริง
+- [ ] Real-world benchmark corpus สำหรับ duplicate/search recall และ latency จาก distribution

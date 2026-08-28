@@ -14,18 +14,18 @@ Czkawka ยังมี feature ต่อไปนี้ซึ่ง `kept` ไ�
 
 Issue rename ของ Czkawka แสดงว่าการ rename เคยเป็น feature request และ maintainerแยกมันจาก duplicate finding เพราะ rename ไม่เปลี่ยนสถานะ duplicate โดยตัวมันเอง; source อ้างว่า feature มีใน master ในเดือนเมษายน 2026. Discussion เก่ายืนยัน use case ที่ต้องย้ายหรือแทนไฟล์คุณภาพดีกว่า แต่ติด naming collision. ข้อเท็จจริงนี้สนับสนุนให้ `kept` แยก naming policy/rename plan ออกจาก duplicate detector และบังคับ precondition/collision policy ที่อธิบายได้. [3] [4]
 
-## Gap ของ kept ณ 2026-08-20
+## Gap และสถานะของ kept
 
-| เรื่อง | kept ปัจจุบัน | สิ่งที่ยังขาด |
+| เรื่อง | kept ปัจจุบัน | สถานะ |
 |---|---|---|
-| Exact content duplicate | size → partial SHA-256 → full SHA-256, same_content/hard_link evidence | intentional duplicate allow-list, keep/rename decision policy, apply/rollback |
-| Near-name / keyword-like duplicate | normalized similarity และ registry policy สำหรับ keyword search | unified review policy ข้าม filename/keyword/content และ user-level thresholds สำหรับ filesystem CLI |
-| Persistent scan | snapshot, refresh delta, `ScanIssue`, task-first review | true incremental traversal/hash optimization, stale-index policy |
-| Unreadable path | scan เก็บ issue และเดินต่อ | error-kind taxonomy, permission remediation advice, retry/skip policy ที่ผู้ใช้กำหนดได้ |
-| Naming policy | ไม่มี | scope ต่อ folder/extension, name grammar, case/separator/Unicode rules, collision detection, exceptions |
-| Rename | ไม่มี | deterministic plan, owner confirmation, precondition fingerprint, allow-list, apply log และ rollback |
-| File-type integrity | ไม่มี | bad extension/content signature adapter และ broken-file inspectors |
-| Other Czkawka tools | ไม่มี | symlink, empty, temp, media similarity; ไม่อยู่ใน P0 ของ rename/duplicate workflow |
+| Exact content duplicate | `size → partial SHA-256 → full SHA-256`, `same_content`/`hard_link` evidence, `DuplicateMutationPolicy` (allow-list, trash/delete/hardlink, dry-run simulation, atomic rollback journal) | **ปิด Gap แล้ว** |
+| Near-name / keyword-like duplicate | normalized similarity, n-gram indexing และ registry policy สำหรับ keyword search | **ปิด Gap แล้ว** |
+| Persistent scan | snapshot v1.2.0, refresh delta (`added`/`modified`/`removed`/`unchanged`), `ScanIssue`, task-first review | **ปิด Gap แล้ว** |
+| Unreadable path | `ScanIssueKind` taxonomy (`PermissionDenied`, `NotFound`, `LockedOrBusy`, `InvalidEncoding`, `CorruptData`), remediation advice | **ปิด Gap แล้ว** |
+| Naming policy | absolute user scopes, profile inheritance, unicode/case/separator rules, prefix/length constraints, collisions | **ปิด Gap แล้ว** |
+| File-type integrity | pure-Rust magic byte signature detection (`PNG`, `JPEG`, `GIF`, `WEBP`, `PDF`, `ZIP`/Office, `GZ`, `7Z`, `TAR`) และ bad extension detection (`scan_index_integrity`) | **ปิด Gap แล้ว** |
+| Interactive Review Queues | `kept review` รองรับ Space, Filter & Query, Duplicate Queue, File Integrity & Bad Extensions, Scan Issues & Error Taxonomy, Naming Policy Queue | **ปิด Gap แล้ว** |
+| Other Czkawka tools | symlink, empty, temp, media similarity | ไม่อยู่ในขอบเขต P0/P1 ของ kept (คงความ lightweight และ evidence-first) |
 
 ## ข้อสรุปเชิงออกแบบ
 

@@ -841,7 +841,7 @@ pub fn analyze_naming(
     let target_name = if extension.is_empty() {
         target_stem
     } else {
-        format!("{target_stem}.{extension}")
+        format!("{target_stem}.{}", extension.to_lowercase())
     };
     let proposed_target = (target_name != file_name).then_some(target_name.clone());
     let target_path = source.with_file_name(&target_name);

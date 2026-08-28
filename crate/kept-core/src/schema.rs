@@ -102,21 +102,39 @@ pub struct SearchPolicy {
     #[serde(rename = "fuzzyMinSimilarity")]
     #[schemars(range(min = 0.0, max = 1.0))]
     pub fuzzy_min_similarity: f64,
-    #[serde(rename = "fuzzyCandidateLimit")]
+    #[serde(
+        default = "default_fuzzy_candidate_limit",
+        rename = "fuzzyCandidateLimit"
+    )]
     pub fuzzy_candidate_limit: usize,
-    #[serde(rename = "fuzzyNgramSize")]
+    #[serde(default = "default_fuzzy_ngram_size", rename = "fuzzyNgramSize")]
     pub fuzzy_ngram_size: usize,
-    #[serde(rename = "maxFuzzyNgramPostings")]
+    #[serde(
+        default = "default_max_fuzzy_ngram_postings",
+        rename = "maxFuzzyNgramPostings"
+    )]
     pub max_fuzzy_ngram_postings: usize,
+}
+
+fn default_fuzzy_candidate_limit() -> usize {
+    1_024
+}
+
+fn default_fuzzy_ngram_size() -> usize {
+    2
+}
+
+fn default_max_fuzzy_ngram_postings() -> usize {
+    4_096
 }
 
 impl Default for SearchPolicy {
     fn default() -> Self {
         Self {
             fuzzy_min_similarity: 0.30,
-            fuzzy_candidate_limit: 1_024,
-            fuzzy_ngram_size: 2,
-            max_fuzzy_ngram_postings: 4_096,
+            fuzzy_candidate_limit: default_fuzzy_candidate_limit(),
+            fuzzy_ngram_size: default_fuzzy_ngram_size(),
+            max_fuzzy_ngram_postings: default_max_fuzzy_ngram_postings(),
         }
     }
 }

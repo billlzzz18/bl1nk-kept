@@ -33,11 +33,85 @@ pub struct ScanIndex {
     pub issues: Vec<ScanIssue>,
 }
 
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ScanIssueKind {
+    PermissionDenied,
+    NotFound,
+    LockedOrBusy,
+    InvalidEncoding,
+    CorruptData,
+    BadExtension,
+    #[default]
+    GenericIo,
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
 pub struct ScanIssue {
     pub path: String,
     pub operation: String,
+    #[serde(default)]
+    pub kind: ScanIssueKind,
     pub message: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub remediation: Option<String>,
+}
+
+impl ScanIssue {
+    pub fn new(
+        path: impl Into<String>,
+        operation: impl Into<String>,
+        message: impl Into<String>,
+    ) -> Self {
+        let msg_str = message.into();
+        let (kind, remediation) = classify_io_message(&msg_str);
+        Self {
+            path: path.into(),
+            operation: operation.into(),
+            kind,
+            message: msg_str,
+            remediation,
+        }
+    }
+}
+
+fn classify_io_message(msg: &str) -> (ScanIssueKind, Option<String>) {
+    let lower = msg.to_lowercase();
+    if lower.contains("permission")
+        || lower.contains("access is denied")
+        || lower.contains("operation not permitted")
+    {
+        (
+            ScanIssueKind::PermissionDenied,
+            Some("Check file permissions or run with appropriate access privileges.".to_string()),
+        )
+    } else if lower.contains("not found")
+        || lower.contains("cannot find")
+        || lower.contains("no such file")
+    {
+        (
+            ScanIssueKind::NotFound,
+            Some("Verify path exists and has not been moved or deleted.".to_string()),
+        )
+    } else if lower.contains("used by another process")
+        || lower.contains("locked")
+        || lower.contains("busy")
+    {
+        (
+            ScanIssueKind::LockedOrBusy,
+            Some("Close the application currently locking this file and retry.".to_string()),
+        )
+    } else if lower.contains("encoding") || lower.contains("invalid utf-8") {
+        (
+            ScanIssueKind::InvalidEncoding,
+            Some("File contains invalid character encoding.".to_string()),
+        )
+    } else {
+        (
+            ScanIssueKind::GenericIo,
+            Some("Check storage device integrity and file accessibility.".to_string()),
+        )
+    }
 }
 
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, PartialEq, Eq)]

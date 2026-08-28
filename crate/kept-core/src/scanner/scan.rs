@@ -95,9 +95,9 @@ fn record_scan_issue(
     operation: &str,
     error: std::io::Error,
 ) {
-    issues.push(ScanIssue {
-        path: path.display().to_string(),
-        operation: operation.to_string(),
-        message: error.to_string(),
-    });
+    issues.push(ScanIssue::new(
+        path.display().to_string(),
+        operation.to_string(),
+        error.to_string(),
+    ));
 }

@@ -610,13 +610,11 @@
       "description": "NOTE-001: ค่าค้นหาเป็น policy ของเจ้าของ registry; default คงผลเดิมที่ผ่าน benchmark แล้วแต่ไม่บังคับทุก dataset",
       "type": "object",
       "required": [
-        "fuzzyCandidateLimit",
-        "fuzzyMinSimilarity",
-        "fuzzyNgramSize",
-        "maxFuzzyNgramPostings"
+        "fuzzyMinSimilarity"
       ],
       "properties": {
         "fuzzyCandidateLimit": {
+          "default": 1024,
           "type": "integer",
           "format": "uint",
           "minimum": 0.0
@@ -628,11 +626,13 @@
           "minimum": 0.0
         },
         "fuzzyNgramSize": {
+          "default": 2,
           "type": "integer",
           "format": "uint",
           "minimum": 0.0
         },
         "maxFuzzyNgramPostings": {
+          "default": 4096,
           "type": "integer",
           "format": "uint",
           "minimum": 0.0

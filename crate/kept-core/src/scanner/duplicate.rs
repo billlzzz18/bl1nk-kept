@@ -45,6 +45,60 @@ fn default_max_ngram_postings() -> usize {
     256
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct DuplicateAllowRule {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub path_a: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub path_b: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub glob_pattern: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sha256: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
+}
+
+impl DuplicateAllowRule {
+    pub fn matches_group(&self, group: &DuplicateGroup) -> bool {
+        if let Some(rule_hash) = &self.sha256 {
+            if let Some(evidence) = &group.evidence {
+                if evidence.full_sha256.eq_ignore_ascii_case(rule_hash) {
+                    return true;
+                }
+            }
+        }
+        if let (Some(a), Some(b)) = (&self.path_a, &self.path_b) {
+            let has_a = group.items.iter().any(|item| item == a);
+            let has_b = group.items.iter().any(|item| item == b);
+            if has_a && has_b {
+                return true;
+            }
+        }
+        if let Some(pattern) = &self.glob_pattern {
+            let matches_all = group.items.iter().all(|item| item.contains(pattern));
+            if matches_all {
+                return true;
+            }
+        }
+        false
+    }
+}
+
+pub fn filter_allowed_duplicates(
+    groups: Vec<DuplicateGroup>,
+    allow_list: &[DuplicateAllowRule],
+) -> Vec<DuplicateGroup> {
+    if allow_list.is_empty() {
+        return groups;
+    }
+    groups
+        .into_iter()
+        .filter(|group| !allow_list.iter().any(|rule| rule.matches_group(group)))
+        .collect()
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DuplicateGroup {
     pub kind: String,

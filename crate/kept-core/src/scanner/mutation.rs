@@ -1,6 +1,6 @@
 //! Duplicate mutation policy, simulation, execution, and rollback.
 
-use super::duplicate::{full_hash, hash_hex, DuplicateGroup};
+use super::duplicate::{full_hash, hash_hex, DuplicateAllowRule, DuplicateGroup};
 use super::types::{unix_now, ScanIndex};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -19,6 +19,8 @@ pub struct DuplicateMutationPolicy {
     pub allowed_roots: Vec<String>,
     #[serde(rename = "protectedPatterns", default = "default_protected_patterns")]
     pub protected_patterns: Vec<String>,
+    #[serde(default)]
+    pub allow_list: Vec<DuplicateAllowRule>,
     #[serde(
         rename = "backupDirectory",
         default,
@@ -50,6 +52,7 @@ impl Default for DuplicateMutationPolicy {
         Self {
             allowed_roots: Vec::new(),
             protected_patterns: default_protected_patterns(),
+            allow_list: Vec::new(),
             backup_directory: None,
             preserve_canonical: true,
             verify_checksum_before_action: true,

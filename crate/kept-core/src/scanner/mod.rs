@@ -1,23 +1,29 @@
 //! Scanner module split into cohesive submodules:
-//! - `types`: Core structs (`ScanIndex`, `FileRecord`, `PersistentScanSnapshot`, etc.)
+//! - `types`: Core structs (`ScanIndex`, `FileRecord`, `PersistentScanSnapshot`, `ScanIssue`, etc.)
 //! - `scan`: Directory traversal and metadata extraction
 //! - `filter`: Filter criteria and treemap generation
-//! - `duplicate`: Exact/near name and content-verified duplicate detection
+//! - `duplicate`: Exact/near name, content duplicates, and allow-lists
 //! - `mutation`: Mutation policy, simulation, execution, and rollback
+//! - `integrity`: Magic byte detection and bad extension inspection
 
 pub mod duplicate;
 pub mod filter;
+pub mod integrity;
 pub mod mutation;
 pub mod scan;
 pub mod types;
 
 pub use duplicate::{
-    find_content_duplicates, find_duplicates, find_duplicates_with_stats, normalized_similarity,
-    ContentDuplicateOptions, ContentDuplicateStats, DuplicateEvidence, DuplicateGroup,
-    DuplicateOptions, DuplicateSearchStats,
+    filter_allowed_duplicates, find_content_duplicates, find_duplicates,
+    find_duplicates_with_stats, normalized_similarity, ContentDuplicateOptions,
+    ContentDuplicateStats, DuplicateAllowRule, DuplicateEvidence, DuplicateGroup, DuplicateOptions,
+    DuplicateSearchStats,
 };
 pub use filter::{
     build_treemap, filter_index, CustomFilter, CustomOperator, FileFilter, FilterSet, TreemapNode,
+};
+pub use integrity::{
+    check_file_extension_integrity, scan_index_integrity, BadExtensionIssue, IntegrityStatus,
 };
 pub use mutation::{
     create_duplicate_mutation_plan, execute_duplicate_mutation, rollback_duplicate_mutation,
@@ -28,7 +34,8 @@ pub use mutation::{
 pub use scan::scan_directory;
 pub use types::{
     create_persistent_snapshot, plan_incremental_refresh, FileRecord, PersistentScanSnapshot,
-    RefreshPlan, ScanIndex, ScanIssue, ScanOptions, CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION,
+    RefreshPlan, ScanIndex, ScanIssue, ScanIssueKind, ScanOptions,
+    CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION,
 };
 
 #[cfg(test)]
@@ -43,11 +50,7 @@ mod tests {
             scanned_at_unix: 0,
             total_size: 0,
             files: Vec::new(),
-            issues: vec![ScanIssue {
-                path: "locked".into(),
-                operation: "read_dir".into(),
-                message: "permission denied".into(),
-            }],
+            issues: vec![ScanIssue::new("locked", "read_dir", "permission denied")],
         };
 
         let value = serde_json::to_value(index).expect("index must serialize");
@@ -339,6 +342,7 @@ mod content_duplicate_tests {
         let policy = DuplicateMutationPolicy {
             allowed_roots: vec![directory.display().to_string()],
             protected_patterns: vec![".git".to_string()],
+            allow_list: Vec::new(),
             backup_directory: Some(directory.join("trash-bin").display().to_string()),
             preserve_canonical: true,
             verify_checksum_before_action: true,
@@ -376,6 +380,67 @@ mod content_duplicate_tests {
         assert_eq!(std::fs::read(&duplicate_path).unwrap(), b"identical data");
 
         std::fs::remove_dir_all(directory).expect("temporary directory must be removed");
+    }
+
+    #[test]
+    fn file_integrity_detects_bad_extension_mismatches() {
+        let directory = temporary_directory("file-integrity");
+        let png_magic = &[0x89, b'P', b'N', b'G', 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0];
+        let pdf_magic = b"%PDF-1.7 sample content";
+
+        // Write valid PNG with .png extension
+        std::fs::write(directory.join("valid.png"), png_magic).expect("valid png must be written");
+        // Write PDF with mismatched .txt extension
+        std::fs::write(directory.join("fake.txt"), pdf_magic).expect("fake txt must be written");
+
+        let index = scan_directory(&directory, &ScanOptions::default())
+            .expect("fixture directory must be indexed");
+        let (bad_extensions, _) = scan_index_integrity(&index);
+
+        assert_eq!(bad_extensions.len(), 1);
+        assert_eq!(bad_extensions[0].path, "fake.txt");
+        assert_eq!(bad_extensions[0].detected_extension, "pdf");
+        assert_eq!(bad_extensions[0].actual_extension, "txt");
+
+        std::fs::remove_dir_all(directory).expect("temporary directory must be removed");
+    }
+
+    #[test]
+    fn duplicate_allow_list_filters_known_benign_duplicates() {
+        let groups = vec![
+            DuplicateGroup {
+                kind: "same_content".to_string(),
+                similarity: 1.0,
+                items: vec!["a/photo.jpg".to_string(), "b/photo-copy.jpg".to_string()],
+                evidence: Some(DuplicateEvidence {
+                    size_bytes: 100,
+                    partial_sha256: "abc".to_string(),
+                    full_sha256: "deadbeef".to_string(),
+                }),
+            },
+            DuplicateGroup {
+                kind: "same_content".to_string(),
+                similarity: 1.0,
+                items: vec!["c/doc.pdf".to_string(), "d/doc-copy.pdf".to_string()],
+                evidence: Some(DuplicateEvidence {
+                    size_bytes: 200,
+                    partial_sha256: "def".to_string(),
+                    full_sha256: "cafebabe".to_string(),
+                }),
+            },
+        ];
+
+        let allow_list = vec![DuplicateAllowRule {
+            path_a: None,
+            path_b: None,
+            glob_pattern: None,
+            sha256: Some("deadbeef".to_string()),
+            reason: Some("approved mirror".to_string()),
+        }];
+
+        let filtered = filter_allowed_duplicates(groups, &allow_list);
+        assert_eq!(filtered.len(), 1);
+        assert_eq!(filtered[0].items[0], "c/doc.pdf");
     }
 }
 

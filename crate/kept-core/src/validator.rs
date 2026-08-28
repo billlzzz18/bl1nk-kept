@@ -58,6 +58,61 @@ impl Validator {
             .collect()
     }
 
+    pub fn validate_search_policy(&self) -> Result<(), Vec<ValidationError>> {
+        if let Some(policy) = &self.registry.search_policy {
+            if !valid_search_policy(policy) {
+                return Err(vec![ValidationError {
+                    code: "INVALID_SEARCH_POLICY".into(),
+                    message: format!(
+                        "Search policy requires fuzzyMinSimilarity from 0.0 to 1.0 (found {}) and fuzzyNgramSize above zero",
+                        policy.fuzzy_min_similarity
+                    ),
+                    field: Some("searchPolicy".into()),
+                }]);
+            }
+        }
+        Ok(())
+    }
+
+    pub fn validate_all(&self) -> Vec<ValidationError> {
+        self.validate_registry().err().unwrap_or_default()
+    }
+
+    pub fn validate_entry_by_id(&self, entry_id: &str) -> Vec<ValidationError> {
+        for group in &self.registry.groups {
+            for entry in &group.entries {
+                if entry.get("id").and_then(Value::as_str) == Some(entry_id) {
+                    return self
+                        .validate_entry(&group.group_id, entry)
+                        .err()
+                        .unwrap_or_default();
+                }
+            }
+        }
+        vec![ValidationError {
+            code: "ENTRY_NOT_FOUND".into(),
+            message: format!("Entry '{entry_id}' not found"),
+            field: Some("id".into()),
+        }]
+    }
+
+    pub fn validate_group(&self, group_id: &str) -> Vec<ValidationError> {
+        let Some(group) = self.registry.groups.iter().find(|g| g.group_id == group_id) else {
+            return vec![ValidationError {
+                code: "GROUP_NOT_FOUND".into(),
+                message: format!("Group '{group_id}' not found"),
+                field: None,
+            }];
+        };
+        let mut errors = Vec::new();
+        for entry in &group.entries {
+            if let Err(mut entry_errors) = self.validate_entry(&group.group_id, entry) {
+                errors.append(&mut entry_errors);
+            }
+        }
+        errors
+    }
+
     pub fn validate_entry(
         &self,
         group_id: &str,
@@ -184,7 +239,10 @@ impl Validator {
         {
             errors.push(ValidationError {
                 code: "INVALID_SEARCH_POLICY".into(),
-                message: "Search policy requires fuzzyMinSimilarity from 0.0 to 1.0 and fuzzyNgramSize above zero".into(),
+                message: format!(
+                    "Search policy requires fuzzyMinSimilarity from 0.0 to 1.0 (found {}) and fuzzyNgramSize above zero",
+                    self.registry.search_policy.as_ref().map(|p| p.fuzzy_min_similarity).unwrap_or(0.0)
+                ),
                 field: Some("searchPolicy".into()),
             });
             return Err(errors);

@@ -29,12 +29,15 @@ pub use policy::{
     ResolvedNamingRule, UserConfig, USER_CONFIG_FILE_NAME, USER_CONFIG_VERSION,
 };
 pub use scanner::{
-    build_treemap, create_persistent_snapshot, filter_index, find_content_duplicates,
-    find_duplicates, find_duplicates_with_stats, plan_incremental_refresh, scan_directory,
-    ContentDuplicateOptions, ContentDuplicateStats, CustomFilter, CustomOperator,
-    DuplicateEvidence, DuplicateOptions, DuplicateSearchStats, FileFilter, FileRecord, FilterSet,
-    PersistentScanSnapshot, RefreshPlan, ScanIndex, ScanIssue, ScanOptions, TreemapNode,
-    CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION,
+    build_treemap, create_duplicate_mutation_plan, create_persistent_snapshot,
+    execute_duplicate_mutation, filter_index, find_content_duplicates, find_duplicates,
+    find_duplicates_with_stats, plan_incremental_refresh, rollback_duplicate_mutation,
+    scan_directory, simulate_duplicate_mutation, ActionSimulation, ContentDuplicateOptions,
+    ContentDuplicateStats, CustomFilter, CustomOperator, DuplicateActionKind, DuplicateEvidence,
+    DuplicateGroup, DuplicateMutationPlan, DuplicateMutationPolicy, DuplicateOptions,
+    DuplicatePlanAction, DuplicateSearchStats, DuplicateSimulationResult, FileFilter, FileRecord,
+    FilterSet, PersistentScanSnapshot, RefreshPlan, RollbackEntry, RollbackJournal, ScanIndex,
+    ScanIssue, ScanOptions, TreemapNode, CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION,
 };
 pub use search::KeywordSearch;
 pub use validator::Validator;

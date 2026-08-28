@@ -16,7 +16,7 @@
 - [x] `kept review`, `kept find` และ `kept duplicates` ใช้ index เดียวกัน; มี TTY review menu และ non-interactive `--json`/`--action export-plan --yes`
 - [x] **User config lifecycle and read-only naming review**: `kept setup` สร้าง OS-appropriate `config.yaml` เพียงครั้งเดียว; `kept config` สรุป config และ `config defaults/profile/scope` จัดการ YAML ของผู้ใช้ผ่าน task-level commands; `config edit` เป็น advanced path; `doctor`/`doctor --fix` รายงานและกู้ missing/invalid config พร้อม backup; `review` วิเคราะห์ naming จาก scope absolute ที่ผู้ใช้กำหนดโดยไม่ rename/apply
 - [x] **Registry group management**: `kept group` แสดง supported field types, list/show/add/set/remove/move groups และ list/add/remove group schema fields โดยตรวจ registry ก่อน save
-- [ ] **Duplicate mutation policy and residual regressions**
+- [x] **Duplicate mutation policy and residual regressions**
   - เริ่มจาก review/export เท่านั้น; ออกแบบ mutation policy, allow-list, rollback และ simulation ก่อนเปิด delete/rename/hard-link replacement
   - เพิ่ม unreadable-file, partial-hash collision และ action-scope regression cases
 

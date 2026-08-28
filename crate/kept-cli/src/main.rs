@@ -427,6 +427,11 @@ enum SetupAction {
 enum DuplicateAction {
     Show,
     ExportPlan,
+    Simulate,
+    Trash,
+    Delete,
+    HardLink,
+    Rollback,
 }
 
 #[derive(Subcommand)]
@@ -2540,6 +2545,9 @@ fn choose_duplicate_action() -> anyhow::Result<Option<DuplicateAction>> {
     let choices = [
         "1. ดูรายงาน JSON อีกครั้ง",
         "2. export duplicate plan",
+        "3. simulate duplicate mutation (dry-run)",
+        "4. trash duplicates to backup directory",
+        "5. rollback recent duplicate mutation",
         "0. จบโดยไม่เปลี่ยนไฟล์",
     ];
     let selected = Select::new()
@@ -2551,6 +2559,9 @@ fn choose_duplicate_action() -> anyhow::Result<Option<DuplicateAction>> {
         duplicate_action_from_selection(match position {
             0 => "1",
             1 => "2",
+            2 => "3",
+            3 => "4",
+            4 => "5",
             _ => "0",
         })
     }))
@@ -2558,8 +2569,11 @@ fn choose_duplicate_action() -> anyhow::Result<Option<DuplicateAction>> {
 
 fn duplicate_action_from_selection(selection: &str) -> Option<DuplicateAction> {
     match selection.trim().to_ascii_lowercase().as_str() {
-        "1" => Some(DuplicateAction::Show),
-        "2" => Some(DuplicateAction::ExportPlan),
+        "1" | "show" => Some(DuplicateAction::Show),
+        "2" | "export" | "export-plan" => Some(DuplicateAction::ExportPlan),
+        "3" | "simulate" => Some(DuplicateAction::Simulate),
+        "4" | "trash" => Some(DuplicateAction::Trash),
+        "5" | "rollback" => Some(DuplicateAction::Rollback),
         "0" | "q" | "" => None,
         _ => None,
     }
@@ -2571,6 +2585,14 @@ fn run_duplicate_action(
     report: &serde_json::Value,
     yes: bool,
 ) -> anyhow::Result<()> {
+    use kept_core::{
+        create_duplicate_mutation_plan, execute_duplicate_mutation, rollback_duplicate_mutation,
+        simulate_duplicate_mutation, DuplicateActionKind, DuplicateGroup, DuplicateMutationPlan,
+        DuplicateMutationPolicy, RollbackJournal, ScanIndex,
+    };
+
+    let journal_file = root.join("kept-duplicate-rollback.json");
+
     match action {
         DuplicateAction::Show => {
             println!("{}", serde_json::to_string_pretty(report)?);
@@ -2585,6 +2607,104 @@ fn run_duplicate_action(
             }
             std::fs::write(&output, serde_json::to_string_pretty(report)?)?;
             println!("Exported duplicate plan: {}", output.display());
+            Ok(())
+        }
+        DuplicateAction::Simulate
+        | DuplicateAction::Trash
+        | DuplicateAction::Delete
+        | DuplicateAction::HardLink => {
+            let groups: Vec<DuplicateGroup> =
+                serde_json::from_value(report["groups"].clone()).unwrap_or_default();
+            let index: ScanIndex = ScanIndex {
+                root: root.display().to_string(),
+                scanned_at_unix: 0,
+                total_size: 0,
+                files: Vec::new(),
+                issues: Vec::new(),
+            };
+
+            let kind = match action {
+                DuplicateAction::Delete => DuplicateActionKind::Delete,
+                DuplicateAction::HardLink => DuplicateActionKind::HardLink,
+                _ => DuplicateActionKind::Trash,
+            };
+
+            let plan = create_duplicate_mutation_plan(&index, &groups, kind);
+            let policy = DuplicateMutationPolicy {
+                allowed_roots: vec![root.display().to_string()],
+                protected_patterns: vec![".git".to_string(), "node_modules".to_string()],
+                backup_directory: Some(root.join(".kept-trash").display().to_string()),
+                preserve_canonical: true,
+                verify_checksum_before_action: true,
+            };
+
+            let simulation = simulate_duplicate_mutation(&plan, &index, &policy);
+            println!(
+                "Simulation: {} action(s) valid, {} blocked. Total reclaimable: {} bytes.",
+                simulation.valid_actions.len(),
+                simulation.blocked_actions.len(),
+                simulation.total_reclaimable_bytes
+            );
+            for blocked in &simulation.blocked_actions {
+                println!(
+                    "  [BLOCKED] {} ({})",
+                    blocked.action.target_path,
+                    blocked.rejection_reason.as_deref().unwrap_or("policy rule")
+                );
+            }
+
+            if matches!(action, DuplicateAction::Simulate) {
+                return Ok(());
+            }
+
+            if !simulation.simulation_passed {
+                anyhow::bail!("Cannot apply mutation plan: safety simulation blocked some actions");
+            }
+
+            if !yes
+                && !confirm_action(&format!(
+                    "Apply duplicate {:?} mutation to {} file(s)",
+                    kind,
+                    simulation.valid_actions.len()
+                ))?
+            {
+                println!("ยกเลิกแล้ว");
+                return Ok(());
+            }
+
+            let safe_plan = DuplicateMutationPlan {
+                root: plan.root.clone(),
+                created_at_unix: plan.created_at_unix,
+                actions: simulation.valid_actions,
+                total_reclaimable_bytes: simulation.total_reclaimable_bytes,
+            };
+
+            let journal = execute_duplicate_mutation(&safe_plan, &index, &policy)?;
+            std::fs::write(&journal_file, serde_json::to_string_pretty(&journal)?)?;
+            println!(
+                "Applied duplicate mutation. Rollback journal saved to: {}",
+                journal_file.display()
+            );
+            Ok(())
+        }
+        DuplicateAction::Rollback => {
+            if !journal_file.is_file() {
+                anyhow::bail!("No rollback journal found at: {}", journal_file.display());
+            }
+            let mut journal: RollbackJournal =
+                serde_json::from_str(&std::fs::read_to_string(&journal_file)?)?;
+            if !yes
+                && !confirm_action(&format!(
+                    "Rollback {} duplicate mutation entries",
+                    journal.entries.len()
+                ))?
+            {
+                println!("ยกเลิกแล้ว");
+                return Ok(());
+            }
+            let restored = rollback_duplicate_mutation(&mut journal)?;
+            std::fs::write(&journal_file, serde_json::to_string_pretty(&journal)?)?;
+            println!("Rollback complete: {restored} file(s) restored.");
             Ok(())
         }
     }

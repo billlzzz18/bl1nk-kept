@@ -286,9 +286,9 @@ mod foundation_migration_tests {
         let directory =
             std::env::temp_dir().join(format!("kept-csv-import-{}", std::process::id()));
         let csv_path = directory.join("keywords.csv");
-        std::fs::remove_dir_all(&directory).ok();
-        std::fs::create_dir_all(&directory).expect("temporary import fixture must be created");
-        std::fs::write(&csv_path, "id,aliases\nreport,report|รายงาน\n")
+        fs::remove_dir_all(&directory).ok();
+        fs::create_dir_all(&directory).expect("temporary import fixture must be created");
+        fs::write(&csv_path, "id,aliases\nreport,report|รายงาน\n")
             .expect("CSV fixture must be written");
 
         let registry =
@@ -297,7 +297,7 @@ mod foundation_migration_tests {
 
         assert_eq!(entry["id"], "report");
         assert_eq!(entry["aliases"], serde_json::json!(["report", "รายงาน"]));
-        std::fs::remove_dir_all(directory).expect("temporary import fixture must be removed");
+        fs::remove_dir_all(directory).expect("temporary import fixture must be removed");
     }
 
     #[test]
@@ -310,15 +310,15 @@ mod foundation_migration_tests {
                 .expect("system clock must be after Unix epoch")
                 .as_nanos()
         ));
-        std::fs::create_dir_all(&directory).expect("temporary directory must be created");
+        fs::create_dir_all(&directory).expect("temporary directory must be created");
         let csv_path = directory.join("legacy.csv");
         let registry_path = directory.join("legacy-registry.json");
-        std::fs::write(&csv_path, "id,aliases\nlegacy-keyword,legacy alias\n")
+        fs::write(&csv_path, "id,aliases\nlegacy-keyword,legacy alias\n")
             .expect("legacy CSV fixture must be written");
         let legacy = import_csv(&csv_path, "legacy", "Legacy")
             .expect("legacy registry fixture must be imported");
         assert_eq!(legacy.version, "1.1.0");
-        std::fs::write(
+        fs::write(
             &registry_path,
             serde_json::to_string_pretty(&legacy).expect("legacy fixture must serialize"),
         )
@@ -339,7 +339,7 @@ mod foundation_migration_tests {
         assert!(foundation.regex_rules.is_empty());
         assert!(foundation.classification_policy.is_none());
         assert!(foundation.corpus_manifest.is_none());
-        std::fs::remove_dir_all(directory).expect("temporary directory must be removed");
+        fs::remove_dir_all(directory).expect("temporary directory must be removed");
     }
 }
 
@@ -357,10 +357,10 @@ mod foundation_save_boundary_tests {
                 .expect("system clock must be after Unix epoch")
                 .as_nanos()
         ));
-        std::fs::create_dir_all(&directory).expect("temporary directory must be created");
+        fs::create_dir_all(&directory).expect("temporary directory must be created");
         let csv_path = directory.join("legacy.csv");
         let output_path = directory.join("registry.json");
-        std::fs::write(&csv_path, "id,aliases\nlegacy-keyword,legacy alias\n")
+        fs::write(&csv_path, "id,aliases\nlegacy-keyword,legacy alias\n")
             .expect("legacy CSV fixture must be written");
         let legacy = import_csv(&csv_path, "legacy", "Legacy")
             .expect("legacy registry fixture must be imported");
@@ -370,7 +370,7 @@ mod foundation_save_boundary_tests {
 
         assert!(error.to_string().contains("current schema version"));
         assert!(!output_path.exists());
-        std::fs::remove_dir_all(directory).expect("temporary directory must be removed");
+        fs::remove_dir_all(directory).expect("temporary directory must be removed");
     }
 }
 

@@ -110,8 +110,12 @@ impl SchemaBuilder {
 // =============================================================================
 
 /// Initialise a tracing subscriber for the MCP server, honouring `RUST_LOG`.
+///
+/// NOTE-001: stdio transport ใช้ stdout เป็น JSON-RPC channel — log ต้องไป stderr เท่านั้น
+/// ไม่งั้น client จะอ่าน stream ไม่ได้และปิดการเชื่อมต่อด้วย EOF ระหว่าง `initialize`
 pub fn init_logging() {
     let _ = tracing_subscriber::fmt()
+        .with_writer(std::io::stderr)
         .with_env_filter(
             tracing_subscriber::EnvFilter::try_from_default_env()
                 .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info")),

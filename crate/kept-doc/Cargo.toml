@@ -10,7 +10,6 @@ description = "Document sync and conversion engine for Notion, Markdown, and mor
 serde.workspace = true
 serde_json.workspace = true
 serde_yaml.workspace = true
-toml.workspace = true
 csv.workspace = true
 tokio.workspace = true
 anyhow.workspace = true

@@ -22,7 +22,7 @@ repo-contract:
     {{python}} -m unittest tests/test_repository_contract.py tests/test_repository_tools.py
 
 cli-smoke:
-    cargo build -q -p kept-cli
+    cargo build -q -p kept-cli --bin kept
     {{python}} -m unittest tests/test_public_cli_smoke.py
 
 schema:

@@ -38,7 +38,7 @@
 
 ## P1 — Filesystem query and incremental index
 
-- [ ] **Filesystem query language and saved queries**: compile `ext:pdf size>50MB dup:content` เข้า `FilterSet`, พร้อม `--explain`, saved query และ config presets
+- [x] **Filesystem query language and saved queries**: compile `ext:pdf size>50MB dup:content` เข้า `FilterSet`, พร้อม `--explain`, saved query และ config presets
 - [x] **Persistent scan index baseline**: `kept scan` อ่าน/เขียน snapshot, report refresh delta และให้ `find`/`review`/`duplicates` ใช้ default หรือ portable `--index` snapshot
 - [ ] **Persistent incremental index optimization**: ลดงาน traversal/hash ตาม refresh plan โดยไม่ลดความถูกต้องของ full scan contract
 

@@ -56,30 +56,22 @@ pub fn parse_nfm(input: &str) -> Vec<UniversalBlock> {
     parse_blocks_at_indent(&lines, &mut idx, 0)
 }
 
+#[inline]
 fn get_indent_level(line: &str) -> usize {
-    let mut count = 0;
-    for ch in line.chars() {
-        if ch == '\t' {
-            count += 1;
-        } else {
-            break;
-        }
-    }
-    count
+    line.chars().take_while(|&c| c == '\t').count()
 }
 
+#[inline]
 fn strip_indent(line: &str, level: usize) -> &str {
     let mut tabs = 0;
-    let mut byte_idx = 0;
-    for (i, ch) in line.char_indices() {
-        if ch == '\t' && tabs < level {
+    line.trim_start_matches(|c| {
+        if c == '\t' && tabs < level {
             tabs += 1;
-            byte_idx = i + ch.len_utf8();
+            true
         } else {
-            break;
+            false
         }
-    }
-    &line[byte_idx..]
+    })
 }
 
 fn parse_blocks_at_indent(

@@ -1285,10 +1285,6 @@ name = "hashbrown"
 version = "0.14.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
-dependencies = [
- "ahash",
- "allocator-api2",
-]
 
 [[package]]
 name = "hashbrown"
@@ -1895,9 +1891,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "csv",
- "dashmap",
  "fuzzy-matcher",
- "hashbrown 0.14.5",
  "jsonschema",
  "regex",
  "reqwest",
@@ -1909,9 +1903,7 @@ dependencies = [
  "strsim 0.11.1",
  "thiserror 1.0.69",
  "tokio",
- "tracing",
  "unicode-normalization",
- "walkdir",
 ]
 
 [[package]]

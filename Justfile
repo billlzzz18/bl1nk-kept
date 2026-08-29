@@ -44,7 +44,15 @@ version-check:
 version-bump new_version="":
     {{python}} tools/bump_version.py {{new_version}}
 
-check: fmt test clippy repo-contract cli-smoke schema-check links version-check
+# Fix CRLF to LF line endings across source files
+fix-eol:
+    {{python}} tools/fix_line_endings.py
+
+# Check for any CRLF line endings
+check-eol:
+    {{python}} tools/fix_line_endings.py --check
+
+check: fix-eol fmt test clippy repo-contract cli-smoke schema-check links version-check
 
 package:
     {{python}} tools/package_source.py

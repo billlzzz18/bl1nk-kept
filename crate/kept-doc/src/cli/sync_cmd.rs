@@ -71,7 +71,7 @@ async fn sync_file(path: &Path, client: &NotionClient, notion_db: &str) -> Resul
 
     let doc = MarkdownWithFrontmatterConverter::from_platform(content)
         .map_err(|e| anyhow!("converting {:?} to IR: {}", path, e))?;
-    let request = NotionToPlatform::to_platform(&doc)
+    let request = NotionToPlatform::from_universal(&doc)
         .map_err(|e| anyhow!("converting {:?} to Notion: {}", path, e))?;
 
     let mut properties = request.properties;

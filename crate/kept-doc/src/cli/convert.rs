@@ -34,9 +34,9 @@ pub async fn run_convert(
 
     let output_str = match to_fmt.as_str() {
         "json" => serde_json::to_string_pretty(&doc)?,
-        "markdown" | "md" => MarkdownConverter::to_platform(&doc)?,
+        "markdown" | "md" => MarkdownConverter::from_universal(&doc)?,
         "notion" => {
-            let request = NotionToPlatform::to_platform(&doc)?;
+            let request = NotionToPlatform::from_universal(&doc)?;
             serde_json::to_string_pretty(&request)?
         }
         _ => anyhow::bail!("Unsupported target format: {}", to_fmt),

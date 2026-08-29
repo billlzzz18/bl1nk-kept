@@ -26,7 +26,7 @@ impl ToPlatform for GithubMarkdownConverter {
     const PLATFORM: Platform = Platform::Markdown;
     type Output = String;
 
-    fn to_platform(doc: &UniversalDocument) -> Result<Self::Output, ConverterError> {
+    fn from_universal(doc: &UniversalDocument) -> Result<Self::Output, ConverterError> {
         let mut result = String::new();
         for block in &doc.blocks {
             render_gfm_block(block, 0, &mut result);

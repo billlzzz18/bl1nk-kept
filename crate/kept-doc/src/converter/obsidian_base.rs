@@ -229,7 +229,7 @@ impl ToPlatform for ObsidianBaseAdapter {
     const PLATFORM: Platform = Platform::ObsidianBase;
     type Output = String;
 
-    fn to_platform(doc: &UniversalDocument) -> Result<Self::Output, ConverterError> {
+    fn from_universal(doc: &UniversalDocument) -> Result<Self::Output, ConverterError> {
         Self::render_markdown_table(doc)
     }
 }

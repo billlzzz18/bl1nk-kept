@@ -132,7 +132,7 @@ impl ToPlatform for NotionToPlatform {
     const PLATFORM: Platform = Platform::Notion;
     type Output = CreatePageRequest;
 
-    fn to_platform(doc: &UniversalDocument) -> Result<Self::Output, ConverterError> {
+    fn from_universal(doc: &UniversalDocument) -> Result<Self::Output, ConverterError> {
         let parent = doc
             .metadata
             .source_id

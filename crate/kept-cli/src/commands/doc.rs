@@ -41,7 +41,7 @@ pub async fn handle_doc(cmd: DocCommands) -> anyhow::Result<()> {
                 }
             }
 
-            let md = MarkdownConverter::to_platform(&doc)
+            let md = MarkdownConverter::from_universal(&doc)
                 .map_err(|e| anyhow::anyhow!("Failed to write markdown: {}", e))?;
             std::fs::write(output, md)?;
             println!("Converted successfully to Markdown!");

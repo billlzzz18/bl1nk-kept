@@ -55,7 +55,7 @@ impl ToolHandler for IrToCsvTool {
             serde_json::from_value(args).map_err(|e| invalid_args("Invalid arguments", e))?;
         let doc: kept_doc::UniversalDocument = serde_json::from_value(input.ir_json)
             .map_err(|e| invalid_args("Invalid IR JSON", e))?;
-        let csv = LarkSheetAdapter::to_platform(&doc)
+        let csv = LarkSheetAdapter::from_universal(&doc)
             .map_err(|e| McpError::validation(format!("Conversion failed: {e}")))?;
         Ok(json!({ "csv": csv }))
     }

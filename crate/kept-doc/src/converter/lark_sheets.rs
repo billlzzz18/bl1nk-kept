@@ -78,7 +78,7 @@ impl ToPlatform for LarkSheetAdapter {
     const PLATFORM: Platform = Platform::Sheets;
     type Output = String; // CSV representation
 
-    fn to_platform(doc: &UniversalDocument) -> Result<Self::Output, ConverterError> {
+    fn from_universal(doc: &UniversalDocument) -> Result<Self::Output, ConverterError> {
         let mut wtr = csv::Writer::from_writer(vec![]);
 
         for block in &doc.blocks {

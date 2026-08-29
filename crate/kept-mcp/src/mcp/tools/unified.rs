@@ -163,7 +163,7 @@ struct ConvertDocInput {
     /// Base64-encoded document bytes; required for binary sources (pdf, docx).
     #[serde(alias = "source_base64", alias = "content_base64", default)]
     source_content_base64: Option<String>,
-    #[serde(alias = "target_format", alias = "to_platform", alias = "to")]
+    #[serde(alias = "target_format", alias = "from_universal", alias = "to")]
     target_platform: String,
     sanitize_thai: Option<bool>,
 }
@@ -285,7 +285,7 @@ impl ToolHandler for ConvertDocumentTool {
         // 3. Universal IR -> Target
         let output_value = match tgt_plat.as_str() {
             "markdown" | "md" | "github" | "obsidian" => {
-                let md = MarkdownConverter::to_platform(&doc).map_err(internal)?;
+                let md = MarkdownConverter::from_universal(&doc).map_err(internal)?;
                 json!({ "markdown": md })
             }
             "notion" | "notion_blocks" => {
@@ -358,7 +358,7 @@ struct ConvertTableInput {
         alias = "markdown_table"
     )]
     source_data: String,
-    #[serde(alias = "target_format", alias = "to_platform", alias = "to")]
+    #[serde(alias = "target_format", alias = "from_universal", alias = "to")]
     target_platform: String,
 }
 
@@ -398,11 +398,11 @@ impl ToolHandler for ConvertTableTool {
         // 2. Universal Table IR -> Target
         let output_value = match tgt_plat.as_str() {
             "obsidian_base" | "obsidian" | "markdown_table" | "md_table" => {
-                let md_table = ObsidianBaseAdapter::to_platform(&doc).map_err(internal)?;
+                let md_table = ObsidianBaseAdapter::from_universal(&doc).map_err(internal)?;
                 json!({ "table": md_table })
             }
             "csv" | "sheets" | "lark_sheets" | "lark" => {
-                let csv = LarkSheetAdapter::to_platform(&doc).map_err(internal)?;
+                let csv = LarkSheetAdapter::from_universal(&doc).map_err(internal)?;
                 json!({ "csv": csv })
             }
             "ir" | "universal_ir" => {

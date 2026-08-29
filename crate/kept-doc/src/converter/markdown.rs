@@ -35,7 +35,7 @@ impl ToPlatform for MarkdownConverter {
     const PLATFORM: Platform = Platform::Markdown;
     type Output = String;
 
-    fn to_platform(doc: &UniversalDocument) -> Result<Self::Output, ConverterError> {
+    fn from_universal(doc: &UniversalDocument) -> Result<Self::Output, ConverterError> {
         let mut result = String::new();
         for block in &doc.blocks {
             render_universal_block(block, 0, &mut result);
@@ -434,7 +434,7 @@ mod tests {
             styles: StyleSheet::default(),
         };
 
-        let md = MarkdownConverter::to_platform(&doc).unwrap();
+        let md = MarkdownConverter::from_universal(&doc).unwrap();
         assert_eq!(md, "# Title\n**Body**");
     }
 
@@ -532,7 +532,7 @@ mod tests {
             styles: StyleSheet::default(),
         };
 
-        let md = MarkdownConverter::to_platform(&doc).unwrap();
+        let md = MarkdownConverter::from_universal(&doc).unwrap();
         assert_eq!(md, "| Name | Age |\n| --- | ---: |\n| Alice | 30 |");
     }
 
@@ -540,7 +540,7 @@ mod tests {
     fn table_roundtrips_through_ir() {
         let md = "| A | B |\n| --- | --- |\n| 1 | 2 |";
         let doc = MarkdownConverter::from_platform(md.to_string()).unwrap();
-        let out = MarkdownConverter::to_platform(&doc).unwrap();
+        let out = MarkdownConverter::from_universal(&doc).unwrap();
         assert_eq!(out, md);
     }
 
@@ -584,7 +584,7 @@ mod tests {
             }],
             styles: StyleSheet::default(),
         };
-        let md = MarkdownConverter::to_platform(&doc).unwrap();
+        let md = MarkdownConverter::from_universal(&doc).unwrap();
         assert_eq!(md, "|  |  |\n| --- | --- |\n| 1 | 2 |\n| 3 | 4 |");
     }
 }

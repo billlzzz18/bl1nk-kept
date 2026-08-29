@@ -101,7 +101,7 @@ pub trait FromPlatform {
 pub trait ToPlatform {
     const PLATFORM: Platform;
     type Output;
-    fn to_platform(doc: &UniversalDocument) -> Result<Self::Output, ConverterError>;
+    fn from_universal(doc: &UniversalDocument) -> Result<Self::Output, ConverterError>;
 }
 
 /// Converter registry for dynamic platform discovery
@@ -199,7 +199,7 @@ where
     T: ToPlatform<Output = String> + Send + Sync,
 {
     fn write(&self, doc: &UniversalDocument) -> Result<Vec<u8>, ConvertError> {
-        let s = T::to_platform(doc).map_err(ConvertError::from)?;
+        let s = T::from_universal(doc).map_err(ConvertError::from)?;
         Ok(s.into_bytes())
     }
 }

@@ -11,7 +11,7 @@
 //!    `PropertyValue` map (explicit `type:` tagged YAML).
 //! 3. [`MarkdownConverter`] to convert the Markdown body ↔ blocks.
 //!
-//! Output format produced by [`to_platform`]:
+//! Output format produced by [`from_universal`]:
 //!
 //! ```text
 //! ---
@@ -75,7 +75,7 @@ impl ToPlatform for MarkdownWithFrontmatterConverter {
     const PLATFORM: Platform = Platform::Markdown;
     type Output = String;
 
-    fn to_platform(doc: &UniversalDocument) -> Result<Self::Output, ConverterError> {
+    fn from_universal(doc: &UniversalDocument) -> Result<Self::Output, ConverterError> {
         let mut out = String::new();
         if !doc.metadata.properties.is_empty() {
             let yaml = properties_to_yaml(&doc.metadata.properties)
@@ -95,11 +95,11 @@ impl ToPlatform for MarkdownWithFrontmatterConverter {
                 }
             }
         }
-        // Match `MarkdownConverter::to_platform` exactly: that converter
+        // Match `MarkdownConverter::from_universal` exactly: that converter
         // trims trailing whitespace from its output, so the composed output
         // must not append an extra newline either. Appending one here would
         // break plain-markdown round-trips.
-        let body = MarkdownConverter::to_platform(doc)?;
+        let body = MarkdownConverter::from_universal(doc)?;
         out.push_str(&body);
         Ok(out)
     }
@@ -132,7 +132,7 @@ mod tests {
     fn smoke_roundtrip_short() {
         let input = "---\ntitle:\n  type: title\n  value: \"X\"\n---\n# Hi\n".to_string();
         let doc = MarkdownWithFrontmatterConverter::from_platform(input).unwrap();
-        let out = MarkdownWithFrontmatterConverter::to_platform(&doc).unwrap();
+        let out = MarkdownWithFrontmatterConverter::from_universal(&doc).unwrap();
         assert!(out.starts_with("---\n"));
         assert!(out.contains("type: title"));
         assert!(out.contains("# Hi"));

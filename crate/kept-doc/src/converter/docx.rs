@@ -138,7 +138,7 @@ impl ToPlatform for DocxAdapter {
     const PLATFORM: Platform = Platform::Docx;
     type Output = Vec<u8>;
 
-    fn to_platform(doc: &UniversalDocument) -> Result<Self::Output, ConverterError> {
+    fn from_universal(doc: &UniversalDocument) -> Result<Self::Output, ConverterError> {
         DocxAdapter::write_bytes(doc).map_err(|e| ConverterError::ConversionFailed(e.to_string()))
     }
 }

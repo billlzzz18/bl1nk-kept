@@ -169,11 +169,13 @@ pub mod lark_sheets;
 pub mod markdown;
 pub mod markdown_frontmatter;
 pub mod notion;
+pub mod notion_markdown;
 pub mod obsidian_base;
 pub mod pdf;
 
 pub use docx::DocxAdapter;
 pub use filter::{Filter, FilterPipeline, MarkdownAlertFilter, ThaiSanitizationFilter};
+pub use notion_markdown::NotionMarkdownConverter;
 pub use obsidian_base::ObsidianBaseAdapter;
 pub use pdf::PdfAdapter;
 

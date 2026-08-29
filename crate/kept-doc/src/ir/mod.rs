@@ -48,4 +48,5 @@ pub enum Platform {
     Docx,
     Obsidian,
     ObsidianBase,
+    NotionMarkdown,
 }

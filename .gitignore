@@ -35,5 +35,4 @@ tmph0_ry3oy/
 tmpyt0svnk7/
 
 # Local editor MCP configs contain credentials; never commit
-.cursor/
 .agents/mcp_config.json

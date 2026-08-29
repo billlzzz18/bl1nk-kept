@@ -33,9 +33,15 @@ pub enum Commands {
         #[arg(short, long)]
         json: bool,
     },
-    /// Find files from the latest scan index using simple filter facts.
+    /// Find files from the latest scan index using simple filter facts or query expression.
     Find {
         root: PathBuf,
+        /// Query string in Filesystem Query Language (e.g. "ext:pdf size>50MB dup:content")
+        #[arg(short = 'q', long)]
+        query: Option<String>,
+        /// Explain query plan without executing
+        #[arg(long)]
+        explain: bool,
         #[arg(long = "type")]
         file_type: Option<String>,
         #[arg(long)]
@@ -153,6 +159,8 @@ async fn main() -> anyhow::Result<()> {
         } => handle_task_scan(root, output, include_hidden, json)?,
         Commands::Find {
             root,
+            query,
+            explain,
             file_type,
             name,
             path_contains,
@@ -164,6 +172,8 @@ async fn main() -> anyhow::Result<()> {
             json,
         } => handle_task_find(FindRequest {
             root,
+            query,
+            explain,
             file_type,
             name,
             path_contains,
@@ -309,6 +319,8 @@ mod tests {
 
         let result = handle_task_find(FindRequest {
             root: root.clone(),
+            query: None,
+            explain: false,
             file_type: Some("pdf".to_string()),
             name: Some("report".to_string()),
             path_contains: None,
@@ -321,6 +333,70 @@ mod tests {
         });
 
         assert!(result.is_ok(), "find must query the snapshot");
+        if let Some(bytes) = previous {
+            std::fs::write(&snapshot_path, bytes).ok();
+        } else {
+            std::fs::remove_file(&snapshot_path).ok();
+        }
+        std::fs::remove_dir_all(root).expect("fixture root must be removed");
+    }
+
+    #[test]
+    fn task_first_find_with_fql_query_and_explain() {
+        use kept_core::{create_persistent_snapshot, scan_directory, ScanOptions};
+
+        let root = std::env::temp_dir().join(format!("kept-task-fql-{}", std::process::id()));
+        std::fs::create_dir_all(&root).expect("fixture root must be created");
+        std::fs::write(root.join("report.pdf"), "fixture").expect("fixture file must be written");
+        let options = ScanOptions::default();
+        let index = scan_directory(&root, &options).expect("fixture must scan");
+        let snapshot_path = default_scan_snapshot_path(&index.root);
+        let previous = std::fs::read(&snapshot_path).ok();
+        std::fs::create_dir_all(
+            snapshot_path
+                .parent()
+                .expect("snapshot path must have a parent"),
+        )
+        .expect("snapshot directory must be created");
+        std::fs::write(
+            &snapshot_path,
+            serde_json::to_string(&create_persistent_snapshot(index, &options))
+                .expect("snapshot must serialize"),
+        )
+        .expect("snapshot must be written");
+
+        let explain_result = handle_task_find(FindRequest {
+            root: root.clone(),
+            query: Some("ext:pdf size>1B report".to_string()),
+            explain: true,
+            file_type: None,
+            name: None,
+            path_contains: None,
+            min_size: None,
+            max_size: None,
+            after: None,
+            before: None,
+            index: None,
+            json: true,
+        });
+        assert!(explain_result.is_ok(), "explain query plan must succeed");
+
+        let find_result = handle_task_find(FindRequest {
+            root: root.clone(),
+            query: Some("ext:pdf size>1B report".to_string()),
+            explain: false,
+            file_type: None,
+            name: None,
+            path_contains: None,
+            min_size: None,
+            max_size: None,
+            after: None,
+            before: None,
+            index: None,
+            json: true,
+        });
+        assert!(find_result.is_ok(), "query execution must succeed");
+
         if let Some(bytes) = previous {
             std::fs::write(&snapshot_path, bytes).ok();
         } else {
@@ -356,6 +432,8 @@ mod tests {
 
         let result = handle_task_find(FindRequest {
             root: root.clone(),
+            query: None,
+            explain: false,
             file_type: Some("pdf".to_string()),
             name: Some("report".to_string()),
             path_contains: None,

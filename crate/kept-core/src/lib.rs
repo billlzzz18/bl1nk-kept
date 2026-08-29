@@ -29,16 +29,17 @@ pub use policy::{
     ResolvedNamingRule, UserConfig, USER_CONFIG_FILE_NAME, USER_CONFIG_VERSION,
 };
 pub use scanner::{
-    build_treemap, check_file_extension_integrity, create_duplicate_mutation_plan,
+    build_treemap, check_file_extension_integrity, compile_query, create_duplicate_mutation_plan,
     create_persistent_snapshot, execute_duplicate_mutation, filter_allowed_duplicates,
     filter_index, find_content_duplicates, find_duplicates, find_duplicates_with_stats,
-    plan_incremental_refresh, rollback_duplicate_mutation, scan_directory, scan_index_integrity,
-    simulate_duplicate_mutation, ActionSimulation, BadExtensionIssue, ContentDuplicateOptions,
-    ContentDuplicateStats, CustomFilter, CustomOperator, DuplicateActionKind, DuplicateAllowRule,
-    DuplicateEvidence, DuplicateGroup, DuplicateMutationPlan, DuplicateMutationPolicy,
-    DuplicateOptions, DuplicatePlanAction, DuplicateSearchStats, DuplicateSimulationResult,
-    FileFilter, FileRecord, FilterSet, IntegrityStatus, PersistentScanSnapshot, RefreshPlan,
-    RollbackEntry, RollbackJournal, ScanIndex, ScanIssue, ScanIssueKind, ScanOptions, TreemapNode,
+    parse_size_to_bytes, plan_incremental_refresh, rollback_duplicate_mutation, scan_directory,
+    scan_index_integrity, simulate_duplicate_mutation, ActionSimulation, BadExtensionIssue,
+    ContentDuplicateOptions, ContentDuplicateStats, CustomFilter, CustomOperator,
+    DuplicateActionKind, DuplicateAllowRule, DuplicateEvidence, DuplicateGroup,
+    DuplicateMutationPlan, DuplicateMutationPolicy, DuplicateOptions, DuplicatePlanAction,
+    DuplicateSearchStats, DuplicateSimulationResult, FileFilter, FileRecord, FilterSet,
+    IntegrityStatus, PersistentScanSnapshot, QueryClause, QueryPlan, RefreshPlan, RollbackEntry,
+    RollbackJournal, ScanIndex, ScanIssue, ScanIssueKind, ScanOptions, TreemapNode,
     CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION,
 };
 pub use search::KeywordSearch;

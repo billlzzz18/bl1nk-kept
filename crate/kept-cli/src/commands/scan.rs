@@ -31,6 +31,8 @@ pub struct TaskScanResult {
 #[derive(Debug)]
 pub struct FindRequest {
     pub root: PathBuf,
+    pub query: Option<String>,
+    pub explain: bool,
     pub file_type: Option<String>,
     pub name: Option<String>,
     pub path_contains: Option<String>,
@@ -133,7 +135,53 @@ pub fn create_or_refresh_scan(
 }
 
 pub fn handle_task_find(request: FindRequest) -> anyhow::Result<()> {
-    use kept_core::{filter_index, FileFilter, FilterSet, PersistentScanSnapshot};
+    use kept_core::{compile_query, filter_index, FileFilter, FilterSet, PersistentScanSnapshot};
+
+    if let Some(q) = &request.query {
+        let (compiled_filters, plan) = compile_query(q).map_err(anyhow::Error::msg)?;
+        if request.explain {
+            if request.json {
+                println!("{}", serde_json::to_string_pretty(&plan)?);
+            } else {
+                println!("Query: '{}'", plan.raw_query);
+                println!("Explanation:");
+                for step in &plan.explanation {
+                    println!("  - {}", step);
+                }
+            }
+            return Ok(());
+        }
+
+        let canonical_root = request.root.canonicalize()?;
+        let snapshot_path = request
+            .index
+            .unwrap_or_else(|| default_scan_snapshot_path(&canonical_root.display().to_string()));
+        let snapshot: PersistentScanSnapshot =
+            serde_json::from_str(&std::fs::read_to_string(&snapshot_path).map_err(|_| {
+                anyhow::anyhow!(
+                    "ยังไม่มี index สำหรับ '{}'; รัน kept scan <path> ก่อน",
+                    canonical_root.display()
+                )
+            })?)?;
+        if snapshot.root != canonical_root.display().to_string() {
+            anyhow::bail!("index ไม่ตรงกับ root ที่ร้องขอ; รัน kept scan <path> ใหม่");
+        }
+
+        let records = filter_index(&snapshot.index, &compiled_filters);
+        if request.json {
+            println!("{}", serde_json::to_string_pretty(&records)?);
+        } else {
+            for record in &records {
+                println!("{}\t{}\t{}", record.size, record.modified_unix, record.path);
+            }
+            println!(
+                "Matched {} of {} file(s).",
+                records.len(),
+                snapshot.index.files.len()
+            );
+        }
+        return Ok(());
+    }
 
     let canonical_root = request.root.canonicalize()?;
     let snapshot_path = request
@@ -307,6 +355,8 @@ pub fn run_interactive_find(root: PathBuf) -> anyhow::Result<()> {
         .map_err(|_| anyhow::anyhow!("ค่า modified-before ต้องเป็น Unix time"))?;
     handle_task_find(FindRequest {
         root,
+        query: None,
+        explain: false,
         file_type,
         name,
         path_contains,

@@ -10,6 +10,7 @@ pub mod duplicate;
 pub mod filter;
 pub mod integrity;
 pub mod mutation;
+pub mod query;
 pub mod scan;
 pub mod types;
 
@@ -31,6 +32,7 @@ pub use mutation::{
     DuplicateMutationPolicy, DuplicatePlanAction, DuplicateSimulationResult, RollbackEntry,
     RollbackJournal,
 };
+pub use query::{compile_query, parse_size_to_bytes, QueryClause, QueryPlan};
 pub use scan::scan_directory;
 pub use types::{
     create_persistent_snapshot, plan_incremental_refresh, FileRecord, PersistentScanSnapshot,

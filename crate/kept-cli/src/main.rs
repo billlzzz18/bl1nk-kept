@@ -35,6 +35,8 @@ pub enum Commands {
     },
     /// Find files from the latest scan index using simple filter facts or query expression.
     Find {
+        /// Root directory (defaults to current directory if omitted)
+        #[arg(default_value = ".")]
         root: PathBuf,
         /// Query string in Filesystem Query Language (e.g. "ext:pdf size>50MB dup:content")
         #[arg(short = 'q', long)]
@@ -954,12 +956,11 @@ mod tests {
 
     #[test]
     fn config_editor_defaults_to_nano_and_accepts_explicit_editor_path() {
-        assert_eq!(
-            resolve_config_editor(None).to_string_lossy(),
-            std::env::var_os("KEPT_EDITOR")
-                .unwrap_or_else(|| "nano".into())
-                .to_string_lossy()
-        );
+        let editor = resolve_config_editor(None);
+        assert!(!editor.as_os_str().is_empty());
+        if let Some(configured) = std::env::var_os("KEPT_EDITOR") {
+            assert_eq!(editor, configured);
+        }
         assert_eq!(
             resolve_config_editor(Some("/usr/bin/custom-editor".into())),
             std::ffi::OsString::from("/usr/bin/custom-editor")

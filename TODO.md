@@ -16,6 +16,7 @@
 - [x] `kept review`, `kept find` และ `kept duplicates` ใช้ index เดียวกัน; มี TTY review menu และ non-interactive `--json`/`--action export-plan --yes`
 - [x] **User config lifecycle and read-only naming review**: `kept setup` สร้าง OS-appropriate `config.yaml` เพียงครั้งเดียว; `kept config` สรุป config และ `config defaults/profile/scope` จัดการ YAML ของผู้ใช้ผ่าน task-level commands; `config edit` เป็น advanced path; `doctor`/`doctor --fix` รายงานและกู้ missing/invalid config พร้อม backup; `review` วิเคราะห์ naming จาก scope absolute ที่ผู้ใช้กำหนดโดยไม่ rename/apply
 - [x] **Registry group management**: `kept group` แสดง supported field types, list/show/add/set/remove/move groups และ list/add/remove group schema fields โดยตรวจ registry ก่อน save
+- [x] **CLI command modularization**: แยก command handlers จาก `main.rs` ไป `crate/kept-cli/src/commands/` โดยคง arguments, behavior และ tests เดิม; `cargo fmt --all -- --check`, `cargo test --workspace`, repository contracts และ CLI smoke ผ่าน
 - [x] **Duplicate mutation policy and residual regressions**
   - เริ่มจาก review/export เท่านั้น; ออกแบบ mutation policy, allow-list, rollback และ simulation ก่อนเปิด delete/rename/hard-link replacement
   - เพิ่ม unreadable-file, partial-hash collision และ action-scope regression cases
@@ -25,6 +26,15 @@
 - [x] Foundation schema 1.2.0: deterministic migration, UTF-8/NFC profile, glossary/provenance/regex/classifier/corpus-manifest slots
 - [x] Public CC0 Thai seed corpus (`words_th`, `stopwords_th`) พร้อม URI/license/SHA-256 manifest และ integrity test
 - [x] JSONL anonymized importer, evidence-first classifier, regex vector validator และ repeated experiment selection
+- [x] **Obsidian translations modern UI terms intake**: สกัด 2,595 terms จาก `obsidian-translations` เข้าสู่ `data/corpus/obsidian_terms.jsonl` พร้อม provenance
+- [ ] **Hybrid Semantic Search & Reranking Engine**
+  - Dense embeddings vector retrieval (Ollama `bge-m3` / Jina) ร่วมกับ BM25 Lexical + Thai Bigram
+  - Vector similarity caching บน disk เพื่อลด latency
+  - Cross-encoder reranker pipeline (`bge-reranker-v2-m3` / Jina Rerank)
+  - CLI `kept search --semantic` / `--hybrid` และ MCP search tools
+- [ ] **Dogfooding & End-to-End Evaluation Loop**
+  - รัน Dogfooding ทดสอบ scan/find/query/convert/semantic บน workspace จริง
+  - ตรวจสอบความถูกต้องของ Bigram Tokenizer กับคำศัพท์ไทยสมัยใหม่และ edge cases
 - [ ] **Evidence run and correction loop**
   - immutable run manifest, raw JSONL, offline rescore และ append-only correction history
   - `kept:debt` marker parser/ledger และ gain scoreboard ที่เปรียบเทียบเฉพาะ comparable runs
@@ -41,6 +51,12 @@
 - [x] **Filesystem query language and saved queries**: compile `ext:pdf size>50MB dup:content` เข้า `FilterSet`, พร้อม `--explain`, saved query และ config presets
 - [x] **Persistent scan index baseline**: `kept scan` อ่าน/เขียน snapshot, report refresh delta และให้ `find`/`review`/`duplicates` ใช้ default หรือ portable `--index` snapshot
 - [ ] **Persistent incremental index optimization**: ลดงาน traversal/hash ตาม refresh plan โดยไม่ลดความถูกต้องของ full scan contract
+- [ ] **LLM Wiki / Obsidian Vault Lifecycle & Management (`kept vault`)**:
+  - `kept vault init <path>` สร้างโครงสร้าง 3-layer (`raw/`, `wiki/`, `index.md`, `log.md`) และ schema definition (CLAUDE.md/AGENTS.md)
+  - `kept vault ingest <source>` อ่าน raw source, สกัดสาระสำคัญ, อัปเดต/สร้าง entity-concept pages, อัปเดต catalog `index.md` และบันทึก append-only `log.md`
+  - `kept vault lint` ตรวจสอบ vault integrity: orphan notes, broken `[[wikilinks]]`, dead links, และ contradiction markers ระหว่างหน้า
+  - `kept vault query <query>` ค้นหาและสังเคราะห์คำตอบจาก wiki pages พร้อม citations อ้างอิง และบันทึกคำตอบกลับเป็น wiki note ใหม่
+  - MCP Tools สำหรับ LLM Agent Vault: `vault_ingest`, `vault_query`, `vault_lint`
 
 ## P2 — kept-doc fidelity and intake
 

@@ -8,6 +8,7 @@ pub mod scanner;
 pub mod schema;
 pub mod search;
 pub mod semantic;
+pub mod source_graph;
 pub mod validator;
 
 pub use analyzer::RegistryAnalyzer;
@@ -43,6 +44,13 @@ pub use scanner::{
     CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION,
 };
 pub use search::KeywordSearch;
+pub use source_graph::{
+    coalesce_file_events, load_index, save_index, DefinitionKind, FileEvent, FileEventKind,
+    GraphBuilder, GraphEvent, GraphIndex, GraphManager, ImplementationRecord, ImportRecord,
+    IndexBuilder, IndexBuilderConfig, IndexManager, IndexManagerConfig, KeptGraphIndexConfig,
+    ReferenceKind, ScopeGraphIndex, SourceFileEvent, SourceGraph, SourceGraphStats,
+    SymbolDefinition, SymbolReference,
+};
 pub use validator::Validator;
 
 use crate::schema::KeywordRegistry;

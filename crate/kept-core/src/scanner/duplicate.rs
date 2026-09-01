@@ -412,6 +412,7 @@ pub fn hash_hex(hash: &[u8]) -> String {
 
 #[cfg(unix)]
 fn hard_link_subgroups(index: &ScanIndex, indexes: &[usize]) -> Vec<Vec<usize>> {
+    use std::collections::BTreeMap;
     use std::os::unix::fs::MetadataExt;
 
     let mut by_inode = BTreeMap::<(u64, u64), Vec<usize>>::new();

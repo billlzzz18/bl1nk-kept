@@ -29,7 +29,7 @@ pub fn choose_duplicate_action() -> anyhow::Result<Option<DuplicateAction>> {
     ];
     let selected = Select::new()
         .with_prompt("เลือกการทำงาน (ใช้ ↑/↓ หรือ j/k แล้วกด Enter)")
-        .items(&choices)
+        .items(choices)
         .default(0)
         .interact_opt()?;
     Ok(selected.and_then(|position| {

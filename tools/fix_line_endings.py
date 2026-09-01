@@ -30,6 +30,8 @@ IGNORED_DIRS = {
     "target",
     "data",  # binary/checksum-verified upstream artifacts
     ".claude",
+    ".headroom",
+    "codeql-db",
     "__pycache__",
     ".venv",
 }

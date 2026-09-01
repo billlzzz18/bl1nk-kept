@@ -49,4 +49,9 @@ tmpyt0svnk7/
 .claude/worktrees/
 .claude/settings.local.json
 
+# CodeQL database
+codeql-db/
+*.codeql
+
+
 

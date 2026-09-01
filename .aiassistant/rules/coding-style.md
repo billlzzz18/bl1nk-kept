@@ -42,7 +42,7 @@ Follow standard Rust conventions:
 - `snake_case` for functions, methods, variables, modules, crates
 - `PascalCase` (UpperCamelCase) for types, traits, enums, type parameters
 - `SCREAMING_SNAKE_CASE` for constants and statics
-- Lifetimes: short lowercase (`'a`, `'de`) — descriptive names for complex cases (`'input`) <!-- rumdl-disable-line line-length -->
+- Lifetimes: short lowercase (`'a`, `'de`) — descriptive names for complex cases(`'input`)
 
 ## Ownership and Borrowing
 

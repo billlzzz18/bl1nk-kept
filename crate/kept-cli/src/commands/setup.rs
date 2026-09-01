@@ -32,7 +32,7 @@ pub fn handle_setup() -> anyhow::Result<()> {
         let choices = ["1. เปิดแก้ไข config.yaml ทันที", "0. ข้ามขั้นตอนแก้ไข"];
         let selected = Select::new()
             .with_prompt("เลือกขั้นตอนถัดไป (ใช้ ↑/↓ หรือ j/k แล้วกด Enter)")
-            .items(&choices)
+            .items(choices)
             .default(0)
             .interact_opt()?;
         if let Some(SetupAction::EditConfig) = selected.and_then(setup_action_from_selection) {

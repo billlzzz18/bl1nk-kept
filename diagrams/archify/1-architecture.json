@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "bl1nk-kept System Architecture",
+    "quality_profile": "showcase"
+  },
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Client Interface Tier",
+      "wraps": ["kept_cli", "kept_mcp"]
+    },
+    {
+      "kind": "security-group",
+      "label": "Core Engine & Data Tier",
+      "wraps": ["kept_core", "kept_doc"]
+    }
+  ],
+  "components": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "User / AI Agent",
+      "sublabel": "Terminal & MCP Client",
+      "pos": [40, 240],
+      "size": [130, 60]
+    },
+    {
+      "id": "kept_cli",
+      "type": "frontend",
+      "label": "kept-cli",
+      "sublabel": "Clap CLI & TUI Dispatch",
+      "pos": [240, 140],
+      "size": [140, 60]
+    },
+    {
+      "id": "kept_mcp",
+      "type": "frontend",
+      "label": "kept-mcp",
+      "sublabel": "Model Context Protocol",
+      "pos": [240, 340],
+      "size": [140, 60]
+    },
+    {
+      "id": "kept_core",
+      "type": "backend",
+      "label": "kept-core",
+      "sublabel": "FQL Engine & Scan Index",
+      "pos": [480, 140],
+      "size": [140, 60]
+    },
+    {
+      "id": "kept_doc",
+      "type": "backend",
+      "label": "kept-doc",
+      "sublabel": "Universal IR & Notion Sync",
+      "pos": [480, 340],
+      "size": [140, 60]
+    },
+    {
+      "id": "disk",
+      "type": "database",
+      "label": "Filesystem Snapshot",
+      "sublabel": "Local Index & Hash DB",
+      "pos": [720, 140],
+      "size": [140, 60]
+    },
+    {
+      "id": "notion_api",
+      "type": "external",
+      "label": "Notion API",
+      "sublabel": "Remote Document Blocks",
+      "pos": [720, 340],
+      "size": [140, 60]
+    }
+  ],
+  "connections": [
+    {
+      "id": "c1",
+      "from": "user",
+      "to": "kept_cli",
+      "label": "CLI commands",
+      "variant": "emphasis"
+    },
+    {
+      "id": "c2",
+      "from": "user",
+      "to": "kept_mcp",
+      "label": "tool calls"
+    },
+    {
+      "id": "c3",
+      "from": "kept_cli",
+      "to": "kept_core",
+      "label": "scan & query",
+      "variant": "emphasis"
+    },
+    {
+      "id": "c4",
+      "from": "kept_mcp",
+      "to": "kept_doc",
+      "label": "parse & sync docs",
+      "variant": "emphasis"
+    },
+    {
+      "id": "c5",
+      "from": "kept_core",
+      "to": "kept_doc",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "doc refs",
+      "labelDy": 36
+    },
+    {
+      "id": "c6",
+      "from": "kept_core",
+      "to": "disk",
+      "label": "read / write index",
+      "variant": "emphasis"
+    },
+    {
+      "id": "c7",
+      "from": "kept_doc",
+      "to": "notion_api",
+      "label": "sync blocks",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "title": "Client Interfaces",
+      "dot": "cyan",
+      "items": [
+        "kept-cli executes terminal commands (scan, find, review, duplicates)",
+        "kept-mcp exposes stdio tools directly to LLM agents"
+      ]
+    },
+    {
+      "title": "Core Engines & Storage",
+      "dot": "emerald",
+      "items": [
+        "kept-core executes FQL query compilation and progressive duplicate detection",
+        "kept-doc manages Universal Document IR, Notion synchronization, and NFM Markdown"
+      ]
+    }
+  ]
+}

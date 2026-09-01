@@ -1,0 +1,10 @@
+# Serana
+/.serena/
+.serena-project.local.yml
+.serena/workflow/cache
+
+# Local project configuration
+project.local.yml
+
+# Cache
+/cache

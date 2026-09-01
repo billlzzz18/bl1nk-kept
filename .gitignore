@@ -36,3 +36,17 @@ tmpyt0svnk7/
 
 # Local editor MCP configs contain credentials; never commit
 .agents/mcp_config.json
+
+# Database and local agent memory/cache files
+*.db
+*.sqlite
+*.sqlite3
+.headroom/
+.serena/cache/
+.serena/project.local.yml
+
+# Agent worktrees and local settings
+.claude/worktrees/
+.claude/settings.local.json
+
+

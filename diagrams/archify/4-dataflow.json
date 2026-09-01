@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Universal Document IR & Notion Sync Dataflow",
+    "quality_profile": "showcase"
+  },
+  "stages": [
+    { "label": "Source Data" },
+    { "label": "Lexer & AST" },
+    { "label": "Universal IR" },
+    { "label": "Target Sync" }
+  ],
+  "nodes": [
+    {
+      "id": "notion_source",
+      "stage": 0,
+      "row": 0,
+      "type": "external",
+      "label": "Notion API",
+      "sublabel": "JSON block payloads"
+    },
+    {
+      "id": "markdown_source",
+      "stage": 0,
+      "row": 2,
+      "type": "external",
+      "label": "Markdown File",
+      "sublabel": ".md with frontmatter"
+    },
+    {
+      "id": "notion_parser",
+      "stage": 1,
+      "row": 0,
+      "type": "backend",
+      "label": "Notion Parser",
+      "sublabel": "extract properties"
+    },
+    {
+      "id": "markdown_parser",
+      "stage": 1,
+      "row": 2,
+      "type": "backend",
+      "label": "NFM Markdown",
+      "sublabel": "pulldown-cmark + AST"
+    },
+    {
+      "id": "universal_ir",
+      "stage": 2,
+      "row": 1,
+      "type": "database",
+      "label": "Universal IR",
+      "sublabel": "Callout / Table / Block",
+      "tag": "Lossless IR"
+    },
+    {
+      "id": "notion_writer",
+      "stage": 3,
+      "row": 0,
+      "type": "backend",
+      "label": "Notion Writer",
+      "sublabel": "id_mapper ChangeSet"
+    },
+    {
+      "id": "markdown_writer",
+      "stage": 3,
+      "row": 2,
+      "type": "backend",
+      "label": "GFM Writer",
+      "sublabel": "atomic disk write"
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "from": "notion_source",
+      "to": "notion_parser",
+      "label": "block payloads",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f2",
+      "from": "markdown_source",
+      "to": "markdown_parser",
+      "label": "raw markdown",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f3",
+      "from": "notion_parser",
+      "to": "universal_ir",
+      "label": "normalize to IR"
+    },
+    {
+      "id": "f4",
+      "from": "markdown_parser",
+      "to": "universal_ir",
+      "label": "normalize to IR"
+    },
+    {
+      "id": "f5",
+      "from": "universal_ir",
+      "to": "notion_writer",
+      "label": "emit ChangeSet",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f6",
+      "from": "universal_ir",
+      "to": "markdown_writer",
+      "label": "emit GFM",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "title": "Bidirectional Fidelity",
+      "dot": "emerald",
+      "items": [
+        "Universal IR prevents format-specific leakage between Notion and Markdown",
+        "ChangeSets track incremental modifications without full page overwrites"
+      ]
+    },
+    {
+      "title": "Deterministic Id Mapping",
+      "dot": "cyan",
+      "items": [
+        "IdMapper guarantees local blocks map to remote Notion UUIDs stably",
+        "Callouts and complex tables roundtrip losslessly"
+      ]
+    }
+  ]
+}

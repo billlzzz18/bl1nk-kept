@@ -1,0 +1,6 @@
+{
+  "plugin": [
+    "list",
+    "cli-developer"
+  ]
+}

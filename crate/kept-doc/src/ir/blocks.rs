@@ -31,6 +31,7 @@ pub struct TableRow {
     pub style: Option<style::StyleRef>,
 }
 
+//noinspection ALL
 /// All block types that exist across platforms
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]

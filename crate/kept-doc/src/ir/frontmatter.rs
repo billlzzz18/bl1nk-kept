@@ -41,7 +41,7 @@ pub enum PropertyType {
     Checkbox,
     Url,
     Email,
-    /// Catch-all for any [`crate::ir::metadata::PropertyValue`] variant that
+    /// Catch-all for any [`PropertyValue`] variant that
     /// does not have a dedicated wire representation. The full variant is
     /// stored under the `value:` key as opaque YAML/JSON.
     Custom,

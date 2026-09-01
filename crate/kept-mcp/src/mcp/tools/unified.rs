@@ -249,10 +249,8 @@ impl ToolHandler for ConvertDocumentTool {
             }
             "notion" | "notion_blocks" => {
                 // Parse JSON notion blocks if provided as JSON string
-                let blocks: Vec<kept_doc::ir::UniversalBlock> =
-                    serde_json::from_str(&input.source_content).map_err(|e| {
-                        McpError::invalid_params(format!("Invalid Notion JSON: {e}"))
-                    })?;
+                let blocks: Vec<UniversalBlock> = serde_json::from_str(&input.source_content)
+                    .map_err(|e| McpError::invalid_params(format!("Invalid Notion JSON: {e}")))?;
                 UniversalDocument {
                     metadata: kept_doc::ir::DocumentMetadata::default(),
                     blocks,

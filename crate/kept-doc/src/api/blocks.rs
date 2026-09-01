@@ -56,11 +56,12 @@ impl NotionClient {
             .await
     }
 
+    //noinspection ALL
     /// Soft-delete a block by moving it to the trash (`in_trash = true`).
     ///
     /// Typed counterpart of the unified trash lifecycle in
     /// [`crate::api::trash`]; this delegates to
-    /// [`trash`](crate::client::NotionClient::trash) so there is one
+    /// [`trash`](NotionClient::trash) so there is one
     /// source of truth for the request shape. Undo it with
     /// `client.restore(Resource::Block, id)`.
     pub async fn delete_block(&self, block_id: &str) -> Result<Block> {

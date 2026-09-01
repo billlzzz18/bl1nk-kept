@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "Progressive Duplicate Detection & Scan Lifecycle",
+    "quality_profile": "standard",
+    "viewBox": [980, 660]
+  },
+  "lanes": [
+    { "id": "main", "label": "Scan Pipeline" },
+    { "id": "waiting", "label": "Progressive Checks" },
+    { "id": "exceptions", "label": "Duplicate Resolution" },
+    { "id": "terminal", "label": "Index Storage" }
+  ],
+  "states": [
+    {
+      "id": "unindexed",
+      "lane": "main",
+      "col": 0,
+      "step": "01",
+      "type": "start",
+      "label": "Unindexed",
+      "sublabel": "scan root dir",
+      "tag": "start"
+    },
+    {
+      "id": "size_grouped",
+      "lane": "main",
+      "col": 1,
+      "step": "02",
+      "type": "active",
+      "label": "Size Grouped",
+      "sublabel": "bucket by byte size",
+      "tag": "filter"
+    },
+    {
+      "id": "prefix_hashed",
+      "lane": "main",
+      "col": 2,
+      "step": "03",
+      "type": "active",
+      "label": "Prefix Hashed",
+      "sublabel": "4KB header hash",
+      "tag": "hash"
+    },
+    {
+      "id": "full_hashed",
+      "lane": "main",
+      "col": 3,
+      "step": "04",
+      "type": "active",
+      "label": "Full BLAKE3",
+      "sublabel": "exact byte match",
+      "tag": "verified"
+    },
+    {
+      "id": "indexed_saved",
+      "lane": "main",
+      "col": 4,
+      "step": "05",
+      "type": "success",
+      "label": "Index Persisted",
+      "sublabel": "commit snapshot",
+      "tag": "done"
+    },
+    {
+      "id": "unique_file",
+      "lane": "terminal",
+      "col": 0,
+      "type": "failure",
+      "label": "Unique File",
+      "sublabel": "skip deeper hashing",
+      "tag": "unique"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "t1",
+      "from": "unindexed",
+      "to": "size_grouped",
+      "variant": "emphasis"
+    },
+    {
+      "id": "t2",
+      "from": "size_grouped",
+      "to": "prefix_hashed",
+      "variant": "emphasis"
+    },
+    {
+      "id": "t3",
+      "from": "prefix_hashed",
+      "to": "full_hashed",
+      "variant": "emphasis"
+    },
+    {
+      "id": "t4",
+      "from": "full_hashed",
+      "to": "indexed_saved",
+      "variant": "default"
+    },
+    {
+      "id": "t5_unique",
+      "from": "size_grouped",
+      "to": "unique_file",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "title": "Progressive Verification",
+      "dot": "emerald",
+      "items": [
+        "Unique file sizes are pruned before computing expensive cryptographic hashes",
+        "Prefix hashing discards false positive candidates before full disk read"
+      ]
+    },
+    {
+      "title": "BLAKE3 Cryptographic Safety",
+      "dot": "cyan",
+      "items": [
+        "Full BLAKE3 checksums guarantee deterministic duplicate detection",
+        "Persistent index stores hash tree for sub-second FQL queries"
+      ]
+    }
+  ]
+}

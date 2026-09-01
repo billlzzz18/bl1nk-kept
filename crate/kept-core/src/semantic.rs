@@ -439,8 +439,7 @@ mod tests {
             embeddings_endpoint("http://127.0.0.1:11434/v1"),
             "http://127.0.0.1:11434/v1/embeddings"
         );
-        let body =
-            embeddings_request_body("bge-m3", &[("first".to_string()), ("second".to_string())]);
+        let body = embeddings_request_body("bge-m3", &["first".to_string(), "second".to_string()]);
         assert_eq!(body["model"], "bge-m3");
         assert_eq!(body["input"][1], "second");
     }

@@ -1,0 +1,52 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "FQL Compilation & Scan Execution Pipeline",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    { "id": "client", "label": "CLI & User Interface" },
+    { "id": "compiler", "label": "kept-core FQL Compiler" },
+    { "id": "engine", "label": "Scan & Index Engine" }
+  ],
+  "phases": [
+    { "id": "query_input", "label": "Query Input & Parsing", "fromCol": 0, "toCol": 1 },
+    { "id": "compilation", "label": "AST Optimization", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "execution", "label": "Snapshot Evaluation", "fromCol": 4, "toCol": 5, "variant": "dashed" }
+  ],
+  "nodes": [
+    { "id": "user_cmd", "lane": "client", "col": 0, "type": "external", "label": "User Query", "sublabel": "kept find -q ...", "width": 140 },
+    { "id": "cli_entry", "lane": "client", "col": 1, "type": "frontend", "label": "CLI Dispatch", "sublabel": "parse CLI args", "width": 140 },
+    { "id": "tokenizer", "lane": "compiler", "col": 2, "type": "backend", "label": "Lexer / Tokenizer", "sublabel": "split tokens", "width": 140 },
+    { "id": "ast_compiler", "lane": "compiler", "col": 3, "type": "backend", "label": "AST Compiler", "sublabel": "FilterSet builder", "width": 140, "tag": "optimizing" },
+    { "id": "snapshot_filter", "lane": "engine", "col": 4, "type": "backend", "label": "Snapshot Evaluator", "sublabel": "in-memory predicate", "width": 140 },
+    { "id": "cli_render", "lane": "client", "col": 5, "type": "backend", "label": "Result Renderer", "sublabel": "Table / JSON view", "width": 140 }
+  ],
+  "mainPath": ["user_cmd", "cli_entry", "tokenizer", "ast_compiler", "snapshot_filter", "cli_render"],
+  "edges": [
+    { "id": "e1", "from": "user_cmd", "to": "cli_entry", "variant": "emphasis" },
+    { "id": "e2", "from": "cli_entry", "to": "tokenizer", "label": "query string" },
+    { "id": "e3", "from": "tokenizer", "to": "ast_compiler", "label": "token stream" },
+    { "id": "e4", "from": "ast_compiler", "to": "snapshot_filter", "label": "FilterSet", "variant": "emphasis" },
+    { "id": "e5", "from": "snapshot_filter", "to": "cli_render", "label": "matched records" }
+  ],
+  "cards": [
+    {
+      "title": "FQL Compilation",
+      "dot": "cyan",
+      "items": [
+        "Expressions like ext:pdf size>50MB compile to structured Rust predicates",
+        "Explain flag displays AST token decomposition before index scan"
+      ]
+    },
+    {
+      "title": "Zero-I/O Evaluation",
+      "dot": "emerald",
+      "items": [
+        "In-memory evaluation runs against loaded persistent snapshot index",
+        "No disk scanning required during repeated queries"
+      ]
+    }
+  ]
+}

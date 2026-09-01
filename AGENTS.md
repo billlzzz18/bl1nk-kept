@@ -43,3 +43,5 @@ Every implementation must follow TDD in this exact sequence: write a red (failin
 | `.learnings/` | Agent memory; retain, never expose as product data | Read `.learnings/ERRORS.md` before implementation; keep in checkout and source archive |
 
 Use `just --list` to discover project commands. The next agent must start from the requirement ledger and matching TODO item, not from old reports, snapshots, presentations, or prior chat summaries. A passing test for one new feature never substitutes for reconciliation of earlier Director requirements.
+
+

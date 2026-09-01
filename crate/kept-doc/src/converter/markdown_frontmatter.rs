@@ -4,10 +4,10 @@
 //!
 //! This is **not** a new block-level converter; it composes:
 //!
-//! 1. [`crate::api::markdown_frontmatter::detect_frontmatter`] to split
+//! 1. [`detect_frontmatter`] to split
 //!    a leading `---`-delimited YAML block from the Markdown body.
-//! 2. [`crate::ir::frontmatter::parse_frontmatter_to_properties`] /
-//!    [`crate::ir::frontmatter::properties_to_yaml`] to convert YAML ↔
+//! 2. [`parse_frontmatter_to_properties`] /
+//!    [`properties_to_yaml`] to convert YAML ↔
 //!    `PropertyValue` map (explicit `type:` tagged YAML).
 //! 3. [`MarkdownConverter`] to convert the Markdown body ↔ blocks.
 //!

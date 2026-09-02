@@ -1,5 +1,7 @@
 # TODO.md แผนงาน kept
 
+## P0 — Repository operating baseline
+
 ## 1. Handoff, สัญญา และแผนงานที่ใช้งานจริง
 
 - [ ] ปรับ `AGENTS.md` เมื่อเริ่ม implementation ให้มี repository map ของ FFF filesystem engine, `kept-vault`, package manifest, lockfile, package store, script runtime และ MCP tool modules ที่สร้างจริง

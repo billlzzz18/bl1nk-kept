@@ -1274,7 +1274,7 @@ mod search_policy_command_tests {
                 },
                 "errorMessages": {}
             },
-            "synonym_sets": [],
+            "synonymSets": [],
             "searchPolicy": {
                 "fuzzyMinSimilarity": 1.2
             },

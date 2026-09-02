@@ -3,6 +3,7 @@
   "title": "KeywordRegistry",
   "type": "object",
   "required": [
+    "foundation",
     "groups",
     "metadata",
     "validation",
@@ -10,14 +11,7 @@
   ],
   "properties": {
     "foundation": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/FoundationProfile"
-        },
-        {
-          "type": "null"
-        }
-      ]
+      "$ref": "#/definitions/FoundationProfile"
     },
     "groups": {
       "type": "array",
@@ -58,9 +52,10 @@
       "$ref": "#/definitions/ValidationConfig"
     },
     "version": {
-      "type": "string"
+      "const": "1.2.0"
     }
   },
+  "additionalProperties": false,
   "definitions": {
     "ClassificationPolicy": {
       "type": "object",
@@ -71,13 +66,18 @@
       "properties": {
         "eligibleThreshold": {
           "type": "number",
-          "format": "double"
+          "format": "double",
+          "maximum": 1.0,
+          "minimum": 0.0
         },
         "reviewThreshold": {
           "type": "number",
-          "format": "double"
+          "format": "double",
+          "maximum": 1.0,
+          "minimum": 0.0
         }
-      }
+      },
+      "additionalProperties": false
     },
     "CorpusManifest": {
       "type": "object",
@@ -95,7 +95,8 @@
         "revision": {
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "CorpusManifestEntry": {
       "type": "object",
@@ -108,7 +109,8 @@
       ],
       "properties": {
         "contentSha256": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^[0-9A-Fa-f]{64}$"
         },
         "id": {
           "type": "string"
@@ -120,9 +122,11 @@
           "type": "string"
         },
         "split": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^(build|validation|holdout)$"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "CustomFieldConfig": {
       "type": "object",
@@ -158,7 +162,8 @@
         "maxOne": {
           "type": "boolean"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "FieldSchema": {
       "type": "object",
@@ -208,7 +213,8 @@
             "type": "string"
           }
         }
-      }
+      },
+      "additionalProperties": false
     },
     "FoundationProfile": {
       "description": "NOTE-001: profile ที่ตรึง normalization/classification/corpus revision เพื่อให้ผลตรวจซ้ำได้",
@@ -270,7 +276,8 @@
         "updatedAt": {
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "GlossaryTerm": {
       "type": "object",
@@ -293,7 +300,9 @@
         },
         "confidence": {
           "type": "number",
-          "format": "double"
+          "format": "double",
+          "maximum": 1.0,
+          "minimum": 0.0
         },
         "id": {
           "type": "string"
@@ -313,7 +322,8 @@
         "term": {
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "GroupStats": {
       "type": "object",
@@ -340,7 +350,8 @@
           "type": "number",
           "format": "double"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "KeywordGroup": {
       "type": "object",
@@ -367,7 +378,9 @@
         },
         "entries": {
           "type": "array",
-          "items": true
+          "items": {
+            "type": "object"
+          }
         },
         "groupId": {
           "type": "string"
@@ -385,7 +398,8 @@
             }
           ]
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Metadata": {
       "type": "object",
@@ -427,7 +441,8 @@
           "format": "uint64",
           "minimum": 0.0
         }
-      }
+      },
+      "additionalProperties": false
     },
     "NormalizationProfile": {
       "description": "NOTE-001: policy ถูกบันทึกใน registry เพื่อให้ normalize ข้อมูลรอบหลังได้เหมือนรอบเดิม",
@@ -441,21 +456,22 @@
       ],
       "properties": {
         "casePolicy": {
-          "type": "string"
+          "const": "lowercase_latin"
         },
         "encoding": {
-          "type": "string"
+          "const": "utf-8"
         },
         "scriptPolicy": {
-          "type": "string"
+          "const": "preserve_non_latin"
         },
         "unicodeForm": {
-          "type": "string"
+          "const": "nfc"
         },
         "whitespacePolicy": {
-          "type": "string"
+          "const": "collapse"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "ProvenanceRecord": {
       "type": "object",
@@ -467,7 +483,8 @@
       ],
       "properties": {
         "contentSha256": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^[0-9A-Fa-f]{64}$"
         },
         "id": {
           "type": "string"
@@ -478,7 +495,8 @@
         "sourceUri": {
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "RegexRule": {
       "type": "object",
@@ -512,7 +530,8 @@
             "$ref": "#/definitions/RegexTestVector"
           }
         }
-      }
+      },
+      "additionalProperties": false
     },
     "RegexScope": {
       "type": "string",
@@ -538,7 +557,8 @@
         "value": {
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "RegistryIndex": {
       "type": "object",
@@ -596,7 +616,8 @@
             }
           }
         }
-      }
+      },
+      "additionalProperties": false
     },
     "RuleSeverity": {
       "type": "string",
@@ -617,7 +638,7 @@
           "default": 1024,
           "type": "integer",
           "format": "uint",
-          "minimum": 0.0
+          "minimum": 1.0
         },
         "fuzzyMinSimilarity": {
           "type": "number",
@@ -629,15 +650,16 @@
           "default": 2,
           "type": "integer",
           "format": "uint",
-          "minimum": 0.0
+          "minimum": 1.0
         },
         "maxFuzzyNgramPostings": {
           "default": 4096,
           "type": "integer",
           "format": "uint",
-          "minimum": 0.0
+          "minimum": 1.0
         }
-      }
+      },
+      "additionalProperties": false
     },
     "SynonymSet": {
       "type": "object",
@@ -676,7 +698,8 @@
         "term": {
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "ValidationConfig": {
       "type": "object",
@@ -694,7 +717,8 @@
         "rules": {
           "$ref": "#/definitions/ValidationRules"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "ValidationRules": {
       "type": "object",
@@ -738,7 +762,8 @@
             "type": "string"
           }
         }
-      }
+      },
+      "additionalProperties": false
     }
   }
 }

@@ -320,7 +320,9 @@ fn valid_normalization_profile(profile: &crate::schema::NormalizationProfile) ->
 fn valid_search_policy(policy: &crate::schema::SearchPolicy) -> bool {
     policy.fuzzy_min_similarity.is_finite()
         && (0.0..=1.0).contains(&policy.fuzzy_min_similarity)
+        && policy.fuzzy_candidate_limit > 0
         && policy.fuzzy_ngram_size > 0
+        && policy.max_fuzzy_ngram_postings > 0
 }
 
 fn validate_field(
@@ -583,6 +585,35 @@ mod foundation_profile_tests {
         let errors = Validator::new(registry)
             .validate_registry()
             .expect_err("out-of-range user search policy must be rejected");
+
+        assert!(errors
+            .iter()
+            .any(|error| error.code == "INVALID_SEARCH_POLICY"));
+    }
+
+    #[test]
+    fn validator_rejects_zero_fuzzy_search_budgets() {
+        let legacy = KeywordRegistry {
+            version: "1.1.0".to_string(),
+            metadata: Metadata::default(),
+            groups: Vec::new(),
+            validation: ValidationConfig::default(),
+            synonym_sets: Vec::new(),
+            index: None,
+            search_policy: None,
+            foundation: None,
+        };
+        let mut registry = migrate_registry(legacy).expect("legacy registry must migrate");
+        registry.search_policy = Some(SearchPolicy {
+            fuzzy_min_similarity: 0.3,
+            fuzzy_candidate_limit: 0,
+            fuzzy_ngram_size: 0,
+            max_fuzzy_ngram_postings: 0,
+        });
+
+        let errors = Validator::new(registry)
+            .validate_registry()
+            .expect_err("zero search budgets must be rejected");
 
         assert!(errors
             .iter()

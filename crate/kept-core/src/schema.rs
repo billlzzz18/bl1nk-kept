@@ -5,14 +5,108 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+pub const PUBLIC_REGISTRY_SCHEMA_VERSION: &str = "1.2.0";
+
 /// NOTE-001: สร้าง JSON Schema จาก model registry ปัจจุบันเพื่อให้ artifact ภายนอกไม่ drift จาก Rust source
 pub fn export_keyword_registry_schema() -> schemars::schema::RootSchema {
-    schemars::schema_for!(KeywordRegistry)
+    let mut schema = serde_json::to_value(schemars::schema_for!(KeywordRegistry))
+        .expect("generated registry schema must serialize");
+    tighten_public_schema(&mut schema);
+    serde_json::from_value(schema).expect("tightened registry schema must remain valid")
+}
+
+fn tighten_public_schema(schema: &mut serde_json::Value) {
+    let root = schema
+        .as_object_mut()
+        .expect("generated registry schema must be an object");
+    let required = root
+        .get_mut("required")
+        .and_then(serde_json::Value::as_array_mut)
+        .expect("generated registry schema must define required root fields");
+    if !required.iter().any(|field| field == "foundation") {
+        required.push(serde_json::Value::String("foundation".to_string()));
+    }
+    root.insert(
+        "additionalProperties".to_string(),
+        serde_json::Value::Bool(false),
+    );
+
+    let properties = root
+        .get_mut("properties")
+        .and_then(serde_json::Value::as_object_mut)
+        .expect("generated registry schema must define root properties");
+    properties.insert(
+        "version".to_string(),
+        serde_json::json!({ "const": PUBLIC_REGISTRY_SCHEMA_VERSION }),
+    );
+    properties.insert(
+        "foundation".to_string(),
+        serde_json::json!({ "$ref": "#/definitions/FoundationProfile" }),
+    );
+
+    let definitions = root
+        .get_mut("definitions")
+        .and_then(serde_json::Value::as_object_mut)
+        .expect("generated registry schema must define nested types");
+    for name in [
+        "ClassificationPolicy",
+        "CorpusManifest",
+        "CorpusManifestEntry",
+        "CustomFieldConfig",
+        "FieldSchema",
+        "FoundationProfile",
+        "GlossaryTerm",
+        "GroupStats",
+        "KeywordGroup",
+        "Metadata",
+        "NormalizationProfile",
+        "ProvenanceRecord",
+        "RegexRule",
+        "RegexTestVector",
+        "RegistryIndex",
+        "SearchPolicy",
+        "SynonymSet",
+        "ValidationConfig",
+        "ValidationRules",
+    ] {
+        definitions
+            .get_mut(name)
+            .and_then(serde_json::Value::as_object_mut)
+            .expect("generated definition must exist")
+            .insert(
+                "additionalProperties".to_string(),
+                serde_json::Value::Bool(false),
+            );
+    }
+
+    definitions
+        .get_mut("KeywordGroup")
+        .and_then(|definition| definition.get_mut("properties"))
+        .and_then(|properties| properties.get_mut("entries"))
+        .and_then(serde_json::Value::as_object_mut)
+        .expect("KeywordGroup entries schema must exist")
+        .insert("items".to_string(), serde_json::json!({ "type": "object" }));
+
+    let normalization = definitions
+        .get_mut("NormalizationProfile")
+        .and_then(|definition| definition.get_mut("properties"))
+        .and_then(serde_json::Value::as_object_mut)
+        .expect("NormalizationProfile properties must exist");
+    for (field, value) in [
+        ("encoding", "utf-8"),
+        ("unicodeForm", "nfc"),
+        ("whitespacePolicy", "collapse"),
+        ("casePolicy", "lowercase_latin"),
+        ("scriptPolicy", "preserve_non_latin"),
+    ] {
+        normalization.insert(field.to_string(), serde_json::json!({ "const": value }));
+    }
 }
 
 // ============= Registry Types =============
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
 pub struct KeywordRegistry {
     pub version: String,
     pub metadata: Metadata,
@@ -34,6 +128,7 @@ pub struct KeywordRegistry {
 
 /// NOTE-001: profile ที่ตรึง normalization/classification/corpus revision เพื่อให้ผลตรวจซ้ำได้
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema, Default)]
+#[serde(deny_unknown_fields)]
 pub struct FoundationProfile {
     #[serde(rename = "schemaVersion")]
     pub schema_version: String,
@@ -72,6 +167,7 @@ pub struct FoundationProfile {
 
 /// NOTE-001: policy ถูกบันทึกใน registry เพื่อให้ normalize ข้อมูลรอบหลังได้เหมือนรอบเดิม
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
 pub struct NormalizationProfile {
     pub encoding: String,
     #[serde(rename = "unicodeForm")]
@@ -98,6 +194,7 @@ impl Default for NormalizationProfile {
 
 /// NOTE-001: ค่าค้นหาเป็น policy ของเจ้าของ registry; default คงผลเดิมที่ผ่าน benchmark แล้วแต่ไม่บังคับทุก dataset
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
 pub struct SearchPolicy {
     #[serde(rename = "fuzzyMinSimilarity")]
     #[schemars(range(min = 0.0, max = 1.0))]
@@ -106,13 +203,16 @@ pub struct SearchPolicy {
         default = "default_fuzzy_candidate_limit",
         rename = "fuzzyCandidateLimit"
     )]
+    #[schemars(range(min = 1))]
     pub fuzzy_candidate_limit: usize,
     #[serde(default = "default_fuzzy_ngram_size", rename = "fuzzyNgramSize")]
+    #[schemars(range(min = 1))]
     pub fuzzy_ngram_size: usize,
     #[serde(
         default = "default_max_fuzzy_ngram_postings",
         rename = "maxFuzzyNgramPostings"
     )]
+    #[schemars(range(min = 1))]
     pub max_fuzzy_ngram_postings: usize,
 }
 
@@ -140,6 +240,7 @@ impl Default for SearchPolicy {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
 pub struct SynonymSet {
     pub term: String,
     #[serde(default)]
@@ -153,6 +254,7 @@ pub struct SynonymSet {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
 pub struct RegistryIndex {
     #[serde(rename = "lastIndexed")]
     pub last_indexed: String,
@@ -169,6 +271,7 @@ pub struct RegistryIndex {
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
 pub struct Metadata {
     #[serde(rename = "lastUpdated")]
     pub last_updated: String,
@@ -187,6 +290,7 @@ pub struct Metadata {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
 pub struct KeywordGroup {
     #[serde(rename = "groupId")]
     pub group_id: String,
@@ -207,6 +311,7 @@ pub struct KeywordGroup {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
 pub struct GroupStats {
     #[serde(rename = "totalWeight")]
     pub total_weight: f64,
@@ -217,6 +322,7 @@ pub struct GroupStats {
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
 pub struct FieldSchema {
     #[serde(rename = "type")]
     pub field_type: String,
@@ -235,6 +341,7 @@ pub struct FieldSchema {
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
 pub struct CustomFieldConfig {
     pub enabled: bool,
     #[serde(rename = "maxOne")]
@@ -251,6 +358,7 @@ pub struct CustomFieldConfig {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
 pub struct ValidationConfig {
     pub rules: ValidationRules,
     #[serde(rename = "errorMessages")]
@@ -275,6 +383,7 @@ impl Default for ValidationConfig {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
 pub struct ValidationRules {
     #[serde(rename = "aliasMinLength")]
     pub alias_min_length: usize,
@@ -375,16 +484,19 @@ mod schema_export_tests {
 
         let validator =
             jsonschema::validator_for(&schema).expect("schema must compile for consumers");
-        let valid_registry = serde_json::to_value(KeywordRegistry {
-            version: "1.2.0".to_string(),
-            metadata: Metadata::default(),
-            groups: Vec::new(),
-            validation: ValidationConfig::default(),
-            synonym_sets: Vec::new(),
-            index: None,
-            search_policy: None,
-            foundation: None,
-        })
+        let valid_registry = serde_json::to_value(
+            crate::migrate_registry(KeywordRegistry {
+                version: "1.1.0".to_string(),
+                metadata: Metadata::default(),
+                groups: Vec::new(),
+                validation: ValidationConfig::default(),
+                synonym_sets: Vec::new(),
+                index: None,
+                search_policy: None,
+                foundation: None,
+            })
+            .expect("legacy fixture must migrate before validating against the canonical schema"),
+        )
         .expect("registry must serialize to JSON");
         assert!(validator.is_valid(&valid_registry));
         assert!(!validator.is_valid(&json!({
@@ -400,6 +512,71 @@ mod schema_export_tests {
             "maxFuzzyNgramPostings": 4096
         });
         assert!(!validator.is_valid(&invalid_policy));
+    }
+
+    #[test]
+    fn public_schema_rejects_noncanonical_registry_shape_and_zero_search_budgets() {
+        let schema = serde_json::to_value(export_keyword_registry_schema())
+            .expect("schema export must serialize to JSON");
+        let validator =
+            jsonschema::validator_for(&schema).expect("schema must compile for consumers");
+        let canonical = json!({
+            "version": "1.2.0",
+            "metadata": {
+                "lastUpdated": "2026-09-02T00:00:00Z",
+                "description": "registry",
+                "owner": "kept"
+            },
+            "groups": [],
+            "validation": {
+                "rules": {
+                    "aliasMinLength": 1,
+                    "aliasMaxLength": 255,
+                    "descriptionMinLength": 0,
+                    "descriptionMaxLength": 10000,
+                    "customFieldPerEntry": 50,
+                    "requiredBaseFields": ["id", "aliases"]
+                },
+                "errorMessages": {}
+            },
+            "foundation": {
+                "schemaVersion": "1.2.0",
+                "normalization": {
+                    "encoding": "utf-8",
+                    "unicodeForm": "nfc",
+                    "whitespacePolicy": "collapse",
+                    "casePolicy": "lowercase_latin",
+                    "scriptPolicy": "preserve_non_latin"
+                },
+                "createdAt": "2026-09-02T00:00:00Z",
+                "updatedAt": "2026-09-02T00:00:00Z"
+            }
+        });
+        assert!(validator.is_valid(&canonical));
+
+        let mut missing_foundation = canonical.clone();
+        missing_foundation
+            .as_object_mut()
+            .expect("fixture is an object")
+            .remove("foundation");
+        assert!(!validator.is_valid(&missing_foundation));
+
+        let mut legacy_version = canonical.clone();
+        legacy_version["version"] = json!("1.1.0");
+        assert!(!validator.is_valid(&legacy_version));
+
+        let mut zero_budget = canonical.clone();
+        zero_budget["searchPolicy"] = json!({
+            "fuzzyMinSimilarity": 0.3,
+            "fuzzyCandidateLimit": 0,
+            "fuzzyNgramSize": 0,
+            "maxFuzzyNgramPostings": 0
+        });
+        assert!(!validator.is_valid(&zero_budget));
+
+        let mut unknown_root_field = canonical;
+        unknown_root_field["typo"] = json!(true);
+        assert!(!validator.is_valid(&unknown_root_field));
     }
 
     #[test]

@@ -135,8 +135,10 @@ impl EvidenceRecord {
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema, PartialEq)]
 pub struct ClassificationPolicy {
     #[serde(rename = "eligibleThreshold")]
+    #[schemars(range(min = 0.0, max = 1.0))]
     pub eligible_threshold: f64,
     #[serde(rename = "reviewThreshold")]
+    #[schemars(range(min = 0.0, max = 1.0))]
     pub review_threshold: f64,
 }
 
@@ -184,6 +186,7 @@ pub struct ProvenanceRecord {
     pub source_uri: String,
     pub license: String,
     #[serde(rename = "contentSha256")]
+    #[schemars(regex(pattern = "^[0-9A-Fa-f]{64}$"))]
     pub content_sha256: String,
 }
 
@@ -197,6 +200,7 @@ pub struct GlossaryTerm {
     pub aliases: Vec<String>,
     #[serde(rename = "provenanceId")]
     pub provenance_id: String,
+    #[schemars(range(min = 0.0, max = 1.0))]
     pub confidence: f64,
 }
 
@@ -379,7 +383,9 @@ pub struct CorpusManifestEntry {
     pub source_uri: String,
     pub license: String,
     #[serde(rename = "contentSha256")]
+    #[schemars(regex(pattern = "^[0-9A-Fa-f]{64}$"))]
     pub content_sha256: String,
+    #[schemars(regex(pattern = "^(build|validation|holdout)$"))]
     pub split: String,
 }
 

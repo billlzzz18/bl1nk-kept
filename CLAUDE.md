@@ -5,6 +5,11 @@ code in this repository.
 
 ## Build, Test & Lint Commands
 
+Pre-commit & Full Validation:
+
+- Run all repo checks: `just check` (runs line-ending normalization, fmt check, tests, clippy, python contracts, cli smoke, schema validation, markdown links, version contract) <!-- rumdl-disable-line line-length -->
+- Regenerate public schema: `just schema` (updates `schema/keyword-registry.schema.json`)
+
 Cargo workspace commands:
 
 - Build entire workspace: `cargo build --workspace`

@@ -1,64 +1,95 @@
+<!-- markdownlint-disable MD013 -->
 # bl1nk-kept
 
 [English](README.md) · [Specification](SPEC.md) · [คู่มือคำสั่ง](get-start.md) · [Schema](schema/README.md) · [Benchmarks](benchmarks/README.md)
 
-**bl1nk-kept** คือชุดเครื่องมือและ Rust workspace สำหรับตรวจสอบ keyword, วิเคราะห์ filesystem, ค้นหาไฟล์ซ้ำ (duplicate detection) และแปลงเอกสารแบบ offline ผ่าน CLI เดียวชื่อ `kept`.
+**bl1nk-kept** คือชุดเครื่องมือและ Rust workspace แบบ local-first ที่ให้บริการทั้ง CLI (`kept`) และ stdio MCP server (`bl1nk-kept-mcp`) สำหรับจัดการ keyword registry, วิเคราะห์ระบบไฟล์, ตรวจจับไฟล์ซ้ำแบบหลายขั้นตอน และแปลงเอกสารแบบ offline
 
-| Crate | หน้าที่ |
+| Crate | ความรับผิดชอบ |
 | --- | --- |
-| `kept-core` | Data model ของ registry, BM25 / Thai bigram search, ScanIndex, ระบบตรวจจับไฟล์ซ้ำ และ data foundations |
-| `kept-doc` | เครื่องมือแปลงเอกสารแบบ offline ผ่าน Universal IR และ Notion Markdown (NFM) |
-| `kept-cli` | Command-line interface หลักชื่อ `kept` สำหรับผู้ใช้งาน |
-| `kept-mcp` | Model Context Protocol (MCP) server `bl1nk-kept-mcp` สำหรับเชื่อมต่อ AI Agent |
+| `kept-core` | Data model ของ registry, BM25 / Thai bigram search, ScanIndex snapshots, ระบบตรวจจับไฟล์ซ้ำ 4 ขั้นตอน, semantic search และ data foundations |
+| `kept-doc` | เครื่องมือแปลงเอกสารแบบ offline ผ่าน Universal IR รองรับ Markdown, Notion Markdown (NFM), DOCX และ PDF (Pure Library) |
+| `kept-cli` | Command-line interface หลัก (`kept`) พร้อมเมนู interactive, ระบบ doctor ตรวจสอบสภาพแวดล้อม และ task-first execution |
+| `kept-mcp` | Stdio Model Context Protocol (MCP) server `bl1nk-kept-mcp` ให้บริการ tools ด้าน filesystem, เอกสาร และตารางสำหรับ AI Agent |
 
-## ทำไมต้อง bl1nk-kept
+## ความสามารถหลัก
 
-**เส้นทางหลักฐานเดียวสำหรับชื่อ ไฟล์ และเอกสาร** `kept` เริ่มจาก keyword registry และ filesystem index แล้วแยกสัญญาณออกจากกัน: ความคล้ายทางภาษาไม่ใช่ความเท่ากันของเนื้อหา และ duplicate ทุกกลุ่มมีหลักฐานยืนยันชัดเจนจาก size, partial hash, full hash และ group evidence
+**1. ตรวจจับไฟล์ซ้ำและสร้างหลักฐานยืนยัน (Progressive Duplicate Detection)**
+- Pipeline ตรวจสอบ 4 ขั้นตอนแบบ read-only ปลอดภัยต่อไฟล์ต้นทาง: `size bucket` → `partial SHA-256` → `full SHA-256` → `group evidence`
+- จัดหมวดหมู่ชัดเจน: `same_name`, `near_name`, `same_content` และ `hard_link`
+- รับประกันความปลอดภัย: ไม่มีการแก้ไขหรือลบไฟล์ต้นทางของผู้ใช้โดยอัตโนมัติ
 
-**ค้นหาภาษาไทยโดยไม่ซ่อนความไม่แน่ใจ** BM25, Thai bigram, synonym compatibility และ n-gram fuzzy retrieval ทำงานร่วมกัน โดย near match ยังคงเป็น candidate ที่ตรวจสอบได้ ไม่ถูกแปลงเป็นข้อมูลจริงโดยพลการ
+**2. ค้นหาภาษาไทยแบบไฮบริด (Thai-Aware & Hybrid Semantic Search)**
+- ผสาน BM25 inverted index เข้ากับ Thai bigram tokenization, synonym expansion และ n-gram fuzzy candidate filtering
+- คะแนนและผลลัพธ์โปร่งใส: near match ยังคงเป็น candidate ที่ตรวจสอบได้ ไม่ถูกแปลงเป็นข้อมูลจริงโดยพลการ
+- รองรับ Dense Vector Search และ Reranking ผ่าน Ollama และ Jina พร้อมแยกแจกแจงคะแนนชัดเจน
 
-**งานเอกสารแบบ offline ที่ตรวจย้อนกลับได้** Universal IR กำหนดเป้าหมายแบบ typed data สำหรับการแปลง Markdown แทนการมองเอกสารเป็นข้อความทั่วไป และมี pipeline รองรับการแยก native extraction, page diagnostics และ OCR ชัดเจน
+**3. วิเคราะห์ระบบไฟล์และกฎการตั้งชื่อ (Filesystem Analytics & Naming Rules)**
+- บันทึกสถานะโฟลเดอร์ลงใน `ScanIndex` snapshots พร้อมเก็บ structured `ScanIssue` diagnostics
+- ตรวจสอบกฎการตั้งชื่อตาม profile แบบ read-only รองรับ absolute path scoping, priority resolution และ conflict detection
+- เมนู Interactive TUI ใน terminal สำหรับตรวจดูการใช้พื้นที่, กลุ่มไฟล์ซ้ำ และข้อผิดพลาดในการตั้งชื่อ
 
-**ค่าเริ่มต้นที่อธิบายได้เสมอ** มี public corpus provenance, ผลการทดสอบซ้ำ, raw benchmark artifacts และ JSON schema ที่สร้างขึ้นอัตโนมัติ ทำให้ทุกการตัดสินใจสามารถตรวจสอบและปรับปรุงได้
+**4. แปลงเอกสารแบบ Offline ผ่าน Universal IR**
+- ใช้ Intermediate Representation (IR) ในการแปลงโครงสร้างระหว่าง GitHub Flavored Markdown (GFM), Notion Markdown (NFM), DOCX และ PDF โดยไม่ต้องพึ่งพา network
 
 ## การติดตั้งและเริ่มต้นใช้งาน
 
-### คอมไพล์และติดตั้ง
+### คอมไพล์จาก Source
 
 ```bash
 cargo build --release -p kept-cli --bin kept
 ```
 
-### คำสั่งที่ใช้งานบ่อย
+### การใช้งานทั่วไป
 
 ```bash
+# สร้าง config เริ่มต้นและตรวจความพร้อมของระบบ
 kept setup
 kept doctor
+
+# สแกนโฟลเดอร์ สร้าง persistent snapshot และเปิดเมนูตรวจสอบ
 kept scan ./workspace
-kept review ./workspace
+
+# ค้นหาและกรองไฟล์จาก index เดิมอย่างรวดเร็ว (ไม่ต้องสแกนซ้ำ)
 kept find ./workspace --type pdf --min-size 50mb
+kept find ./workspace --query "รายงานประจำปี"
+
+# ตรวจสอบไฟล์ซ้ำและวิเคราะห์การใช้พื้นที่
 kept duplicates ./workspace
+kept review ./workspace
+
+# ค้นหาคำใน Keyword Registry ด้วย Thai BM25 / Fuzzy search
 kept search "คำค้นหา"
 ```
 
-### การตั้งค่า (Configuration)
+### การตั้งค่าคอนฟิก (Configuration)
 
-`config.yaml` เป็นไฟล์ของผู้ใช้:
+ไฟล์ตั้งค่าถูกเก็บในตำแหน่งมาตรฐานของระบบปฏิบัติการ (`%APPDATA%/kept/config.yaml` บน Windows, `~/.config/kept/config.yaml` บน Linux/macOS):
 
-- `kept config` แสดงสรุป profiles และ scopes ที่ตั้งค่าไว้
-- `kept config defaults`, `kept config profile` และ `kept config scope` จัดการค่าคอนฟิกผ่านคำสั่ง task-level
-- `kept doctor --fix` ช่วยกู้คืน config ที่หายหรือเสียหายโดยสำรองไฟล์เดิมไว้ก่อนเสมอ
-- `kept review` ตรวจสอบข้อกำหนดการตั้งชื่อตาม profile ในโหมด read-only ปลอดภัยต่อไฟล์ต้นทาง
+- `kept config`: ดูสรุปคอนฟิก, profiles และลำดับ scope hierarchy
+- `kept config profile`: จัดการ profile กฎการตั้งชื่อ, ตัวพิมพ์เล็ก/ใหญ่, ตัวคั่น, shortcuts และค่า similarity threshold
+- `kept config scope`: ผูก profile เข้ากับ absolute path พร้อมกำหนด priority และข้อยกเว้น
+- `kept doctor --fix`: ตรวจสอบและกู้คืน config ที่เสียหายอย่างปลอดภัย พร้อมสำรองไฟล์เดิมอัตโนมัติ (`.invalid*.bak`)
 
-## เอกสารประกอบ
+## Model Context Protocol (MCP)
 
-| หัวข้อ | รายละเอียด |
+รัน stdio MCP server สำหรับเชื่อมต่อกับเครื่องมือภายนอก (Claude Code, Cursor, Windsurf, Zed):
+
+```bash
+cargo run --release -p kept-mcp --bin bl1nk-kept-mcp
+```
+
+ให้บริการเครื่องมือแปลงเอกสาร, สกัดตาราง และสืบค้นระบบไฟล์ผ่าน JSON-RPC มาตรฐาน
+
+## เอกสารประกอบและสถาปัตยกรรม
+
+| เอกสาร | รายละเอียด |
 | --- | --- |
-| [คู่มือคำสั่ง CLI](get-start.md) | คู่มือการใช้งานคำสั่งย่อยและพารามิเตอร์ทั้งหมดของ `kept` |
-| [Specification](SPEC.md) | ข้อกำหนดทางเทคนิค สถาปัตยกรรม และขอบเขตการทำงานของระบบ |
-| [Registry Schema](schema/README.md) | สัญญาณข้อมูล JSON Schema (Draft-07) สำหรับ Keyword Registry |
-| [Benchmarks](benchmarks/README.md) | ระเบียบวิธีและผลการวัดประสิทธิภาพ พร้อมชุดข้อมูลดิบและกราฟเปรียบเทียบ |
-| [คู่มือการมีส่วนร่วม](CONTRIBUTING.md) | แนวทางการพัฒนา การเขียนโค้ด และการส่ง Pull Request |
+| [คู่มือคำสั่ง CLI](get-start.md) | คู่มือการใช้งานคำสั่งย่อย พารามิเตอร์ และ flags ทั้งหมดของ `kept` |
+| [ข้อกำหนดผลิตภัณฑ์](SPEC.md) | สัญญาณเชิงเทคนิค สถาปัตยกรรม และขอบเขตความรับผิดชอบของแต่ละ crate |
+| [Registry Schema](schema/README.md) | สัญญาณ Draft-07 JSON Schema ที่สร้างขึ้นโดยตรงจาก Rust type model |
+| [ผลการวัดประสิทธิภาพ](benchmarks/README.md) | ระเบียบวิธีทดสอบ, ผลประเมิน Thai tokenizer, ชุดข้อมูล JSONL และกราฟ |
+| [คู่มือการมีส่วนร่วม](CONTRIBUTING.md) | แนวทางการพัฒนา, การทดสอบก่อน commit และสไตล์ไกด์ |
 
 ## License
 

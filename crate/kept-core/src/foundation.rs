@@ -956,7 +956,7 @@ mod default_selection_tests {
                 covered_strata: constraints.required_strata.clone(),
             },
             DefaultCandidate {
-                id: "selected".to_string(),
+                id: r#"selected"#.to_string(),
                 f1: 0.95,
                 false_positive_count: 0,
                 p95_latency_ms: 2.0,

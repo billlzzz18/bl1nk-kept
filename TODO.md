@@ -1,80 +1,279 @@
-# TODO
+# TODO.md แผนงาน kept
 
-## P0 — Repository operating baseline
+## 1. Handoff, สัญญา และแผนงานที่ใช้งานจริง
 
-- [x] Public registry schema generate จาก Rust model ที่ `schema/keyword-registry.schema.json`
-- [x] Schema drift check, Draft-07 consumer validation, runtime shared-fixture validation และ policy-boundary regression tests
-- [x] Project-local repository operating skill ที่ `.agents/skills/repository-operating-recovery/`
-- [x] `Justfile`, Rust format/lint policy, repository contracts, public CLI smoke audit, link/version/package tools และ GitHub workflow template
-- [x] Source package รวม `.learnings/`, research, schema, benchmarks และ project-local skills; ตัด build cache/VCS/previous packages/presentation
+- [ ] ปรับ `AGENTS.md` เมื่อเริ่ม implementation ให้มี repository map ของ FFF filesystem engine, `kept-vault`, package manifest, lockfile, package store, script runtime และ MCP tool modules ที่สร้างจริง
 
-## P0 — Duplicate scan ที่ยืนยันเนื้อหา
+- [ ] ระบุ ownership ตามโค้ดจริง: `kept-core` เป็น filesystem/vault domain, `kept-cli` เป็น command surface, `kept-mcp` เป็น long-running MCP service, `kept-doc` เป็น document conversion library
 
-- [x] Content-verified duplicate engine: `size bucket → partial SHA-256 → full SHA-256`
-- [x] จำแนก `same_name`, `near_name`, `same_content`, `hard_link` พร้อม confidence/evidence และ deterministic output
-- [x] `kept scan <directory>` สร้างหรือ refresh persistent index พร้อม deterministic delta และ scan diagnostics แบบ read-only
-- [x] `kept review`, `kept find` และ `kept duplicates` ใช้ index เดียวกัน; มี TTY review menu และ non-interactive `--json`/`--action export-plan --yes`
-- [x] **User config lifecycle and read-only naming review**: `kept setup` สร้าง OS-appropriate `config.yaml` เพียงครั้งเดียว; `kept config` สรุป config และ `config defaults/profile/scope` จัดการ YAML ของผู้ใช้ผ่าน task-level commands; `config edit` เป็น advanced path; `doctor`/`doctor --fix` รายงานและกู้ missing/invalid config พร้อม backup; `review` วิเคราะห์ naming จาก scope absolute ที่ผู้ใช้กำหนดโดยไม่ rename/apply
-- [x] **Registry group management**: `kept group` แสดง supported field types, list/show/add/set/remove/move groups และ list/add/remove group schema fields โดยตรวจ registry ก่อน save
-- [x] **CLI command modularization**: แยก command handlers จาก `main.rs` ไป `crate/kept-cli/src/commands/` โดยคง arguments, behavior และ tests เดิม; `cargo fmt --all -- --check`, `cargo test --workspace`, repository contracts และ CLI smoke ผ่าน
-- [x] **Duplicate mutation policy and residual regressions**
-  - เริ่มจาก review/export เท่านั้น; ออกแบบ mutation policy, allow-list, rollback และ simulation ก่อนเปิด delete/rename/hard-link replacement
-  - เพิ่ม unreadable-file, partial-hash collision และ action-scope regression cases
+- [ ] เพิ่มงานที่เริ่มจริงลง `TODO.md` เป็น checkbox ระดับ behavior ไม่รวม report หรือ ticket ซ้ำซ้อน
 
-## P1 — Evidence system and data foundation
+- [ ] อัปเดต `SPEC.md` เฉพาะ public CLI/MCP/package contract ที่ implementation และ smoke proof ผ่านแล้ว
 
-- [x] Foundation schema 1.2.0: deterministic migration, UTF-8/NFC profile, glossary/provenance/regex/classifier/corpus-manifest slots
-- [x] Public CC0 Thai seed corpus (`words_th`, `stopwords_th`) พร้อม URI/license/SHA-256 manifest และ integrity test
-- [x] JSONL anonymized importer, evidence-first classifier, regex vector validator และ repeated experiment selection
-- [x] **Obsidian translations modern UI terms intake**: สกัด 2,595 terms จาก `obsidian-translations` เข้าสู่ `data/corpus/obsidian_terms.jsonl` พร้อม provenance
-- [ ] **Hybrid Semantic Search & Reranking Engine**
-  - Dense embeddings vector retrieval (Ollama `bge-m3` / Jina) ร่วมกับ BM25 Lexical + Thai Bigram
-  - Vector similarity caching บน disk เพื่อลด latency
-  - Cross-encoder reranker pipeline (`bge-reranker-v2-m3` / Jina Rerank)
-  - CLI `kept search --semantic` / `--hybrid` และ MCP search tools
-- [ ] **Dogfooding & End-to-End Evaluation Loop**
-  - รัน Dogfooding ทดสอบ scan/find/query/convert/semantic บน workspace จริง
-  - ตรวจสอบความถูกต้องของ Bigram Tokenizer กับคำศัพท์ไทยสมัยใหม่และ edge cases
-- [ ] **Evidence run and correction loop**
-  - immutable run manifest, raw JSONL, offline rescore และ append-only correction history
-  - `kept:debt` marker parser/ledger และ gain scoreboard ที่เปรียบเทียบเฉพาะ comparable runs
-  - self-test good/bad fixtures และ correctness/safety gates
-- [ ] **Gold keyword corpus, review and dictionary**
-  - 10,000 provenance-linked reviewed assertions ครอบคลุม canonical/variant/synonym/homograph/homophone/semantic relation/transliteration/command/prohibition/named entity/numeral/ambiguity/negative/boundary
-  - เก็บ raw scan/Markdown/HTML/PDF เป็น source evidence และใช้ sidecar annotation เมื่อแก้ source ไม่ได้
-  - accepted review materialize เป็น dictionary; hypothesis/fuzzy candidate ห้าม promote อัตโนมัติ
-  - [x] เพิ่ม CLI สำหรับ corpus import, validation report, snapshot save/load และ experiment replay โดยไม่เปิด automatic keyword mutation
+- [ ] อัปเดต `CHANGELOG.md` เฉพาะ behavior สาธารณะที่เปลี่ยนจริงใน session นั้น
+
+- [ ] reconcile `.agents/MEMORY.md` ทุก requirement ที่แตะ พร้อม red test, focused test, command proof และเอกสารที่เปลี่ยน
+
+- [ ] รักษา flow ทุก slice เป็น TDD red → minimal implementation → focused green → command-level proof → `just check`
+
+## 2. แทน filesystem traversal เดิมด้วย FFF ใน kept-core
+
+- [ ] ทำ TDD red สำหรับ fixture ที่มี Git repository, `.gitignore`, `.ignore`, hidden files, `node_modules`, `venv`, `.venv`, `__pycache__`, `target`, symlink, binary file, modified file และ untracked file
+
+- [ ] เขียน test ยืนยันว่า scan คืน file set ตาม FFF ignore semantics และ path ทุกตัวเป็น relative path แบบ deterministic
+
+- [ ] เขียน test ยืนยัน metadata ที่ kept ต้องใช้: path, name, extension, size, modified time, binary state และ Git status
+
+- [ ] เพิ่ม `fff-search` dependency แบบ pinned ใน workspace และ `crate/kept-core/Cargo.toml`
+
+- [ ] รัน `cargo check -p kept-core` หลังเพิ่ม dependency แล้วแก้ version/feature incompatibility ให้ build ผ่านก่อนเริ่ม adapter
+
+- [ ] สร้าง `crate/kept-core/src/scanner/fff.rs` สำหรับสร้าง FFF `FilePicker`, รอ initial scan, อ่าน scan progress, ดึง file metadata และ trigger rescan
+
+- [ ] ใช้ FFF mode สำหรับ agent, content indexing, Git status cache และ ignore engine ใน adapter
+
+- [ ] สร้าง typed errors สำหรับ FFF initialization failure, invalid root, scan timeout และ index-not-ready
+
+- [ ] ขยาย `FileRecord` ให้เก็บ `isBinary` และ `gitStatus` แบบ backward-compatible
+
+- [ ] version-bump `PersistentScanSnapshot` และสร้าง migration/read error สำหรับ snapshot รุ่นที่ไม่มี FFF metadata
+
+- [ ] แทน `std::fs::read_dir` recursive traversal ใน `scanner/scan.rs` ด้วย FFF adapter
+
+- [ ] เก็บ `ScanIssue` สำหรับ metadata/indexing failure โดยไม่ทำให้ผล scan ส่วนที่เข้าถึงได้หายไป
+
+- [ ] ลบ traversal implementation เดิมเมื่อ adapter tests ผ่านและไม่มี code path เรียกใช้งานแล้ว
+
+## 3. ย้าย kept scan, find, review, duplicates และ incremental index ไปใช้ FFF-backed index
+
+- [ ] ทำ TDD red สำหรับ `kept scan <root>` ให้สร้าง snapshot จาก FFF file inventory และรายงาน file count, total size, issues และ refresh delta แบบ deterministic
+
+- [ ] แก้ `create_or_refresh_scan` ให้รอ FFF initial scan/index readiness ก่อนเขียน snapshot
+
+- [ ] รักษา `kept scan --output`, `--json`, default user-state snapshot และ portable snapshot ให้ทำงานต่อเนื่อง
+
+- [ ] ทำ TDD red ให้ `kept scan` เคารพ `.gitignore`; `--include-hidden` ต้องไม่ bypass ignore rule
+
+- [ ] ทำ TDD red สำหรับ `kept find --query` ด้วย typo path query แล้ว assert ว่าคืน fuzzy match, score และ Git status
+
+- [ ] รักษา `kept find --type`, `--name`, `--path`, `--min-size`, `--max-size`, `--after`, `--before` และ FQL facts เดิม
+
+- [ ] ให้ FFF คัด candidate paths ก่อน แล้วให้ `FilterSet` ตัดสิน extension, size, modified time, duplicate facts และ custom filters ต่อ
+
+- [ ] เพิ่ม FFF score และ Git status ใน JSON output แบบ additive โดยไม่เปลี่ยน field เดิม
+
+- [ ] ทำ TDD red สำหรับ `kept review` ให้ใช้ FFF-backed snapshot เดียวกับ scan และยังแสดง space summary, scan issue, integrity finding และ naming finding ได้
+
+- [ ] คง duplicate verification `size bucket → partial SHA-256 → full SHA-256` ไว้ โดยใช้ candidate records จาก FFF-backed snapshot
+
+- [ ] ทำ TDD red ยืนยัน same-name, near-name, same-content และ hard-link reports ไม่ regress หลังเปลี่ยน engine
+
+- [ ] ทำ persistent incremental index optimization โดยใช้ FFF watcher events และ refresh plan เพื่อลด traversal/hash งานซ้ำ แต่ยังมี full rescan fallback เมื่อ watcher แจ้ง event loss หรือ ignore rules เปลี่ยน
+
+- [ ] อัปเดต CLI smoke ให้ครอบคลุม ignore semantics, fuzzy find, portable index, review และ duplicate report จาก snapshot เดียวกัน
+
+## 4. รวม FFF, filesystem tools และ MCP contract เข้า bl1nk-kept-mcp
+
+- [ ] ทำ TDD red สำหรับ unified MCP tool registration: `filesystem_find`, `filesystem_grep`, `filesystem_multi_grep`, `filesystem_rescan`, `filesystem_status`
+
+- [ ] สร้าง `FffManager` ใน `crate/kept-mcp/src/mcp/` เก็บ FFF instance ต่อ canonical root และ reuse index/watcher ตลอดอายุ MCP server
+
+- [ ] ให้ manager สร้าง instance เมื่อเรียก root ครั้งแรก, รอ readiness ด้วย timeout, reuse instance เดิม และ cleanup worker/watcher/cache เมื่อ server ปิด
+
+- [ ] ทำ `filesystem_find` คืน fuzzy path, size, modified time, binary state, Git status, score, pagination cursor และ total matches
+
+- [ ] ทำ `filesystem_grep` คืน path, line number, column, line content, context, match range และ cursor
+
+- [ ] ทำ `filesystem_multi_grep` ใช้ OR semantics ของ FFF พร้อม separate constraints
+
+- [ ] ทำ `filesystem_rescan` trigger rescan เฉพาะ root ที่ระบุ และคืน scan state ก่อน/หลังทำงาน
+
+- [ ] ทำ `filesystem_status` คืน active root, indexed file count, scanning state, watcher readiness, warmup state และ error ล่าสุด
+
+- [ ] validate canonical root ทุก tool และใช้ root guard ของ FFF สำหรับ filesystem root/home root
+
+- [ ] ทำ TDD red สำหรับ root isolation, binary file, unreadable metadata, query ไม่พบ, invalid constraint, stale cursor, initial scan timeout และ watcher overflow
+
+- [ ] ทำ MCP schema/versioning สำหรับ filesystem และ vault tools; ทุก tool มี input/output schema version ที่ตรวจได้
+
+- [ ] เพิ่ม dry-run และ permission boundary ให้ tools ที่จะเขียน vault/package state; filesystem search tools ยังคง read-only
+
+- [ ] ส่ง FFF/MCP logs ไป stderr เท่านั้นเพื่อไม่ทำลาย JSON-RPC stdio
+
+- [ ] รัน MCP stdio smoke ที่เรียก filesystem tools พร้อม document tools เดิมใน process `bl1nk-kept-mcp` เดียว
+
+## 5. ตรวจ lifecycle จริง, dogfooding และ Thai Bigram correctness
+
+- [ ] ทำ TDD red สำหรับ watcher events `created`, `modified`, `removed` แล้ว assert ว่า filesystem query เห็น index ล่าสุดโดยไม่สร้าง instance ใหม่
+
+- [ ] ทำ TDD red สำหรับ `.gitignore` เปลี่ยนแล้ว FFF status/rescan state ถูกส่งต่อถึง kept
+
+- [ ] ทำ TDD red สำหรับ snapshot migration และ regression ที่ `review`, `find`, `duplicates`, `--index` ใช้ snapshot เดียวกันหลัง migration
+
+- [ ] ทำ dogfooding run บน workspace จริงสำหรับ `scan`, `find`, filesystem MCP query, `convert` และ semantic search เมื่อพร้อม
+
+- [ ] เก็บ run manifest ของ dogfooding: root type, file count, options, machine/environment, duration, errors, result summary และข้อจำกัด
+
+- [ ] ทำ Thai Bigram tokenizer corpus tests กับคำศัพท์ UI สมัยใหม่, คำติดกัน, อังกฤษปนไทย, acronym, numeral, path, URL, emoji และ punctuation
+
+- [ ] เปรียบเทียบผล BM25/Thai Bigram ก่อนและหลัง FFF filesystem migration โดยใช้ fixture และ query ชุดเดียวกัน
+
+- [ ] รัน focused tests, `cargo test --workspace`, `cargo clippy --workspace -- -D warnings`, `cargo fmt --all -- --check`, `just check`, `just cli-smoke` และ source archive smoke หลัง public CLI เปลี่ยน
+
+## 6. สร้าง crate kept-vault สำหรับ Git-first vault package manager
+
+- [ ] เพิ่ม `crate/kept-vault` เป็น workspace member โดยไม่สร้าง binary ใหม่
+
+- [ ] ทำ TDD red สำหรับ `kept-vault.toml` ที่ประกอบด้วย package id, Git URL, requested ref, resolved commit, optional subdirectory, content roots และ script declarations
+
+- [ ] สร้าง manifest model, validation errors, parser และ deterministic serializer
+
+- [ ] ทำ TDD red สำหรับ `kept-vault.lock` ให้ทุก requested ref resolve เป็น immutable commit SHA และ lockfile เรียง deterministic
+
+- [ ] สร้าง Git resolver สำหรับ clone, fetch, resolve branch/tag/ref เป็น commit SHA และ checkout package ตาม SHA ใน lockfile
+
+- [ ] สร้าง package store ใน OS user-data directory แยกจาก vault root, source checkout และ temporary build output
+
+- [ ] ทำ `kept vault init <path>` ให้สร้าง `raw/`, `wiki/`, `index.md`, `log.md`, `.kept/`, `kept-vault.toml` และ schema/template instruction files
+
+- [ ] ทำ `kept vault package add <git-url> [--ref <ref>] [--subdir <path>]` ให้เพิ่ม package declaration
+
+- [ ] ทำ `kept vault package install` ให้ resolve source refs, เขียน lockfile และ materialize checkout ใน package store
+
+- [ ] ทำ `kept vault package list` แสดง package id, source URL, requested ref, resolved commit, subdirectory และ content roots
+
+- [ ] ทำ `kept vault package status` แสดง checkout state, Git dirty state, lock drift, available scripts และ content root state
+
+- [ ] ทำ `kept vault package update [package]` ให้ resolve ref ใหม่และ update lockfile โดยไม่รัน scripts เอง
+
+- [ ] ทำ `kept vault package remove <package>` ให้ลบ declaration/lock entry; แยก package cache garbage collection เป็น command เฉพาะ
+
+## 7. เพิ่ม package script runtime และ Vault lifecycle commands
+
+- [ ] ทำ TDD red สำหรับ script declaration ที่ใช้ structured command/args array และ reject shell string ที่ต้องพึ่ง implicit shell parsing
+
+- [ ] รองรับ scripts เช่น `["cargo", "test"]`, `["just", "check"]`, `["make", "build"]`, `["bun", "run", "build"]` และ runtime commands ที่ package ประกาศ
+
+- [ ] ทำ `kept vault run <package>:<script> [-- <args...>]` ให้รันจาก checkout ที่ตรงกับ locked commit SHA
+
+- [ ] แสดง package id, locked commit, working directory และ command ก่อนเริ่ม child process
+
+- [ ] stream stdout/stderr แบบ live และคืน exit code เดิมให้ caller
+
+- [ ] ทำ TDD red สำหรับ package ไม่มีใน manifest, package ไม่มีใน lockfile, checkout หาย, commit ไม่ตรง, script ไม่มี, executable ไม่พบ, process failed และ argument forwarding
+
+- [ ] ทำ `kept vault run --list <package>` เพื่อแสดง scripts พร้อม command และ working directory
+
+- [ ] บันทึก runtime execution แบบ append-only ใน `log.md`: package id, commit, script, timestamp, exit code และ artifact path ที่ runtime รายงาน
+
+- [ ] ทำ `kept vault ingest <source-or-package>` อ่าน source/content roots, เก็บ raw source, สกัดสาระ, สร้างหรืออัปเดต entity/concept pages, อัปเดต `index.md` และเพิ่ม log entry
+
+- [ ] ทำ `kept vault lint` ตรวจ orphan notes, broken wikilinks, dead links, contradiction markers, manifest/lock drift, missing checkout และ missing content roots
+
+- [ ] ทำ CLI smoke fixture ที่ add Git package → install → run cargo/just/make script → ingest → lint
+
+## 8. ทำ vault knowledge package, query และ MCP agent tools
+
+- [ ] ทำ TDD red สำหรับ `contentRoots` ให้รับเฉพาะ paths ภายใต้ package checkout/subdirectory ที่ package declaration ระบุ
+
+- [ ] ใช้ FFF index กับ package checkout, raw source และ wiki pages เพื่อค้นหา source ของ vault แบบ live
+
+- [ ] ทำ `kept vault query <query>` ให้ใช้ FFF fuzzy path/content retrieval ก่อน lexical search, semantic retrieval และ reranker
+
+- [ ] คืน citations ที่มี package id, locked commit, relative path, line range, excerpt และ retrieval score
+
+- [ ] ทำ `kept vault query` สังเคราะห์คำตอบจาก wiki/source pages และบันทึกผลเป็น wiki note พร้อม citation/backlink/log entry
+
+- [ ] ทำ MCP tools `vault_ingest`, `vault_query`, `vault_lint` บน `bl1nk-kept-mcp`
+
+- [ ] ทำ TDD red สำหรับ source นอก content roots, missing package checkout, citation ชี้ commit ผิด, broken link หลัง package update และ query ที่ไม่มีผลลัพธ์
+
+- [ ] ทำ end-to-end fixture: add package → install → FFF index → query with citations → ingest → lint → update package → lint drift
+
+## 9. ทำ Hybrid Semantic Search และ Reranking Engine
+
+- [ ] ทำ TDD red สำหรับ dense embedding retrieval ด้วย Ollama `bge-m3` และ Jina provider โดยคง provider/model/endpoint/env override contract ที่มีอยู่
+
+- [ ] เชื่อม dense vector retrieval กับ BM25 lexical search และ Thai Bigram retrieval เป็น hybrid candidate set เดียว
+
+- [ ] ทำ disk-backed vector similarity cache พร้อม key ที่ผูกกับ document/content hash, embedding model id, provider และ schema version
+
+- [ ] ทำ cache invalidation เมื่อ source hash, package commit, model id หรือ embedding settings เปลี่ยน
+
+- [ ] ทำ cross-encoder reranker pipeline รองรับ `bge-reranker-v2-m3` และ Jina Rerank
+
+- [ ] ทำ TDD red สำหรับ reranker unavailable, provider timeout, invalid API key, empty candidate set, duplicate candidate และ fallback ที่ยังคืน lexical result ได้
+
+- [ ] เพิ่ม `kept search --semantic` และ `kept search --hybrid` โดยคืน source, lexical score, vector score, rerank score และ explanation ที่แยกกัน
+
+- [ ] เพิ่ม MCP semantic search tools สำหรับ registry และ vault query โดยคืน citations ไม่ใช่เพียง answer text
+
+- [ ] ทำ regression corpus สำหรับภาษาไทย, ไทยปนอังกฤษ, synonym, typo, named entity, numeral, path และ URL
+
+## 10. ทำ Evidence run, correction loop, gold corpus และ benchmark จริง
+
+- [ ] ทำ immutable evidence run manifest ที่เก็บ input snapshot, corpus revision, model/config, command/options, environment, timestamp และ result hashes
+
+- [ ] เก็บ raw JSONL ของ every evidence run และทำ offline rescore โดยไม่แก้ raw history
+
+- [ ] ทำ append-only correction history ที่ supersede record เดิมได้โดยยัง trace กลับได้
+
+- [ ] ทำ `kept:debt` marker parser และ debt ledger สำหรับ source marker ที่ต้องวัด/ยกระดับในอนาคต
+
+- [ ] ทำ gain scoreboard ที่เปรียบเทียบเฉพาะ runs ที่มี comparable contract; ต่าง corpus/model/config ต้องคืน `incomparable`
+
+- [ ] ทำ good/bad fixtures และ self-test correctness/safety gates ก่อนยอมรับ benchmark gain
+
+- [ ] ทำ workflow เก็บ raw scan, Markdown, HTML, PDF และ sidecar annotation เมื่อแก้ source ไม่ได้
+
+- [ ] ทำ review workflow สำหรับ gold corpus 10,000 assertions พร้อม provenance, stable locator, fragment/context hash, normalized candidate, assertion kind, reviewer decision/reason และ split
+
+- [ ] ครอบคลุม canonical, variant, synonym, homograph, homophone, semantic relation, transliteration, command/prohibition, named entity, numeral, ambiguity, negative และ boundary cases
+
+- [ ] materialize เฉพาะ accepted reviewed assertions เป็น dictionary; hypothesis/fuzzy candidates ห้าม promote เอง
+
 - [ ] เพิ่ม anonymized real-world corpus เมื่อมี export ที่ตัดข้อมูลอ่อนไหวแล้ว
 
-## P1 — Filesystem query and incremental index
+- [ ] สร้าง real-world benchmark corpus สำหรับ duplicate/search recall/latency จาก distribution จริง
 
-- [x] **Filesystem query language and saved queries**: compile `ext:pdf size>50MB dup:content` เข้า `FilterSet`, พร้อม `--explain`, saved query และ config presets
-- [x] **Persistent scan index baseline**: `kept scan` อ่าน/เขียน snapshot, report refresh delta และให้ `find`/`review`/`duplicates` ใช้ default หรือ portable `--index` snapshot
-- [ ] **Persistent incremental index optimization**: ลดงาน traversal/hash ตาม refresh plan โดยไม่ลดความถูกต้องของ full scan contract
-- [ ] **LLM Wiki / Obsidian Vault Lifecycle & Management (`kept vault`)**:
-  - `kept vault init <path>` สร้างโครงสร้าง 3-layer (`raw/`, `wiki/`, `index.md`, `log.md`) และ schema definition (CLAUDE.md/AGENTS.md)
-  - `kept vault ingest <source>` อ่าน raw source, สกัดสาระสำคัญ, อัปเดต/สร้าง entity-concept pages, อัปเดต catalog `index.md` และบันทึก append-only `log.md`
-  - `kept vault lint` ตรวจสอบ vault integrity: orphan notes, broken `[[wikilinks]]`, dead links, และ contradiction markers ระหว่างหน้า
-  - `kept vault query <query>` ค้นหาและสังเคราะห์คำตอบจาก wiki pages พร้อม citations อ้างอิง และบันทึกคำตอบกลับเป็น wiki note ใหม่
-  - MCP Tools สำหรับ LLM Agent Vault: `vault_ingest`, `vault_query`, `vault_lint`
+- [ ] ทำ Thai synonym governance และ `explain-search` ที่แสดง source relation, rule, score contribution, confidence และเหตุผลที่ไม่ promote candidate
 
-## P2 — kept-doc fidelity and intake
+## 11. เพิ่ม kept-doc fidelity, PDF inspection และ review queue
 
-- [x] MarkdownAlertFilter: GitHub Alerts → typed Universal IR `Callout` พร้อม fixtures
-- [ ] GitHub Flavored Markdown writer: quote/list/table/code/divider/image/link/nesting พร้อม golden round-trip และ explicit unsupported diagnostics
-- [ ] Notion converter fidelity: typed mapping/diagnostics, property mapping และ page/database mention resolution แบบไม่บังคับ network
-- [ ] Optional PDF inspector adapter: `kept doc inspect-pdf`, native-text Markdown, per-page provenance และ OCR opt-in; ใช้ `research/PDF_INSPECTOR_RESEARCH.md`
-  - library adapter (`kept-doc` `PdfAdapter`) เสร็จแล้ว; ยังขาด CLI command `kept doc inspect-pdf`, per-page provenance และ OCR opt-in
-- [ ] Review queue: duplicate groups, large files, scanned PDF pages, validation errors และ unsupported conversion
+- [ ] ทำ GitHub Flavored Markdown writer ครอบคลุม quote, list, table, code, divider, image, link และ nesting
 
-## P3 — Remote integration
+- [ ] ทำ golden round-trip tests สำหรับ Markdown → Universal IR → Markdown และ explicit unsupported diagnostics
 
-- [ ] Notion Safe Sync: stable remote IDs, idempotency, revision preconditions, dry-run diff, conflict policy, audit log และ rollback design
-- [ ] Reconciler: แทน `block_{index}` ด้วย stable remote IDs และ idempotent move/insert/delete detection
+- [ ] ทำ Notion converter fidelity สำหรับ typed mapping, diagnostics, property mapping และ page/database mention resolution โดยไม่บังคับ network
 
-## P4 — Operator experience and later extensions
+- [ ] ทำ TDD red สำหรับ property type ที่ไม่รองรับ, mention หาไม่พบ, nested blocks และ conversion ที่ต้องคืน diagnostic แทนข้อมูลเงียบ ๆ
 
-- [ ] Interactive TUI สำหรับ scan, review queue และ action plan บน model เดียวกับ CLI
-- [ ] MCP transport แยกจาก CLI core พร้อม schema/versioning, dry-run tools และ permission boundary
-- [ ] Thai synonym governance และ explain-search
-- [ ] Real-world benchmark corpus สำหรับ duplicate/search recall และ latency จาก distribution
+- [ ] ทำ `kept doc inspect-pdf <input>` บน `kept-doc::PdfAdapter` ที่มีอยู่แล้ว
+
+- [ ] คืน native-text Markdown, per-page provenance, page diagnostics และ OCR opt-in ที่ไม่ทำงานเองโดยอัตโนมัติ
+
+- [ ] ทำ PDF fixture สำหรับ text PDF, scanned PDF, malformed PDF, password/permission error และ per-page extraction failure
+
+- [ ] สร้าง review queue model สำหรับ duplicate groups, large files, scanned PDF pages, validation errors และ unsupported conversion
+
+- [ ] เพิ่ม CLI/MCP surfaces สำหรับ list/show/filter review queue โดยใช้ model เดียวกับ scan/vault/document diagnostics
+
+## 12. ทำ Notion Safe Sync, reconciler และ operator experience
+
+- [ ] ทำ Notion Safe Sync model สำหรับ stable remote IDs, idempotency key, revision precondition, dry-run diff, conflict policy, audit log และ rollback design
+
+- [ ] ทำ TDD red สำหรับ retry request เดิมแล้วห้ามสร้าง duplicate remote block/page
+
+- [ ] ทำ TDD red สำหรับ remote revision เปลี่ยนระหว่าง sync แล้วต้องคืน conflict ที่ระบุ local/remote state
+
+- [ ] เปลี่ยน reconciler จาก `block_{index}` ไปใช้ stable remote IDs
+
+- [ ] ทำ idempotent detection ของ move, insert, delete และ content update
+
+- [ ] ทำ dry-run output ที่แสดง action plan ก่อนทุก remote mutation
+
+- [ ] สร้าง Interactive TUI สำหรับ scan, review queue และ action plan โดยใช้ domain model เดียวกับ CLI/MCP
+
+- [ ] ทำ TUI keyboard flow, non-interactive fallback และ state restoration tests
+
+- [ ] รัน focused tests ต่อ slice, `cargo test --workspace`, `cargo clippy --workspace -- -D warnings`, `cargo fmt --all -- --check`, `just check`, `just cli-smoke`, MCP stdio smoke และ source archive smoke ก่อนปิด public behavior

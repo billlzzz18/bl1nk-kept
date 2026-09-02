@@ -1,37 +1,36 @@
+<!-- markdownlint-disable MD013 -->
 # bl1nk-kept
 
-[ภาษาไทย](README.th.md) · [Specification](SPEC.md) · [Roadmap](TODO.md) · [Research](research/README.md) · [Benchmarks](benchmarks/README.md) · [Schema](schema/README.md)
+[ภาษาไทย](README.th.md) · [Specification](SPEC.md) · [CLI Guide](get-start.md) · [Schema](schema/README.md) · [Benchmarks](benchmarks/README.md)
 
-**bl1nk-kept** is a Rust workspace for inspecting keywords, filesystems, duplicates, and offline documents through one CLI: `kept`. <!-- rumdl-disable-line line-length -->
+**bl1nk-kept** is a high-performance Rust workspace and CLI tool (`kept`) for keyword registries, filesystem analytics, progressive duplicate detection, and offline document conversion.
 
 | Crate | Role |
 | --- | --- |
-| `kept-core` | Registry model, search, filesystem analysis, duplicate detection, and data foundations |
-| `kept-doc` | Offline document conversion through Universal IR |
-| `kept-cli` | The `kept` command-line interface |
+| `kept-core` | Registry model, BM25 / Thai bigram search, ScanIndex, duplicate detection, and data foundations |
+| `kept-doc` | Offline document conversion through Universal IR and Notion Markdown (NFM) |
+| `kept-cli` | The user-facing command-line binary `kept` |
+| `kept-mcp` | Model Context Protocol (MCP) server `bl1nk-kept-mcp` for AI agent tool integration |
 
 ## Why bl1nk-kept
 
-**One evidence path for names, files, and documents.** `kept` starts with a
-keyword registry and a filesystem index, then keeps the signals separate:
-lexical similarity is not content equality, and a duplicate claim is backed by
-size, partial hash, full hash, and group evidence.
+**One evidence path for names, files, and documents.** `kept` starts with a keyword registry and a filesystem index, then keeps the signals separate: lexical similarity is not content equality, and a duplicate claim is backed by size, partial hash, full hash, and group evidence.
 
-**Built for Thai-aware retrieval without hiding uncertainty.** BM25, Thai
-bigrams, synonym compatibility, and configurable n-gram fuzzy retrieval work
-together while near matches remain candidates rather than silently becoming
-canonical data.
+**Built for Thai-aware retrieval without hiding uncertainty.** BM25, Thai bigrams, synonym compatibility, and configurable n-gram fuzzy retrieval work together while near matches remain candidates rather than silently becoming canonical data.
 
-**Offline document work stays inspectable.** Universal IR gives Markdown
-conversion a typed target instead of treating documents as opaque text, while
-the planned PDF adapter keeps native extraction, page diagnostics, and optional
-OCR as distinct stages.
+**Offline document work stays inspectable.** Universal IR gives Markdown conversion a typed target instead of treating documents as opaque text, while native extraction, page diagnostics, and optional OCR remain distinct stages.
 
-**Defaults must be explainable.** Public corpus provenance, repeated
-experiments, raw benchmark artifacts, and a generated public schema turn
-implementation choices into inputs that can be inspected and revised.
+**Defaults must be explainable.** Public corpus provenance, repeated experiments, raw benchmark artifacts, and a generated public schema turn implementation choices into inputs that can be inspected and revised.
 
 ## Start
+
+### Installation & Build
+
+```bash
+cargo build --release -p kept-cli --bin kept
+```
+
+### Common Commands
 
 ```bash
 kept setup
@@ -40,29 +39,27 @@ kept scan ./workspace
 kept review ./workspace
 kept find ./workspace --type pdf --min-size 50mb
 kept duplicates ./workspace
+kept search "keyword"
 ```
 
-`config.yaml` is user-owned: `kept config` summarizes profiles and scopes, while
-`config defaults`, `config profile`, and `config scope` manage it through
-task-level commands. `config edit` remains the advanced YAML path.
-`kept doctor --fix` recovers a missing or invalid config after preserving a
-backup. Use `kept group` to manage registry groups and field schemas. `review`
-consumes the config for read-only naming findings; this release has no rename or
-apply command.
+### Configuration
 
-## Explore
+`config.yaml` is user-owned:
 
-| Need | Start here |
+- `kept config` summarizes profiles and scopes.
+- `kept config defaults`, `kept config profile`, and `kept config scope` manage configuration through task-level commands.
+- `kept doctor --fix` recovers a missing or invalid configuration after preserving a backup.
+- `kept review` analyzes naming conventions against configured profiles in read-only mode.
+
+## Documentation
+
+| Guide | Description |
 | --- | --- |
-| Product boundaries and architecture | [SPEC.md](SPEC.md) |
-| Current and completed work | [TODO.md](TODO.md) |
-| Contributor workflow | [CONTRIBUTING.md](CONTRIBUTING.md) |
-| Research behind implementation decisions | [research/](research/README.md) |
-| Reproducible performance comparisons | [benchmarks/](benchmarks/README.md) |
-| Public registry document contract | [schema/](schema/README.md) |
-| Complete CLI command reference | [get-start.md](get-start.md) |
-| Decisions derived from research | [ADR](docs/adr/) |
-| Open decisions before implementation | [plan.md](plan.md) |
+| [CLI Reference](get-start.md) | Complete reference for all `kept` CLI subcommands and options |
+| [Specification](SPEC.md) | Product specification, invariants, and architecture boundaries |
+| [Registry Schema](schema/README.md) | Machine-readable Draft-07 JSON Schema and generation notes |
+| [Benchmarks](benchmarks/README.md) | Performance benchmark methodology, raw datasets, and charts |
+| [Contributing](CONTRIBUTING.md) | Guidelines for development, testing, and contribution |
 
 ## License
 

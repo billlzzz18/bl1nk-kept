@@ -1,0 +1,31 @@
+{
+  "config": {
+    "default": true,
+    "MD012": false,
+    "MD013": false,
+    "MD024": {
+      "siblings_only": true
+    },
+    "MD032": false,
+    "MD033": false,
+    "MD034": false,
+    "MD041": false,
+    "MD053": false,
+    "MD060": false
+  },
+  "globs": [
+    "**/*.md"
+  ],
+  "ignores": [
+    "target/**",
+    ".headroom/**",
+    "codeql-db/**",
+    ".claude/**",
+    ".serena/**",
+    ".agents/**",
+    ".learnings/**",
+    ".github/**",
+    "node_modules/**",
+    "**/.git/**"
+  ]
+}

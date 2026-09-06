@@ -71,31 +71,19 @@
 
 ## 3. ย้าย kept scan, find, review, duplicates และ incremental index ไปใช้ FFF-backed index
 
-- [ ] ทำ TDD red สำหรับ `kept scan <root>` ให้สร้าง snapshot จาก FFF file inventory และรายงาน file count, total size, issues และ refresh delta แบบ deterministic
-
-- [ ] แก้ `create_or_refresh_scan` ให้รอ FFF initial scan/index readiness ก่อนเขียน snapshot
-
-- [ ] รักษา `kept scan --output`, `--json`, default user-state snapshot และ portable snapshot ให้ทำงานต่อเนื่อง
-
-- [ ] ทำ TDD red ให้ `kept scan` เคารพ `.gitignore`; `--include-hidden` ต้องไม่ bypass ignore rule
-
-- [ ] ทำ TDD red สำหรับ `kept find --query` ด้วย typo path query แล้ว assert ว่าคืน fuzzy match, score และ Git status
-
-- [ ] รักษา `kept find --type`, `--name`, `--path`, `--min-size`, `--max-size`, `--after`, `--before` และ FQL facts เดิม
-
-- [ ] ให้ FFF คัด candidate paths ก่อน แล้วให้ `FilterSet` ตัดสิน extension, size, modified time, duplicate facts และ custom filters ต่อ
-
-- [ ] เพิ่ม FFF score และ Git status ใน JSON output แบบ additive โดยไม่เปลี่ยน field เดิม
-
-- [ ] ทำ TDD red สำหรับ `kept review` ให้ใช้ FFF-backed snapshot เดียวกับ scan และยังแสดง space summary, scan issue, integrity finding และ naming finding ได้
-
-- [ ] คง duplicate verification `size bucket → partial SHA-256 → full SHA-256` ไว้ โดยใช้ candidate records จาก FFF-backed snapshot
-
-- [ ] ทำ TDD red ยืนยัน same-name, near-name, same-content และ hard-link reports ไม่ regress หลังเปลี่ยน engine
-
-- [ ] ทำ persistent incremental index optimization โดยใช้ FFF watcher events และ refresh plan เพื่อลด traversal/hash งานซ้ำ แต่ยังมี full rescan fallback เมื่อ watcher แจ้ง event loss หรือ ignore rules เปลี่ยน
-
-- [ ] อัปเดต CLI smoke ให้ครอบคลุม ignore semantics, fuzzy find, portable index, review และ duplicate report จาก snapshot เดียวกัน
+- [x] ทำ TDD red สำหรับ `kept scan <root>` ให้สร้าง snapshot จาก FFF file inventory และรายงาน file count, total size, issues และ refresh delta แบบ deterministic
+- [x] แก้ `create_or_refresh_scan` ให้รอ FFF initial scan/index readiness ก่อนเขียน snapshot
+- [x] รักษา `kept scan --output`, `--json`, default user-state snapshot และ portable snapshot ให้ทำงานต่อเนื่อง
+- [x] ทำ TDD red ให้ `kept scan` เคารพ `.gitignore`; `--include-hidden` ต้องไม่ bypass ignore rule
+- [x] ทำ TDD red สำหรับ `kept find --query` ด้วย typo path query แล้ว assert ว่าคืน fuzzy match, score และ Git status
+- [x] รักษา `kept find --type`, `--name`, `--path`, `--min-size`, `--max-size`, `--after`, `--before` และ FQL facts เดิม
+- [x] ให้ FFF คัด candidate paths ก่อน แล้วให้ `FilterSet` ตัดสิน extension, size, modified time, duplicate facts และ custom filters ต่อ
+- [x] เพิ่ม FFF score และ Git status ใน JSON output แบบ additive โดยไม่เปลี่ยน field เดิม
+- [x] ทำ TDD red สำหรับ `kept review` ให้ใช้ FFF-backed snapshot เดียวกับ scan และยังแสดง space summary, scan issue, integrity finding และ naming finding ได้
+- [x] คง duplicate verification `size bucket → partial SHA-256 → full SHA-256` ไว้ โดยใช้ candidate records จาก FFF-backed snapshot
+- [x] ทำ TDD red ยืนยัน same-name, near-name, same-content และ hard-link reports ไม่ regress หลังเปลี่ยน engine
+- [x] ทำ persistent incremental index optimization โดยใช้ FFF watcher events และ refresh plan เพื่อลด traversal/hash งานซ้ำ แต่ยังมี full rescan fallback เมื่อ watcher แจ้ง event loss หรือ ignore rules เปลี่ยน
+- [x] อัปเดต CLI smoke ให้ครอบคลุม ignore semantics, fuzzy find, portable index, review และ duplicate report จาก snapshot เดียวกัน
 
 ## 4. รวม FFF, filesystem tools และ MCP contract เข้า bl1nk-kept-mcp
 

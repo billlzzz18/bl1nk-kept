@@ -231,29 +231,29 @@ Interactive TUI ใช้ domain model เดียวกับ CLI/MCP สำ�
 
 สถานะ implementation, ลำดับงาน และ acceptance checklist ของทุกข้ออยู่ใน `TODO.md` เท่านั้น
 
-## 4. Context Admission, Observation & Judge Engine
+## 11. Context Admission, Observation & Judge Engine
 
 ระบบ Context Admission มีหน้าที่ควบคุมการส่งมอบ Context ให้กับ AI Agent/Client เพื่อลดความซ้ำซ้อนของ Token และรักษาความถูกต้องของข้อมูล
 
-### 4.1 Observation Model & Target Locator
+### 11.1 Observation Model & Target Locator
 ทุกการเข้าถึงข้อมูลต้องถูกแปลงให้อยู่ในรูป `Observation`:
 - **Source:** แหล่งที่มา เช่น `File`, `Grep`, `TreeSitter`, `Parser`, `Fts`, `Bm25`, `Vector`
 - **Target URI:** ระบุทรัพยากรแบบไม่คลุมเครือ (`file://`, `symbol://`, `search://`, `document://`, `context://`)
 - **Revision & ContentIdentity:** ติดตาม timestamp/token และ Hash Digest ของเนื้อหา
 
-### 4.2 Acquisition Layer (FFF & Structure)
+### 11.2 Acquisition Layer (FFF & Structure)
 - `look`: ดึง identity, size, revision, outline แบบประหยัด token โดยไม่อ่านเนื้อหาทั้งหมด
 - `view`: materialize เนื้อหาตาม range หรือ symbol เมื่อจำเป็น
 - โครงสร้างโค้ดใช้ Tree-sitter AST, โครงสร้างเอกสารใช้ `kept-doc` Universal IR
 
-### 4.3 Context Registry & State Tracking
-- บันทึกประวัติและ state ของ resource ที่ Agent เคยเห็นลงใน Session Store (SQLite / In-memory backend)
-- ติดตาม `ResourceState` และ invalidation ผ่าน Watcher events
+### 11.3 Context Registry & State Tracking
+- บันทึกประวัติและ state ของ resource ที่ Agent เคยเห็นลงใน Session Store
+- ติดตาม `ResourceState` และ revision tracking ป้องกัน duplicate reads
 
-### 4.4 Judge Engine & Treatments
+### 11.4 Judge Engine & Treatments
 ประเมิน `Observation` เทียบกับ Context History และ Policy เพื่อเลือก Decision:
-- `PASS`: ข้อมูลใหม่ ส่งมอบเนื้อหาเต็มหรือที่ผ่านการ select
-- `REFERENCE`: ข้อมูลเดิมที่เคยเห็นและยังไม่เปลี่ยนแปลง (ส่งคืนเฉพาะ token อ้างอิง)
-- `DELTA`: ข้อมูลเดิมที่มีการเปลี่ยนแปลง (ส่งคืนเฉพาะ diff/changed symbols)
-- `COMPRESS`: บีบอัดเนื้อหาตามโครงสร้าง/คำสั่งเมื่อคุ้มค่า
-- `WARN` / `BLOCK`: แจ้งเตือนหรือระงับเมื่อ Agent ร้องขอข้อมูลซ้ำซ้อนเกินกำหนด
+- `PASS`: ข้อมูลใหม่ ส่งมอบเนื้อหาเต็ม
+- `REFERENCE`: ข้อมูลเดิมที่เคยเห็นและยังไม่เปลี่ยนแปลง (ส่งคืนเฉพาะ pointer 13 tokens)
+- `DELTA`: ข้อมูลเดิมที่มีการเปลี่ยนแปลง (ส่งคืนเฉพาะ diff)
+- `COMPRESS`: บีบอัดเนื้อหาตามโครงสร้างเมื่อคุ้มค่า
+- `WARN` / `BLOCK`: แจ้งเตือนหรือระงับเมื่อ Agent ร้องขอข้อมูลซ้ำซ้อนเกินกำหนด (threshold ≥3 ครั้ง)

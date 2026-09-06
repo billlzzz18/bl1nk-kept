@@ -19,11 +19,11 @@ clippy:
     cargo clippy --workspace --all-targets -- -D warnings
 
 repo-contract:
-    {{python}} -m unittest tests/test_repository_tools.py
+    {{python}} -m unittest discover -s tests -p test_repository_tools.py
 
 cli-smoke:
     cargo build -q -p kept-cli --bin kept
-    {{python}} -m unittest tests/test_public_cli_smoke.py
+    {{python}} -m unittest discover -s tests -p test_public_cli_smoke.py
 
 schema:
     cargo run -q -p kept-core --example export_schema > schema/keyword-registry.schema.json

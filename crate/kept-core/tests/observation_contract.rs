@@ -43,21 +43,42 @@ fn test_observation_and_identity_roundtrip() {
     let identity = ContentIdentity::from_bytes(b"# kept\nFast workspace indexer.");
 
     let source = Source {
+        kind: SourceKind::File,
         adapter: "fff".to_string(),
         target: target.clone(),
         revision: revision.clone(),
         identity: identity.clone(),
     };
 
+    let provenance = Provenance {
+        actor: "test-runner".to_string(),
+        session_id: Some("session-01".to_string()),
+        input_digest: None,
+        timestamp: 1725000001,
+    };
+
     let observation = Observation {
         id: "obs_01".to_string(),
         source,
+        target: target.clone(),
+        revision: revision.clone(),
+        event: Some(ResourceEvent::Modified),
+        structure: Some(StructurePayload {
+            outline: vec![StructureOutlineItem {
+                name: "Section 1".to_string(),
+                kind: "heading".to_string(),
+                range: Some((0, 10)),
+                children: vec![],
+            }],
+            symbols: vec!["symbol_a".to_string()],
+        }),
+        evidence: vec![],
         content: Some("# kept\nFast workspace indexer.".to_string()),
         metadata: serde_json::json!({
             "size": 30,
             "is_binary": false
         }),
-        timestamp: 1725000001,
+        provenance,
     };
 
     let serialized = serde_json::to_string(&observation).expect("serialize observation");
@@ -65,7 +86,10 @@ fn test_observation_and_identity_roundtrip() {
         serde_json::from_str(&serialized).expect("deserialize observation");
 
     assert_eq!(deserialized.id, "obs_01");
+    assert_eq!(deserialized.source.kind, SourceKind::File);
     assert_eq!(deserialized.source.adapter, "fff");
     assert_eq!(deserialized.source.target.to_string(), "file://README.md");
     assert_eq!(deserialized.source.identity.hash(), identity.hash());
+    assert_eq!(deserialized.event, Some(ResourceEvent::Modified));
+    assert!(deserialized.structure.is_some());
 }

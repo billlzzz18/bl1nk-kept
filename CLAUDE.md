@@ -1,77 +1,46 @@
-# CLAUDE.md
+# bl1nk-kept — คำแนะนำ Claude Code
 
-This file provides guidance to Claude Code (claude.ai/code) when working with
-code in this repository.
+คู่มือสำหรับ Claude Code ในการพัฒนาและทดสอบระบบ `bl1nk-kept`
 
-For any file search, grep or memory tool in the current git-indexed directory, use serena tools.
+---
 
-## Build, Test & Lint Commands
+## สถาปัตยกรรมระบบ (System Architecture)
+- **Acquisition:** FFF Adapter จัดการ filesystem (`look`, `view`, `grep`, `watch`)
+- **Structure:** Tree-sitter วิเคราะห์ Code AST และ `kept-doc` วิเคราะห์ Document IR
+- **Model:** แปลงข้อมูลเป็น `Observation` พร้อม `Target` URI (`file://`, `symbol://`, `document://`)
+- **Judge & Admission:** เปรียบเทียบกับ Context Registry แล้วส่ง treatment (`PASS`, `REFERENCE`, `DELTA`, `COMPRESS`) ผ่าน `kept-mcp`
 
-Pre-commit & Full Validation:
+---
 
-- Run all repo checks: `just check` (runs line-ending normalization, fmt check, tests, clippy, python contracts, cli smoke, schema validation, markdown links, version contract) <!-- rumdl-disable-line line-length -->
-- Regenerate public schema: `just schema` (updates `schema/keyword-registry.schema.json`)
+## คำสั่งที่ใช้งานบ่อย (Essential Commands)
 
-Cargo workspace commands:
+### Build & Test
+```bash
+# คอมไพล์ทั้ง workspace
+cargo build --workspace
 
-- Build entire workspace: `cargo build --workspace`
-- Run all tests: `cargo test --workspace`
-- Run single package test: `cargo test -p <package-name>` (e.g. `cargo test -p kept-core`, `cargo test -p kept-cli`) <!-- rumdl-disable-line line-length -->
-- Run specific test: `cargo test -p <package-name> -- <test_name>`
-- Lint workspace (deny warnings): `cargo clippy --workspace --all-targets -- -D warnings` <!-- rumdl-disable-line line-length -->
-- Format check: `cargo fmt --all -- --check`
-- Format apply: `cargo fmt --all`
+# รัน unit tests ทั้งหมด
+cargo test --workspace
 
-Run CLI directly:
+# รันเฉพาะ crate
+cargo test -p kept-core
+cargo test -p kept-doc
+cargo test -p kept-cli
+cargo test -p kept-mcp
 
-- `cargo run -p kept-cli -- <command>` (e.g. `cargo run -p kept-cli -- doctor`, `cargo run -p kept-cli -- scan .`) <!-- rumdl-disable-line line-length -->
-- Export public JSON schema: `cargo run -q -p kept-core --example export_schema`
-
-Repository contract & validation checks (Python 3.12+):
-
-- Contract & Tool unit tests: `python -m unittest tests/test_repository_contract.py tests/test_repository_tools.py`
-- Markdown link integrity: `python tools/check_markdown_links.py`
-- Version contract verification: `python tools/check_version_contract.py`
-
-## High-Level Architecture
-
-`bl1nk-kept` is a Rust workspace (`kept`) for keyword registries, filesystem analytics, duplicate detection, and offline document conversion.
-
-### Crates & Core Responsibilities
-
-```text
-                      ┌──────────────┐
-                      │   kept-cli   │ (CLI command interface `kept`)
-                      └──┬────────┬──┘
-                         │        │
-           ┌─────────────┘        └─────────────┐
-           ▼                                    ▼
-┌──────────────────────┐             ┌──────────────────────┐
-│      kept-core       │             │       kept-doc       │
-│ Registry model, BM25 │             │ Universal IR &       │
-│ Thai bigram search,  │             │ offline document     │
-│ ScanIndex, duplicate │             │ conversion           │
-│ detection pipeline   │             └──────────────────────┘
-└──────────────────────┘
-           ▲
-           │
-┌──────────────────────┐
-│       kept-mcp       │ (stdio MCP server for document & table tools)
-└──────────────────────┘
+# รัน static analysis
+cargo clippy --workspace
 ```
 
-- **`crate/kept-core`**: Core domain logic and data foundations.
-  - **Keyword Registry**: Versioned JSON/YAML/CSV registry, validation, BM25 inverted index with Thai bigrams and n-gram fuzzy candidate retrieval.
-  - **Filesystem Analytics**: Persistent `ScanIndex` caching scan snapshots with structured `ScanIssue` diagnostics.
-  - **Duplicate Detection**: 4-stage evidence pipeline (`size bucket` → `partial SHA-256` → `full SHA-256` → `group evidence`), reporting `same_name`, `near_name`, `same_content`, `hard_link`.
-- **`crate/kept-doc`**: Offline document conversion engine mapping documents to a Universal IR (Intermediate Representation) JSON/Markdown AST.
-- **`crate/kept-cli`**: Command-line application binary exposing `setup`, `doctor`, `scan`, `find`, `review`, `duplicates`, `config`, `group`, `search`, `convert`, `evidence`, and `corpus`.
-- **`crate/kept-mcp`**: Stdio Model Context Protocol (MCP) server `bl1nk-kept-mcp` providing tool interfaces for agentic workflows.
+### Full Validation Suite
+```bash
+# รัน validation ทั้งหมดของโปรเจกต์ (format, clippy, tests, schema)
+just check
+```
 
-## Key Invariants & Contracts
+---
 
-- **SQZ & Anti-Loop Enforcement**: Prefer `sqz_read_file` and `sqz_grep` for reading/searching. If any discovery tool sequence exceeds 3 consecutive calls without producing a concrete code change, immediately abort tool usage and proceed with local implementation.
-- **No Destructive Operations**: Scan, find, review, search, and duplicate inspection paths must never mutate scanned user files.
-- **Config Management**: User config is stored in OS-appropriate directories (`%APPDATA%/kept/config.yaml` on Windows, `~/.config/kept/config.yaml` on Linux/macOS). `doctor --fix` must backup invalid configs before restoring a starter.
-- **Schema Contracts**: Draft-07 JSON Schema defined in `schema/keyword-registry.schema.json`. Must match output of `export_schema` example.
-- **Commit Format**: Conventional Commits `<type>(<scope>): <summary in imperative mood>`.
+## กฎการโค้ดดิ้ง (Coding Guidelines)
+- พัฒนาแบบ TDD (Red -> Green -> Refactor)
+- โค้ด Rust ต้องจัดรูปแบบตาม `rustfmt` และผ่าน `clippy` 0 warnings
+- เก็บ error handling ชัดเจนผ่าน `thiserror` หรือ `anyhow` ตามความเหมาะสมของเลเยอร์

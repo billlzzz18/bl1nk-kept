@@ -34,3 +34,13 @@
 ## กติกาการปิดการตัดสินใจ
 
 ปิดรายการได้เมื่อมีข้อมูลตามตารางและ implementation boundary ชัดเจนเท่านั้น จากนั้นสร้าง ADR ลำดับถัดไปใน `docs/adr/` ก่อนเริ่ม implementation จนกว่าจะปิด ให้เก็บ alternatives ไว้ที่นี่และห้ามนำเสนอว่าเป็น feature ที่รองรับแล้ว
+
+
+## Context Admission & Judge System (ปิดการตัดสินใจแล้ว)
+
+| เรื่องที่ตัดสินใจ | ข้อสรุป | กระทบส่วนใด |
+|---|---|---|
+| การดึงโค้ด `sqz` เข้า Workspace | พอร์ต/Vendor โมดูลจำเป็น (`sqz_engine`) เข้า `kept-core` / `kept-judge` | `kept-core`, dependencies |
+| Context Registry Storage | SQLite backend + In-memory session cache | `kept-core::observation`, `kept-mcp` |
+| Code vs Document Parsing | แยก Tree-sitter (Code AST) กับ `kept-doc` (Document IR) เชื่อมกันด้วย `Observation` / `Target` URI | `kept-core`, `kept-doc` |
+| Public Contract | เพิ่มหมวด Context Admission & Judge Engine ใน `SPEC.md` | `SPEC.md`, CLI/MCP surfaces |

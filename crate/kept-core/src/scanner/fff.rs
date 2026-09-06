@@ -2,7 +2,9 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use thiserror::Error;
 
-use crate::observation::{ContentIdentity, Observation, Revision, Source, Target};
+use crate::observation::{
+    ContentIdentity, Observation, Provenance, Revision, Source, SourceKind, Target,
+};
 use crate::scanner::types::{FileRecord, ScanIssue};
 use fff_search::file_picker::{FFFMode, FilePicker, FilePickerOptions};
 
@@ -98,9 +100,10 @@ impl FffScanner {
 
         let target = Target::File(normalized.clone());
         let source = Source {
+            kind: SourceKind::File,
             adapter: "fff".to_string(),
-            target,
-            revision,
+            target: target.clone(),
+            revision: revision.clone(),
             identity,
         };
 
@@ -120,16 +123,28 @@ impl FffScanner {
             .map(|d| d.as_secs())
             .unwrap_or(0);
 
+        let provenance = Provenance {
+            actor: "fff-adapter".to_string(),
+            session_id: None,
+            input_digest: None,
+            timestamp,
+        };
+
         Ok(Observation {
             id: format!("obs_{}_{}", normalized.replace('/', "_"), timestamp),
             source,
+            target,
+            revision,
+            event: None,
+            structure: None,
+            evidence: Vec::new(),
             content,
             metadata: serde_json::json!({
                 "size": size,
                 "is_binary": is_binary,
                 "modified": modified,
             }),
-            timestamp,
+            provenance,
         })
     }
 

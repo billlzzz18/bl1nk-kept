@@ -3,6 +3,7 @@ pub mod error;
 pub mod foundation;
 pub mod keyboard;
 pub mod migration;
+pub mod observation;
 pub mod policy;
 pub mod scanner;
 pub mod schema;

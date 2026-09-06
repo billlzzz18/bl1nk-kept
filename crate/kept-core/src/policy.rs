@@ -49,7 +49,7 @@ pub struct ConfigDefaults {
     pub semantic: SemanticSearchSettings,
 }
 
-// NOTE-002: ตั้งค่าผ่าน model ID และ endpoint; provider รองรับ "ollama" (default) และ "jina" เท่านั้น
+// NOTE-002: ตั้งค่าผ่าน model ID และ endpoint; provider รองรับ "ollama" (default) และ "local" เท่านั้น
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct SemanticSearchSettings {

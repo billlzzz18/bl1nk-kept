@@ -14,7 +14,7 @@ pub const DEFAULT_RERANK_MODEL_ID: &str = "bge-reranker-v2-m3";
 pub enum SemanticError {
     #[error("invalid semantic endpoint: {0}")]
     InvalidEndpoint(String),
-    #[error("unsupported provider \"{0}\": supported providers are ollama (default) and jina")]
+    #[error("unsupported provider \"{0}\": supported providers are ollama (default) and local")]
     UnsupportedProvider(String),
     #[error(
         "cannot reach the {provider} provider at {endpoint}: is it installed and running? for ollama run `ollama serve`, or point KEPT_SEMANTIC_ENDPOINT at another supported provider (supported: ollama, jina)"
@@ -36,34 +36,31 @@ pub enum SemanticError {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SemanticProvider {
     Ollama,
-    Jina,
+    Local,
 }
 
 impl std::fmt::Display for SemanticProvider {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             SemanticProvider::Ollama => write!(formatter, "ollama"),
-            SemanticProvider::Jina => write!(formatter, "jina"),
+            SemanticProvider::Local => write!(formatter, "local"),
         }
     }
 }
 
 impl SemanticProvider {
-    pub const SUPPORTED: &'static str = "ollama, jina";
+    pub const SUPPORTED: &'static str = "ollama, local";
 
     pub fn parse(value: &str) -> Result<Self, SemanticError> {
         match value.trim().to_lowercase().as_str() {
             "ollama" | "" => Ok(SemanticProvider::Ollama),
-            "jina" => Ok(SemanticProvider::Jina),
+            "local" => Ok(SemanticProvider::Local),
             other => Err(SemanticError::UnsupportedProvider(other.to_string())),
         }
     }
 
     pub fn default_endpoint(self) -> &'static str {
-        match self {
-            SemanticProvider::Ollama => DEFAULT_SEMANTIC_ENDPOINT,
-            SemanticProvider::Jina => "https://api.jina.ai/v1",
-        }
+        DEFAULT_SEMANTIC_ENDPOINT
     }
 }
 
@@ -92,10 +89,7 @@ pub fn resolve(
             .or_else(|| settings.provider.clone())
             .unwrap_or_default(),
     )?;
-    let api_key = from_env("JINA_API_KEY").or_else(|| settings.api_key.clone());
-    if provider == SemanticProvider::Jina && api_key.is_none() {
-        return Err(SemanticError::MissingJinaApiKey);
-    }
+    let api_key = settings.api_key.clone();
     let endpoint = from_env("KEPT_SEMANTIC_ENDPOINT")
         .or_else(|| settings.endpoint.clone())
         .unwrap_or_else(|| provider.default_endpoint().to_string());
@@ -520,25 +514,19 @@ mod tests {
     }
 
     #[test]
-    fn provider_defaults_to_ollama_and_jina_resolves_its_hosted_endpoint() {
+    fn provider_defaults_to_ollama_and_local_resolves_endpoint() {
         let _guard = with_clean_env();
         let ollama = resolve(&Default::default()).unwrap();
         assert_eq!(ollama.provider, SemanticProvider::Ollama);
         assert_eq!(ollama.endpoint, DEFAULT_SEMANTIC_ENDPOINT);
 
-        let jina = resolve(&crate::policy::SemanticSearchSettings {
-            provider: Some("jina".into()),
-            api_key: Some("test-key".into()),
+        let local = resolve(&crate::policy::SemanticSearchSettings {
+            provider: Some("local".into()),
             ..Default::default()
         })
         .unwrap();
-        assert_eq!(jina.provider, SemanticProvider::Jina);
-        assert_eq!(jina.endpoint, "https://api.jina.ai/v1");
-        assert_eq!(
-            jina.api_key,
-            Some("test-key".to_string()),
-            "a YAML-configured api key must reach the resolved config, not be dropped"
-        );
+        assert_eq!(local.provider, SemanticProvider::Local);
+        assert_eq!(local.endpoint, DEFAULT_SEMANTIC_ENDPOINT);
     }
 
     #[test]
@@ -549,22 +537,8 @@ mod tests {
         })
         .unwrap_err();
         assert!(
-            error.to_string().contains("ollama") && error.to_string().contains("jina"),
+            error.to_string().contains("ollama") && error.to_string().contains("local"),
             "error must name the supported providers: {error}"
-        );
-    }
-
-    #[test]
-    fn jina_without_an_api_key_reports_how_to_fix_it() {
-        let _guard = with_clean_env();
-        let error = resolve(&crate::policy::SemanticSearchSettings {
-            provider: Some("jina".into()),
-            ..Default::default()
-        })
-        .unwrap_err();
-        assert!(
-            error.to_string().contains("JINA_API_KEY"),
-            "error must tell the user which env var to set: {error}"
         );
     }
 

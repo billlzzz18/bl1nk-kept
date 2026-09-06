@@ -18,33 +18,33 @@
 
 - [ ] รักษา flow ทุก slice เป็น TDD red → minimal implementation → focused green → command-level proof → `just check`
 
-## 2. แทน filesystem traversal เดิมด้วย FFF ใน kept-core
+## 2. Observation Contract, Evidence Model และ FFF Integration ใน kept-core
 
+### 2.1 Foundation: Observation, Identity & Evidence Data Model (ง่ายสุด - Layer 0 Contract)
+- [ ] ทำ TDD red สำหรับ `Target` URI parser และ format invariants (`file://`, `symbol://`, `search://`, `context://`) ใน `crate/kept-core/tests/observation_contract.rs`
+- [ ] สร้าง `Target` enum และ URI parser (`crate/kept-core/src/observation/target.rs`): parse canonical URI, resolve schemes, deterministic display
+- [ ] สร้าง `Revision` และ `ContentIdentity` models (`crate/kept-core/src/observation/identity.rs`): แยก mtime/version จาก content hash (BLAKE3/SHA-256)
+- [ ] สร้าง `Source`, `Evidence`, `Provenance`, `Observation` struct types (`crate/kept-core/src/observation/types.rs`): รองรับ serialization/deserialization แบบ deterministic
+- [ ] รัน focused contract tests ยืนยัน Observation model serialization และ identity invariants ผ่าน 100%
+
+### 2.2 FFF Acquisition & Filesystem Engine (ปานกลาง - File Acquisition Primitive)
 - [ ] ทำ TDD red สำหรับ fixture ที่มี Git repository, `.gitignore`, `.ignore`, hidden files, `node_modules`, `venv`, `.venv`, `__pycache__`, `target`, symlink, binary file, modified file และ untracked file
-
 - [ ] เขียน test ยืนยันว่า scan คืน file set ตาม FFF ignore semantics และ path ทุกตัวเป็น relative path แบบ deterministic
-
 - [ ] เขียน test ยืนยัน metadata ที่ kept ต้องใช้: path, name, extension, size, modified time, binary state และ Git status
-
-- [ ] เพิ่ม `fff-search` dependency แบบ pinned ใน workspace และ `crate/kept-core/Cargo.toml`
-
-- [ ] รัน `cargo check -p kept-core` หลังเพิ่ม dependency แล้วแก้ version/feature incompatibility ให้ build ผ่านก่อนเริ่ม adapter
-
-- [ ] สร้าง `crate/kept-core/src/scanner/fff.rs` สำหรับสร้าง FFF `FilePicker`, รอ initial scan, อ่าน scan progress, ดึง file metadata และ trigger rescan
-
+- [ ] ขยาย `crate/kept-core/src/scanner/fff.rs` เพิ่ม FFF acquisition layer (`look` สำหรับ outline/metadata vs `view` สำหรับ content read)
 - [ ] ใช้ FFF mode สำหรับ agent, content indexing, Git status cache และ ignore engine ใน adapter
-
 - [ ] สร้าง typed errors สำหรับ FFF initialization failure, invalid root, scan timeout และ index-not-ready
-
 - [ ] ขยาย `FileRecord` ให้เก็บ `isBinary` และ `gitStatus` แบบ backward-compatible
-
 - [ ] version-bump `PersistentScanSnapshot` และสร้าง migration/read error สำหรับ snapshot รุ่นที่ไม่มี FFF metadata
-
 - [ ] แทน `std::fs::read_dir` recursive traversal ใน `scanner/scan.rs` ด้วย FFF adapter
-
 - [ ] เก็บ `ScanIssue` สำหรับ metadata/indexing failure โดยไม่ทำให้ผล scan ส่วนที่เข้าถึงได้หายไป
-
 - [ ] ลบ traversal implementation เดิมเมื่อ adapter tests ผ่านและไม่มี code path เรียกใช้งานแล้ว
+
+### 2.3 Context Registry & Judge Engine Baseline (ท้าทาย - Context Admission Pipeline)
+- [ ] ทำ TDD red สำหรับ `ContextRegistry` เก็บ snapshot revision ที่ agent เคยอ่านแล้ว เพื่อป้องกัน duplicate context reads
+- [ ] สร้าง `ContextRegistry` (`crate/kept-core/src/context/registry.rs`) รองรับ `context://<target>@<rev>` tracking
+- [ ] ทำ TDD red สำหรับ `Judge` admission decisions: `Pass`, `Reference`, `Delta`, `Drop`, `Warn`, `Block`
+- [ ] สร้าง `Judge` engine v1 (`crate/kept-core/src/context/judge.rs`) สำหรับตัดสิน treat observations ก่อนส่งให้ agent / context stream
 
 ## 3. ย้าย kept scan, find, review, duplicates และ incremental index ไปใช้ FFF-backed index
 

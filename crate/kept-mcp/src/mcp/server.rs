@@ -16,10 +16,43 @@ use kept_doc::client::NotionClient;
 /// API tools (search, get/create page, list children, trash) are registered
 /// only when `NOTION_TOKEN` is set, since they need an authenticated client.
 pub fn build() -> Result<Server, Box<dyn std::error::Error>> {
+    let fff_manager = std::sync::Arc::new(tools::filesystem::FffManager::new());
+
     let mut builder = Server::builder()
         .name("bl1nk-kept-mcp")
         .version(env!("CARGO_PKG_VERSION"))
         .capabilities(ServerCapabilities::tools_only())
+        // Filesystem & FFF Discovery Tools
+        .tool(
+            "filesystem_find",
+            tools::filesystem::FilesystemFindTool {
+                manager: fff_manager.clone(),
+            },
+        )
+        .tool(
+            "filesystem_grep",
+            tools::filesystem::FilesystemGrepTool {
+                manager: fff_manager.clone(),
+            },
+        )
+        .tool(
+            "filesystem_multi_grep",
+            tools::filesystem::FilesystemMultiGrepTool {
+                manager: fff_manager.clone(),
+            },
+        )
+        .tool(
+            "filesystem_rescan",
+            tools::filesystem::FilesystemRescanTool {
+                manager: fff_manager.clone(),
+            },
+        )
+        .tool(
+            "filesystem_status",
+            tools::filesystem::FilesystemStatusTool {
+                manager: fff_manager.clone(),
+            },
+        )
         // Unified Document & Table Pipelines
         .tool("search_documents", tools::unified::SearchDocumentsTool)
         .tool("convert_document", tools::unified::ConvertDocumentTool)

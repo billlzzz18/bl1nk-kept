@@ -5,6 +5,7 @@
 //! into a single server (see [`crate::mcp::server`]).
 
 pub mod doc_to_diagram;
+pub mod filesystem;
 pub mod lark;
 pub mod markdown;
 pub mod mermaid;

@@ -1,38 +1,66 @@
-# Contributing to bl1nk-kept
+# แนวทางการร่วมพัฒนา bl1nk-kept (Contributing Guide)
 
-เริ่มจาก `AGENTS.md` เสมอ. ไฟล์นั้นระบุ read order, source-of-truth paths, TDD loop และ non-regression constraints. `SPEC.md` คือ specification เดียว; `TODO.md` คือ backlog เดียว.
+เริ่มจาก `AGENTS.md` เสมอ เอกสารนั้นระบุลำดับการอ่าน, แหล่งข้อมูลความจริง (Source-of-truth), และวงรอบการพัฒนาแบบ TDD (Test-Driven Development)
 
-## Crate boundaries
+---
 
-| Crate | แก้เมื่อความต้องการเกี่ยวกับ |
+## 1. ขอบเขตความรับผิดชอบของแต่ละ Crate (Crate Boundaries)
+
+| Crate | ความรับผิดชอบหลัก |
 |---|---|
-| `kept-core` | registry schema/migration/search, scanner, duplicate detection, treemap และ filters |
-| `kept-doc` | Universal IR, document conversion, document filters และ sync primitives |
-| `kept-cli` | command UX, argument parsing และการ compose crate capabilities |
+| `kept-core` | Observation model (`Target`, `Revision`), FFF scanner adapter, Context Registry, Search & Retrieval (BM25/FTS/Vector), และ Judge Engine |
+| `kept-doc` | Universal Document IR, Parsers (Markdown, NFM, DOCX, PDF, HTML) และ Outline extraction (Pure Library) |
+| `kept-cli` | CLI command surface (`kept`) สำหรับจัดการ workspace, registry, filesystem และ context commands |
+| `kept-mcp` | Stdio MCP server (`bl1nk-kept-mcp`) ส่งมอบ context และ tools ให้ AI agent ผ่าน Judge Admission Gate |
 
-ห้ามคัดลอก business logic ข้าม crate. Public CLI/schema behavior ต้องเปลี่ยนอย่างชัดเจนและมี test ก่อน production code.
+**กฎเหล็ก:** ห้ามคัดลอก Business Logic ข้าม crate, ทุก public capability ต้องมี focused test รองรับเสมอ
 
-## Required commands
+---
+
+## 2. คำสั่งจำเป็นในการพัฒนา (Workflow Commands)
+
+ใช้ `just` เป็น task runner หลักของโปรเจกต์:
 
 ```bash
+# ตรวจสอบคุณภาพทั้งหมดก่อน commit (Format, Lint, Tests, Contracts, Schema)
 just check
+
+# รันเฉพาะชุดทดสอบทั้งหมดใน workspace
+cargo test --workspace
+
+# อัปเดตและตรวจจับ drift ของ schema
 just schema
-just benchmark-chart
+just schema-check
+
+# จัดการเวอร์ชันของ workspace
+just version-bump <semver>
+
+# สร้างแพ็กเกจ source archive สำหรับ release
 just package
 ```
 
-`just check` ครอบคลุม format, Rust workspace tests, Clippy `-D warnings`, repository contracts, Markdown links และ version contract. หากไม่มี `just` ให้รัน recipe เดียวกันจาก `Justfile`.
+---
 
-## Code and data rules
+## 3. กฎการเขียนโค้ดและการทดสอบ (Engineering Standards)
 
-โค้ดใหม่หรือ bug fix ต้องทำ TDD: เขียนและรัน test ที่ล้มเหลวตาม intent ก่อน แล้วเขียน production code ขั้นต่ำจน test ผ่าน. คอมเมนต์ที่อธิบายเหตุผลหรือ constraint ใช้ภาษาไทยรูปแบบ `NOTE-001: <รายละเอียด>` เท่านั้น.
+1. **Test-Driven Development (TDD):**
+   - เขียน failing test เพื่อกำหนด contract และพฤติกรรมที่ต้องการก่อนเสมอ
+   - แก้ไขโค้ดให้น้อยที่สุดเท่าที่จำเป็นเพื่อให้ test ผ่าน (Green)
+2. **Context & Observation Contract:**
+   - การดึงข้อมูลหรือสำรวจไฟล์ต้องสร้างผ่าน `Observation` และระบุ `Target` URI เสมอ
+   - แยกแยะ `look` (metadata/outline เบาแรง) ออกจาก `view` (materialized content) อย่างชัดเจน
+3. **Rust Toolchain & MSRV:**
+   - โค้ดต้องคอมไพล์ผ่านบน Rust Stable (MSRV ตามที่ระบุใน `Cargo.toml`)
+   - ผ่าน `cargo fmt` และ `cargo clippy --workspace --all-targets -- -D warnings` (0 warnings)
+4. **ความสะอาดของ Repository & CI Cost Guard:**
+   - ละเว้นการ push artifact ชั่วคราว หรือรัน CI บนเอกสารโดยไม่จำเป็น
+   - การเสนอไอเดียใหม่ให้บันทึกลง `docs/ideas/` ก่อนนำเข้า `plan.md`
 
-รักษา compatibility ของ CLI/schema เดิม เว้นแต่ breaking change ถูกระบุใน `SPEC.md`, `CHANGELOG.md` และ migration/compatibility test. คำสั่ง CLI ต้องระบุสถานะจริงว่า read-only, writes output, mutates source หรือ unavailable; ห้ามอ้าง behavior ที่ source ไม่มี.
+---
 
-การเปลี่ยน public registry model ต้อง regenerate `schema/keyword-registry.schema.json`. การเปลี่ยน benchmark ต้องเก็บ raw data ใน `benchmarks/data/` และ regenerate chart จาก raw data; ห้ามแก้ตัวเลขหรือ chart ด้วยมือ. Synthetic benchmark ใช้จับ regression เท่านั้น.
+## 4. การส่งมอบงาน (Handoff & Verification)
 
-`research/` และ `.learnings/` เป็น asset ของ source handoff. ห้ามลบ `.learnings/` หรือให้ product commands อ่านมัน. Source package รวมสองส่วนนี้ แต่ตัด `target/`, `.git/`, `__pycache__/`, previous package `dist/` และ past presentation artifacts.
-
-## Version and handoff
-
-ใช้ `just version-bump <semver>` เพื่ออัปเดต Cargo workspace version, `SPEC.md` และ changelog heading พร้อมกัน. ก่อนส่งงานให้รัน `just check` และ `just package`; ส่งผล test ที่รันจริง, compatibility impact และ ZIP ที่สร้างจาก `dist/`.
+ก่อนเปิด PR หรือส่งต่องาน:
+1. ยืนยันว่า `just check` ผ่าน 100%
+2. หากมีการเปลี่ยนแปลง Public Contract ให้อัปเดต `SPEC.md` และบันทึกใน `CHANGELOG.md`
+3. บันทึกบทเรียนหรือข้อจำกัดที่พบลง `.agents/MEMORY.md` เพื่อส่งต่อบริบทให้ Agent เซสชันถัดไป

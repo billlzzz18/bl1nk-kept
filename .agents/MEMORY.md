@@ -73,3 +73,8 @@
 - Do not create rename, apply, delete, copy, hard-link replacement, or rollback commands while `DUP-001` is `NOT APPROVED`.
 - Do not claim the 10K corpus, dictionary materialization or real-world benchmark work exists while `DATA-001` or `DATA-002` is `MISSING`.
 - Do not package or send a final source archive after a public CLI change until `just check` passes and the archive itself executes `just cli-smoke` after extraction.
+
+## Context Admission, Evidence & Idea Backlog (Updated 2026-09-06)
+- **Architecture State:** Contract ของ `Observation` รองรับ `SourceKind`, `ResourceEvent`, `StructurePayload`, `Evidence` และ `Provenance` (Single Source of Truth สำหรับ timestamp).
+- **FFF Core & Judge:** FFF ทำหน้าที่ Acquisition (`look`/`view`), Tree-sitter ทำหน้าที่ Code AST Structure, SQZ logic ทำหน้าที่ Command Output Formatter และ Context Admission Decision (`PASS`, `REFERENCE`, `DELTA`, `COMPRESS`).
+- **Idea / Research Reference:** ไอเดียการวิเคราะห์เปรียบเทียบ `zvec` (Alibaba in-process vector database) ถูกบันทึกไว้ที่ `docs/ideas/ZVEC_INTEGRATION_IDEA.md` เพื่อใช้ประเมินต่อใน Phase 10 (Hybrid Retrieval Engine via Feature Flag).

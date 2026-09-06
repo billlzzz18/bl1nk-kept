@@ -71,9 +71,12 @@ fn fff_scanner_contract_ignores_and_metadata() {
     let fixture = TestFixture::new("comprehensive");
     let root = fixture.path();
 
-    // 1. Initialize git repo in fixture
+    // 1. Initialize git repo in fixture (isolated from any active git hook env)
     let git_init = Command::new("git")
         .args(["init"])
+        .env_remove("GIT_DIR")
+        .env_remove("GIT_WORK_TREE")
+        .env_remove("GIT_INDEX_FILE")
         .current_dir(root)
         .output();
     let is_git_available = git_init.is_ok() && git_init.as_ref().unwrap().status.success();
@@ -81,11 +84,17 @@ fn fff_scanner_contract_ignores_and_metadata() {
     if is_git_available {
         Command::new("git")
             .args(["config", "user.name", "Test Runner"])
+            .env_remove("GIT_DIR")
+            .env_remove("GIT_WORK_TREE")
+            .env_remove("GIT_INDEX_FILE")
             .current_dir(root)
             .output()
             .ok();
         Command::new("git")
             .args(["config", "user.email", "test@example.com"])
+            .env_remove("GIT_DIR")
+            .env_remove("GIT_WORK_TREE")
+            .env_remove("GIT_INDEX_FILE")
             .current_dir(root)
             .output()
             .ok();
@@ -126,11 +135,17 @@ fn fff_scanner_contract_ignores_and_metadata() {
     if is_git_available {
         Command::new("git")
             .args(["add", "src/main.rs", "docs/readme.md"])
+            .env_remove("GIT_DIR")
+            .env_remove("GIT_WORK_TREE")
+            .env_remove("GIT_INDEX_FILE")
             .current_dir(root)
             .output()
             .ok();
         Command::new("git")
             .args(["commit", "-m", "initial commit"])
+            .env_remove("GIT_DIR")
+            .env_remove("GIT_WORK_TREE")
+            .env_remove("GIT_INDEX_FILE")
             .current_dir(root)
             .output()
             .ok();

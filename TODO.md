@@ -21,24 +21,24 @@
 ## 2. Observation Contract, Evidence Model และ FFF Integration ใน kept-core
 
 ### 2.1 Foundation: Observation, Identity & Evidence Data Model (ง่ายสุด - Layer 0 Contract)
-- [ ] ทำ TDD red สำหรับ `Target` URI parser และ format invariants (`file://`, `symbol://`, `search://`, `context://`) ใน `crate/kept-core/tests/observation_contract.rs`
-- [ ] สร้าง `Target` enum และ URI parser (`crate/kept-core/src/observation/target.rs`): parse canonical URI, resolve schemes, deterministic display
-- [ ] สร้าง `Revision` และ `ContentIdentity` models (`crate/kept-core/src/observation/identity.rs`): แยก mtime/version จาก content hash (BLAKE3/SHA-256)
-- [ ] สร้าง `Source`, `Evidence`, `Provenance`, `Observation` struct types (`crate/kept-core/src/observation/types.rs`): รองรับ serialization/deserialization แบบ deterministic
-- [ ] รัน focused contract tests ยืนยัน Observation model serialization และ identity invariants ผ่าน 100%
+- [x] ทำ TDD red สำหรับ `Target` URI parser และ format invariants (`file://`, `symbol://`, `search://`, `context://`) ใน `crate/kept-core/tests/observation_contract.rs`
+- [x] สร้าง `Target` enum และ URI parser (`crate/kept-core/src/observation/target.rs`): parse canonical URI, resolve schemes, deterministic display
+- [x] สร้าง `Revision` และ `ContentIdentity` models (`crate/kept-core/src/observation/identity.rs`): แยก mtime/version จาก content hash (BLAKE3/SHA-256)
+- [x] สร้าง `Source`, `Evidence`, `Provenance`, `Observation` struct types (`crate/kept-core/src/observation/types.rs`): รองรับ serialization/deserialization แบบ deterministic
+- [x] รัน focused contract tests ยืนยัน Observation model serialization และ identity invariants ผ่าน 100%
 
 ### 2.2 FFF Acquisition & Filesystem Engine (ปานกลาง - File Acquisition Primitive)
-- [ ] ทำ TDD red สำหรับ fixture ที่มี Git repository, `.gitignore`, `.ignore`, hidden files, `node_modules`, `venv`, `.venv`, `__pycache__`, `target`, symlink, binary file, modified file และ untracked file
-- [ ] เขียน test ยืนยันว่า scan คืน file set ตาม FFF ignore semantics และ path ทุกตัวเป็น relative path แบบ deterministic
-- [ ] เขียน test ยืนยัน metadata ที่ kept ต้องใช้: path, name, extension, size, modified time, binary state และ Git status
-- [ ] ขยาย `crate/kept-core/src/scanner/fff.rs` เพิ่ม FFF acquisition layer (`look` สำหรับ outline/metadata vs `view` สำหรับ content read)
-- [ ] ใช้ FFF mode สำหรับ agent, content indexing, Git status cache และ ignore engine ใน adapter
-- [ ] สร้าง typed errors สำหรับ FFF initialization failure, invalid root, scan timeout และ index-not-ready
-- [ ] ขยาย `FileRecord` ให้เก็บ `isBinary` และ `gitStatus` แบบ backward-compatible
-- [ ] version-bump `PersistentScanSnapshot` และสร้าง migration/read error สำหรับ snapshot รุ่นที่ไม่มี FFF metadata
-- [ ] แทน `std::fs::read_dir` recursive traversal ใน `scanner/scan.rs` ด้วย FFF adapter
-- [ ] เก็บ `ScanIssue` สำหรับ metadata/indexing failure โดยไม่ทำให้ผล scan ส่วนที่เข้าถึงได้หายไป
-- [ ] ลบ traversal implementation เดิมเมื่อ adapter tests ผ่านและไม่มี code path เรียกใช้งานแล้ว
+- [x] ทำ TDD red สำหรับ fixture ที่มี Git repository, `.gitignore`, `.ignore`, hidden files, `node_modules`, `venv`, `.venv`, `__pycache__`, `target`, symlink, binary file, modified file และ untracked file
+- [x] เขียน test ยืนยันว่า scan คืน file set ตาม FFF ignore semantics และ path ทุกตัวเป็น relative path แบบ deterministic
+- [x] เขียน test ยืนยัน metadata ที่ kept ต้องใช้: path, name, extension, size, modified time, binary state และ Git status
+- [x] ขยาย `crate/kept-core/src/scanner/fff.rs` เพิ่ม FFF acquisition layer (`look` สำหรับ outline/metadata vs `view` สำหรับ content read)
+- [x] ใช้ FFF mode สำหรับ agent, content indexing, Git status cache และ ignore engine ใน adapter
+- [x] สร้าง typed errors สำหรับ FFF initialization failure, invalid root, scan timeout และ index-not-ready
+- [x] ขยาย `FileRecord` ให้เก็บ `isBinary` และ `gitStatus` แบบ backward-compatible
+- [x] version-bump `PersistentScanSnapshot` และสร้าง migration/read error สำหรับ snapshot รุ่นที่ไม่มี FFF metadata
+- [x] แทน `std::fs::read_dir` recursive traversal ใน `scanner/scan.rs` ด้วย FFF adapter
+- [x] เก็บ `ScanIssue` สำหรับ metadata/indexing failure โดยไม่ทำให้ผล scan ส่วนที่เข้าถึงได้หายไป
+- [x] ลบ traversal implementation เดิมเมื่อ adapter tests ผ่านและไม่มี code path เรียกใช้งานแล้ว
 
 ### 2.3 Context Registry & Judge Engine Baseline (ท้าทาย - Context Admission Pipeline)
 - [ ] ทำ TDD red สำหรับ `ContextRegistry` เก็บ snapshot revision ที่ agent เคยอ่านแล้ว เพื่อป้องกัน duplicate context reads

@@ -1,1 +1,57 @@
-ignored.txt
+# Rust build artifacts
+target/
+
+# Generated scale fixtures; release benchmark creates deterministic data in memory instead
+benchmarks/data_*.json
+benchmarks/*.csv
+
+# Local agent notes and transient terminal data
+terminal_full_output/
+
+# Editor and operating-system artifacts
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local credentials and environment files
+.env
+.env.*
+!.env.example
+
+# Temporary benchmark exports
+*.profraw
+*.profdata
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.cursor/
+tmp4zpb3vx_/
+tmp9_xleu13/
+tmph0_ry3oy/
+tmpyt0svnk7/
+
+# Local editor MCP configs contain credentials; never commit
+.agents/mcp_config.json
+
+# Database and local agent memory/cache files
+*.db
+*.sqlite
+*.sqlite3
+.headroom/
+.serena/cache/
+.serena/project.local.yml
+
+# Agent worktrees and local settings
+.claude/worktrees/
+.claude/settings.local.json
+
+# CodeQL database
+codeql-db/
+*.codeql
+
+
+

@@ -64,10 +64,10 @@
 - [ ] ผูกผลลัพธ์ AST เข้ากับ `StructurePayload` และ `StructureOutlineItem` ของ `Observation`
 
 ### 2.3 Context Registry & Judge Engine Baseline (ท้าทาย - Context Admission Pipeline)
-- [ ] ทำ TDD red สำหรับ `ContextRegistry` เก็บ snapshot revision ที่ agent เคยอ่านแล้ว เพื่อป้องกัน duplicate context reads
-- [ ] สร้าง `ContextRegistry` (`crate/kept-core/src/context/registry.rs`) รองรับ `context://<target>@<rev>` tracking
-- [ ] ทำ TDD red สำหรับ `Judge` admission decisions: `Pass`, `Reference`, `Delta`, `Drop`, `Warn`, `Block`
-- [ ] สร้าง `Judge` engine v1 (`crate/kept-core/src/context/judge.rs`) สำหรับตัดสิน treat observations ก่อนส่งให้ agent / context stream
+- [x] ทำ TDD red สำหรับ `ContextRegistry` เก็บ snapshot revision ที่ agent เคยอ่านแล้ว เพื่อป้องกัน duplicate context reads
+- [x] สร้าง `ContextRegistry` (`crate/kept-core/src/context/registry.rs`) รองรับ `context://<target>@<rev>` tracking
+- [x] ทำ TDD red สำหรับ `Judge` admission decisions: `Pass`, `Reference`, `Delta`, `Drop`, `Warn`, `Block`
+- [x] สร้าง `Judge` engine v1 (`crate/kept-core/src/context/judge.rs`) สำหรับตัดสิน treat observations ก่อนส่งให้ agent / context stream
 
 ## 3. ย้าย kept scan, find, review, duplicates และ incremental index ไปใช้ FFF-backed index
 

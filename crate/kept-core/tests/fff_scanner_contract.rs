@@ -22,6 +22,7 @@ impl TestFixture {
             .as_nanos();
         let root = std::env::temp_dir().join(format!("kept-fff-fixture-{name}-{unique_id}"));
         fs::create_dir_all(&root).expect("failed to create fixture dir");
+        let root = root.canonicalize().expect("canonicalize fixture path");
         Self { root }
     }
 

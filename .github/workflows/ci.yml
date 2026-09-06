@@ -12,6 +12,9 @@ on:
       - ".agents/**"
       - ".learnings/**"
       - "benchmarks/**"
+      - "LICENSE*"
+      - ".gitignore"
+      - ".gitattributes"
   pull_request:
     paths-ignore:
       - "docs/**"
@@ -19,14 +22,23 @@ on:
       - ".agents/**"
       - ".learnings/**"
       - "benchmarks/**"
+      - "LICENSE*"
+      - ".gitignore"
+      - ".gitattributes"
+
+# Anti-waste: Cancel in-progress runs when a new commit is pushed rapidly
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
   verify:
-    name: Verify (Linux)
+    name: Verify
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -40,18 +52,18 @@ jobs:
         with:
           python-version: "3.12"
 
-      # Fast Fail Steps: Format & Lint
-      - name: Format
+      # Fast Fail: Format & Lint first (fails in seconds if styled wrong)
+      - name: Format check
         run: cargo fmt --all -- --check
 
-      - name: Rust lint
+      - name: Rust lint (Clippy)
         run: cargo clippy --workspace --all-targets -- -D warnings
 
       # Test suite
       - name: Rust tests
         run: cargo test --workspace
 
-      # Quality & Schema checks
+      # Schema & Integrity contracts
       - name: Repository contracts
         run: python3 -m unittest discover -s tests -p "test_*.py"
 

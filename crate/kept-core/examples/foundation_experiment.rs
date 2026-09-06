@@ -224,6 +224,8 @@ fn build_scan_index() -> Result<(ScanIndex, usize, usize), Box<dyn Error>> {
             size: 1_024 + (index % 64) as u64,
             modified_unix: 0,
             kind: "file".to_string(),
+            is_binary: None,
+            git_status: None,
         });
         if index % 101 == 0 {
             files.push(FileRecord {
@@ -233,6 +235,8 @@ fn build_scan_index() -> Result<(ScanIndex, usize, usize), Box<dyn Error>> {
                 size: 1_024 + (index % 64) as u64,
                 modified_unix: 0,
                 kind: "file".to_string(),
+                is_binary: None,
+                git_status: None,
             });
             expected_exact_groups += 1;
         }
@@ -245,6 +249,8 @@ fn build_scan_index() -> Result<(ScanIndex, usize, usize), Box<dyn Error>> {
                 size: 1_024 + (index % 64) as u64,
                 modified_unix: 0,
                 kind: "file".to_string(),
+                is_binary: None,
+                git_status: None,
             });
             expected_near_groups += 1;
         }

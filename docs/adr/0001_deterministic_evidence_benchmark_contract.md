@@ -28,6 +28,6 @@ Foundation repeated experiment, public corpus manifest, raw JSONL, summary, F1, 
 
 ## เอกสารอ้างอิง
 
-- [งานวิจัย Ponytail ด้าน testing และ benchmark](../../research/PONYTAIL_TESTING_BENCHMARK_YAGNI_APPLICABILITY.md)
-- [Ponytail source findings](../../research/PONYTAIL_SOURCE_FINDINGS.md)
+- [งานวิจัย Ponytail ด้าน testing และ benchmark](../research/PONYTAIL_TESTING_BENCHMARK_YAGNI_APPLICABILITY.md)
+- [Ponytail source findings](../research/PONYTAIL_SOURCE_FINDINGS.md)
 - [รายการงาน evidence system](../../TODO.md)

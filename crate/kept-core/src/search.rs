@@ -6,7 +6,7 @@ use fuzzy_matcher::FuzzyMatcher;
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
 
-/// NOTE-001: ตัดคำโดยรองรับ Thai bigram เพื่อค้นหาข้อความไทยที่ไม่มีการเว้นวรรคได้
+// NOTE-001: ตัดคำโดยรองรับ Thai bigram เพื่อค้นหาข้อความไทยที่ไม่มีการเว้นวรรคได้
 fn tokenize(text: &str) -> Vec<String> {
     let normalized = normalize_query(text);
     let mut tokens = Vec::new();
@@ -27,7 +27,7 @@ fn tokenize(text: &str) -> Vec<String> {
     tokens
 }
 
-/// NOTE-001: สร้าง character n-gram สำหรับลดพื้นที่ที่ต้องเรียก fuzzy matcher
+// NOTE-002: สร้าง character n-gram สำหรับลดพื้นที่ที่ต้องเรียก fuzzy matcher
 fn character_ngrams(text: &str, gram_size: usize) -> Vec<String> {
     let characters: Vec<char> = normalize_query(text).chars().collect();
     if characters.is_empty() {
@@ -53,12 +53,12 @@ pub struct SearchIndexStats {
 #[derive(Default)]
 struct Bm25Index {
     docs: Vec<Bm25Document>,
-    /// NOTE-001: token เก็บหนึ่งครั้งใน dictionary แล้ว document/postings อ้างอิงด้วย u32 ID
+    // NOTE-003: token เก็บหนึ่งครั้งใน dictionary แล้ว document/postings อ้างอิงด้วย u32 ID
     token_ids: HashMap<String, u32>,
     doc_freqs: Vec<usize>,
-    /// NOTE-001: term ID -> document indexes ใช้ดึง candidate ก่อนคำนวณ BM25
+    // NOTE-004: term ID -> document indexes ใช้ดึง candidate ก่อนคำนวณ BM25
     postings: Vec<Vec<usize>>,
-    /// NOTE-001: n-gram จาก id/alias เท่านั้น ลด fuzzy fallback จาก O(N) เป็น candidate set จำกัด
+    // NOTE-005: n-gram จาก id/alias เท่านั้น ลด fuzzy fallback จาก O(N) เป็น candidate set จำกัด
     fuzzy_postings: HashMap<String, Vec<usize>>,
     avgdl: f64,
 }
@@ -66,7 +66,7 @@ struct Bm25Index {
 struct Bm25Document {
     group_index: usize,
     entry_index: usize,
-    // NOTE-001: term frequency เป็น integer IDs ลดการเก็บ String/HashMap ซ้ำต่อ document
+    // NOTE-006: term frequency เป็น integer IDs ลดการเก็บ String/HashMap ซ้ำต่อ document
     token_frequencies: Vec<(u32, u32)>,
     document_length: usize,
 }
@@ -447,7 +447,7 @@ fn entry_fuzzy_score(matcher: &SkimMatcherV2, entry: &Value, query: &str) -> i64
         .unwrap_or_default()
 }
 
-/// NOTE-001: policy ใช้ normalized similarity เพื่อให้ค่า 0.0–1.0 เปรียบเทียบได้ ต่างจาก raw score ของ matcher
+/// NOTE-007: policy ใช้ normalized similarity เพื่อให้ค่า 0.0–1.0 เปรียบเทียบได้ ต่างจาก raw score ของ matcher
 fn entry_fuzzy_similarity(entry: &Value, query: &str) -> f64 {
     entry_terms(entry)
         .map(|term| normalized_similarity(&normalize_query(term), query))

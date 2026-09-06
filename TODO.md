@@ -279,3 +279,14 @@
 - [ ] ทำ TUI keyboard flow, non-interactive fallback และ state restoration tests
 
 - [ ] รัน focused tests ต่อ slice, `cargo test --workspace`, `cargo clippy --workspace -- -D warnings`, `cargo fmt --all -- --check`, `just check`, `just cli-smoke`, MCP stdio smoke และ source archive smoke ก่อนปิด public behavior
+
+## Installer scripts
+
+- [x] ปรับ `install-mcp.sh` ให้ติดตั้ง release asset `bl1nk-kept-mcp` จาก GitHub บน Linux/macOS/Windows shell
+- [x] เพิ่ม `install-mcp.ps1` ให้ติดตั้ง release asset `bl1nk-kept-mcp.exe` บน Windows
+- [x] เพิ่ม release workflow ให้ build และแนบ MCP binary asset พร้อม SHA-256 checksum
+- [x] เพิ่ม release-gate hook จับ `git tag` และ tag push พร้อมหน่วงเวลา 40 วินาที
+- [x] เพิ่ม `release-verifier` agent ตรวจ checklist, แก้ TODO และวนตรวจซ้ำก่อนปล่อย release
+- [x] ให้ release gate ส่ง deterministic preflight และ detailed findings กลับ main agent ก่อน verifier ตัดสิน PASS/FAIL
+- [x] แยก pre-commit ให้รัน `just check` ก่อน commit; release gate ไม่แทนที่ pre-commit
+- [x] เพิ่มคำสั่ง `/commit-push-tag` ให้ main agent เก็บงาน ตรวจ แอด คอมมิต ติดแท็ก และส่งต่อ release verifier ตามลำดับ

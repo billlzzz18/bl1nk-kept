@@ -27,5 +27,5 @@
 
 ## เอกสารอ้างอิง
 
-- [งานวิจัย PDF inspector](../../research/PDF_INSPECTOR_RESEARCH.md)
+- [งานวิจัย PDF inspector](../research/PDF_INSPECTOR_RESEARCH.md)
 - [รายการงาน kept-doc](../../TODO.md)

@@ -20,6 +20,7 @@
 - รับประกันความปลอดภัย: ไม่มีการแก้ไขหรือลบไฟล์ต้นทางของผู้ใช้โดยอัตโนมัติ
 
 **2. ค้นหาภาษาไทยแบบไฮบริด (Thai-Aware & Hybrid Semantic Search)**
+
 - ผสาน BM25 inverted index เข้ากับ Thai bigram tokenization, synonym expansion และ n-gram fuzzy candidate filtering
 - คะแนนและผลลัพธ์โปร่งใส: near match ยังคงเป็น candidate ที่ตรวจสอบได้ ไม่ถูกแปลงเป็นข้อมูลจริงโดยพลการ
 - รองรับ Dense Vector Search และ Reranking ผ่าน Ollama และ Jina พร้อมแยกแจกแจงคะแนนชัดเจน

@@ -209,6 +209,8 @@ fn synthetic_scan_index(objects: usize) -> ScanIndex {
             size: 32_768 + (index % 32) as u64,
             modified_unix: 0,
             kind: "file".to_string(),
+            is_binary: None,
+            git_status: None,
         })
         .chain([
             FileRecord {
@@ -218,6 +220,8 @@ fn synthetic_scan_index(objects: usize) -> ScanIndex {
                 size: 32_768,
                 modified_unix: 0,
                 kind: "file".to_string(),
+                is_binary: None,
+                git_status: None,
             },
             FileRecord {
                 path: "archive/report-2025.md".to_string(),
@@ -226,6 +230,8 @@ fn synthetic_scan_index(objects: usize) -> ScanIndex {
                 size: 32_769,
                 modified_unix: 0,
                 kind: "file".to_string(),
+                is_binary: None,
+                git_status: None,
             },
         ])
         .collect::<Vec<_>>();

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "kept": {
+      "type": "stdio",
+      "command": "./target/release/kept-mcp",
+      "args": []
+    }
+  }
+}

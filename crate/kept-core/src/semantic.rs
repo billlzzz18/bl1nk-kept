@@ -32,7 +32,7 @@ pub enum SemanticError {
     Response(String),
 }
 
-/// NOTE-001: provider ที่รองรับมีแค่ ollama (local default) กับ jina (hosted, มีทั้ง embeddings และ rerank)
+// NOTE-001: provider ที่รองรับมีแค่ ollama (local default) กับ jina (hosted, มีทั้ง embeddings และ rerank)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SemanticProvider {
     Ollama,
@@ -320,7 +320,7 @@ async fn get_bytes(url: &str) -> Result<reqwest::Response, SemanticError> {
         .map_err(|error| SemanticError::Request(error.to_string()))
 }
 
-/// NOTE-001: โปรแกรมต้องจัดการ pull เองเมื่อ provider เป็น Ollama; ห้ามโยนให้ผู้ใช้ไปรัน `ollama pull` เอง
+// NOTE-002: โปรแกรมต้องจัดการ pull เองเมื่อ provider เป็น Ollama; ห้ามโยนให้ผู้ใช้ไปรัน `ollama pull` เอง
 ///
 /// Returns `Ok(true)` when a pull was performed, `Ok(false)` when the model was
 /// already installed or the provider does not support local pulls (jina).

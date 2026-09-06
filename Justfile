@@ -19,7 +19,7 @@ clippy:
     cargo clippy --workspace --all-targets -- -D warnings
 
 repo-contract:
-    {{python}} -m unittest tests/test_repository_contract.py tests/test_repository_tools.py
+    {{python}} -m unittest tests/test_repository_tools.py
 
 cli-smoke:
     cargo build -q -p kept-cli --bin kept

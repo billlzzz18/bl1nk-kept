@@ -7,7 +7,7 @@ use std::collections::HashMap;
 
 pub const PUBLIC_REGISTRY_SCHEMA_VERSION: &str = "1.2.0";
 
-/// NOTE-001: สร้าง JSON Schema จาก model registry ปัจจุบันเพื่อให้ artifact ภายนอกไม่ drift จาก Rust source
+// NOTE-001: สร้าง JSON Schema จาก model registry ปัจจุบันเพื่อให้ artifact ภายนอกไม่ drift จาก Rust source
 pub fn export_keyword_registry_schema() -> schemars::schema::RootSchema {
     let mut schema = serde_json::to_value(schemars::schema_for!(KeywordRegistry))
         .expect("generated registry schema must serialize");
@@ -126,7 +126,7 @@ pub struct KeywordRegistry {
     pub foundation: Option<FoundationProfile>,
 }
 
-/// NOTE-001: profile ที่ตรึง normalization/classification/corpus revision เพื่อให้ผลตรวจซ้ำได้
+// NOTE-002: profile ที่ตรึง normalization/classification/corpus revision เพื่อให้ผลตรวจซ้ำได้
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema, Default)]
 #[serde(deny_unknown_fields)]
 pub struct FoundationProfile {
@@ -165,7 +165,7 @@ pub struct FoundationProfile {
     pub updated_at: String,
 }
 
-/// NOTE-001: policy ถูกบันทึกใน registry เพื่อให้ normalize ข้อมูลรอบหลังได้เหมือนรอบเดิม
+// NOTE-003: policy ถูกบันทึกใน registry เพื่อให้ normalize ข้อมูลรอบหลังได้เหมือนรอบเดิม
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct NormalizationProfile {
@@ -192,7 +192,7 @@ impl Default for NormalizationProfile {
     }
 }
 
-/// NOTE-001: ค่าค้นหาเป็น policy ของเจ้าของ registry; default คงผลเดิมที่ผ่าน benchmark แล้วแต่ไม่บังคับทุก dataset
+// NOTE-004: ค่าค้นหาเป็น policy ของเจ้าของ registry; default คงผลเดิมที่ผ่าน benchmark แล้วแต่ไม่บังคับทุก dataset
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct SearchPolicy {
@@ -367,7 +367,7 @@ pub struct ValidationConfig {
 
 impl Default for ValidationConfig {
     fn default() -> Self {
-        // NOTE-001: ใช้ขีดจำกัดเดียวกับ validator เพื่อให้ registry ที่ import แล้วตรวจสอบได้ทันที
+        // NOTE-005: ใช้ขีดจำกัดเดียวกับ validator เพื่อให้ registry ที่ import แล้วตรวจสอบได้ทันที
         Self {
             rules: ValidationRules {
                 alias_min_length: 1,

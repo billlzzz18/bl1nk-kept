@@ -7,6 +7,7 @@
 //! - `integrity`: Magic byte detection and bad extension inspection
 
 pub mod duplicate;
+pub mod fff;
 pub mod filter;
 pub mod integrity;
 pub mod mutation;
@@ -20,6 +21,7 @@ pub use duplicate::{
     ContentDuplicateStats, DuplicateAllowRule, DuplicateEvidence, DuplicateGroup, DuplicateOptions,
     DuplicateSearchStats,
 };
+pub use fff::{FffAdapterError, FffScanner};
 pub use filter::{
     build_treemap, filter_index, CustomFilter, CustomOperator, FileFilter, FilterSet, TreemapNode,
 };
@@ -78,6 +80,8 @@ mod tests {
             size,
             modified_unix: 0,
             kind: "file".to_string(),
+            is_binary: None,
+            git_status: None,
         }
     }
 
@@ -167,6 +171,8 @@ mod tests {
                 size: 10,
                 modified_unix: 100,
                 kind: "file".into(),
+                is_binary: None,
+                git_status: None,
             }],
             issues: Vec::new(),
         };
@@ -302,6 +308,8 @@ mod content_duplicate_tests {
             size: b"duplicate content".len() as u64,
             modified_unix: 0,
             kind: "file".to_string(),
+            is_binary: None,
+            git_status: None,
         });
 
         let (groups, stats) = find_content_duplicates(&index, &ContentDuplicateOptions::default())
@@ -510,6 +518,8 @@ mod persistent_index_tests {
             size,
             modified_unix,
             kind: "file".to_string(),
+            is_binary: None,
+            git_status: None,
         }
     }
 
@@ -565,6 +575,8 @@ mod persistent_snapshot_tests {
                 size: 10,
                 modified_unix: 100,
                 kind: "file".to_string(),
+                is_binary: None,
+                git_status: None,
             }],
             issues: Vec::new(),
         };

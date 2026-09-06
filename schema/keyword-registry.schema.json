@@ -217,7 +217,6 @@
       "additionalProperties": false
     },
     "FoundationProfile": {
-      "description": "NOTE-001: profile ที่ตรึง normalization/classification/corpus revision เพื่อให้ผลตรวจซ้ำได้",
       "type": "object",
       "required": [
         "createdAt",
@@ -445,7 +444,6 @@
       "additionalProperties": false
     },
     "NormalizationProfile": {
-      "description": "NOTE-001: policy ถูกบันทึกใน registry เพื่อให้ normalize ข้อมูลรอบหลังได้เหมือนรอบเดิม",
       "type": "object",
       "required": [
         "casePolicy",
@@ -628,7 +626,6 @@
       ]
     },
     "SearchPolicy": {
-      "description": "NOTE-001: ค่าค้นหาเป็น policy ของเจ้าของ registry; default คงผลเดิมที่ผ่าน benchmark แล้วแต่ไม่บังคับทุก dataset",
       "type": "object",
       "required": [
         "fuzzyMinSimilarity"

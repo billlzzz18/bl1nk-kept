@@ -1,4 +1,3 @@
-<!-- markdownlint-disable MD013 -->
 # bl1nk-kept
 
 [ภาษาไทย](README.th.md) · [Specification](SPEC.md) · [CLI Guide](get-start.md) · [Schema](schema/README.md) · [Benchmarks](benchmarks/README.md)

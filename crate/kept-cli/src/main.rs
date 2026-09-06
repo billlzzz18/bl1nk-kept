@@ -705,6 +705,8 @@ mod tests {
                     size: 10,
                     modified_unix: 0,
                     kind: "file".into(),
+                    is_binary: None,
+                    git_status: None,
                 },
                 FileRecord {
                     path: "large/b.txt".into(),
@@ -713,6 +715,8 @@ mod tests {
                     size: 30,
                     modified_unix: 0,
                     kind: "file".into(),
+                    is_binary: None,
+                    git_status: None,
                 },
             ],
             issues: Vec::new(),
@@ -736,6 +740,8 @@ mod tests {
                 size: 128,
                 modified_unix: 1,
                 kind: "file".to_string(),
+                is_binary: None,
+                git_status: None,
             }],
             issues: vec![ScanIssue::new(
                 "locked".to_string(),

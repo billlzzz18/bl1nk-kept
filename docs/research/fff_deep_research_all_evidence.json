@@ -1,0 +1,1558 @@
+[
+  {
+    "index": 0,
+    "key": "v2:ffcf04e680a99d86ddddc8f99787e942b206640265aeb3b4745cefa04d000425",
+    "agentId": "a38c797e9d8a12cb9",
+    "data": {
+      "question": "https://github.com/dmtrKovalenko/fff ให้ถูกต้องละ อย่ามั่วหรือโมเมมา",
+      "angles": [
+        {
+          "label": "overview-and-core-architecture",
+          "rationale": "สำรวจโครงสร้างหลักของโปรเจกต์ โมดูลภาษา Rust (fff-search, fff-grep, fff-mcp) และจุดเด่นทางเทคนิค",
+          "query": "\"dmtrKovalenko/fff\" \"file search\" architecture rust crates"
+        },
+        {
+          "rationale": "เจาะลึกการนำไปใช้งานเป็น Model Context Protocol (MCP) server และ SDK สำหรับ AI agent harnesses",
+          "query": "\"dmtrKovalenko/fff\" MCP server \"AI agent\" \"@ff-labs/fff-node\"",
+          "label": "mcp-and-ai-agent-integration"
+        },
+        {
+          "query": "\"dmtrKovalenko/fff.nvim\" OR \"fff.nvim\" setup config lua neovim",
+          "rationale": "ค้นหาข้อมูลการตั้งค่า วิธีการใช้งาน และ API สำหรับผู้ใช้งาน Neovim (fff.nvim)",
+          "label": "neovim-plugin-usage"
+        },
+        {
+          "label": "performance-and-benchmarks",
+          "rationale": "ตรวจสอบการเปรียบเทียบประสิทธิภาพ การใช้ RAM อัลกอริทึม fuzzy matching/frecency เทียบกับ ripgrep และ fzf",
+          "query": "\"dmtrKovalenko/fff\" vs ripgrep fzf benchmark performance memory frecency"
+        },
+        {
+          "query": "site:github.com/dmtrKovalenko/fff/issues OR \"dmtrKovalenko/fff\" bug crash limitations",
+          "label": "issues-and-limitations",
+          "rationale": "ค้นหาปัญหาที่พบบ่อย ข้อจำกัด บั๊ก และการรายงานปัญหาจากผู้ใช้งานจริงบน GitHub Issues"
+        }
+      ],
+      "summary": "แยกมุมมองการค้นหาเป็น 5 ด้านหลัก: สถาปัตยกรรมและโครงสร้าง Core ใน Rust, การใช้งานเป็น MCP Server สำหรับ AI Agent, การใช้งานและ Config บน Neovim, ผลทดสอบ Benchmark/เปรียบเทียบกับ Ripgrep & Fzf, และปัญหาหรือข้อจำกัดจริงจาก Issues เพื่อให้ได้ข้อมูลที่แม่นยำตรงตามข้อเท็จจริงของคลังข้อมูล dmtrKovalenko/fff"
+    }
+  },
+  {
+    "index": 1,
+    "key": "v2:3edcb4633535a43d4ea14c269c775ac243d800cb3c8a6130d114d40d0778cbbc",
+    "agentId": "a694a76d945138f7e",
+    "data": {
+      "results": [
+        {
+          "snippet": "grep timeBudgetMs is ignored for zero-match searches. Because all_matches.len() > 1 is checked alongside time_budget, zero-match searches scan all candidate files and never abort on deadline.",
+          "url": "https://github.com/dmtrKovalenko/fff/issues/826",
+          "title": "[Bug]: grep timeBudgetMs is ignored for zero-match searches",
+          "relevance": "high"
+        },
+        {
+          "snippet": "pi-fff ffgrep cursor drops matches beyond the per-file limit. pageSize is passed as maxMatchesPerFile; cursors only track file offsets rather than intra-file offsets, causing excess matches in single files to be unreachable.",
+          "url": "https://github.com/dmtrKovalenko/fff/issues/825",
+          "relevance": "high",
+          "title": "[Bug]: pi-fff ffgrep cursor drops matches beyond the per-file limit"
+        },
+        {
+          "title": "[Bug]: pi-fff external-path grep can permanently block the Pi process",
+          "relevance": "high",
+          "snippet": "pi-fff external-path grep can permanently block the Pi process. Synchronous native FFI calls can stop returning and block JS event loop, bypassing outer JS timeouts.",
+          "url": "https://github.com/dmtrKovalenko/fff/issues/843"
+        },
+        {
+          "snippet": "ffgrep path constraint targeting an unindexed file silently widens to a repo-wide fuzzy search, returning misleading and noisy results when targeting files like node_modules.",
+          "relevance": "high",
+          "title": "ffgrep: path constraint targeting an unindexed file silently widens to a repo-wide fuzzy search",
+          "url": "https://github.com/dmtrKovalenko/fff/issues/830"
+        },
+        {
+          "snippet": "fff-node (Android arm64) FileFinder.create segfaults deterministically with 3+ immediate subdirectories under basePath.",
+          "url": "https://github.com/dmtrKovalenko/fff/issues/835",
+          "title": "fff-node (Android arm64): FileFinder.create segfaults deterministically with 3+ immediate subdirectories",
+          "relevance": "high"
+        },
+        {
+          "snippet": "pi-fff fffind path globs do not match files under dot-directories (e.g. .config, .pi, .agents).",
+          "url": "https://github.com/dmtrKovalenko/fff/issues/828",
+          "relevance": "medium",
+          "title": "[Bug]: pi-fff fffind path globs do not match files under dot-directories"
+        }
+      ]
+    }
+  },
+  {
+    "index": 2,
+    "key": "v2:b1b16187ae3371b4e530166167c155df5bdec274307ce7f1aea6958503a79b72",
+    "agentId": "a16a448660ce68ed6",
+    "data": {
+      "results": [
+        {
+          "snippet": "Main repository documentation detailing Neovim configuration via lazy.nvim and vim.pack, build hook via require('fff.download').download_or_build_binary(), grep modes ('plain', 'regex', 'fuzzy'), and Lua API. Note: repo package name is now dmtrKovalenko/fff.",
+          "title": "dmtrKovalenko/fff GitHub Repository",
+          "relevance": "high",
+          "url": "https://github.com/dmtrKovalenko/fff"
+        },
+        {
+          "title": "README.md at main - dmtrKovalenko/fff",
+          "relevance": "high",
+          "url": "https://github.com/dmtrKovalenko/fff/blob/1b79eecb58a73fdfb8045ed9919ef9af487357be/README.md",
+          "snippet": "Direct documentation for Neovim setup spec, lazy.nvim configuration, keymaps, and full public Lua API functions: find_files(), live_grep(), live_grep_under_cursor(), scan_files(), refresh_git_status(), find_files_in_dir(path), change_indexing_directory(path)."
+        },
+        {
+          "relevance": "high",
+          "snippet": "Release notes & diff comparing v0.6.4...v0.7.0 covering Neovim 0.10.0+ requirement, public API changes, and grep engine tuning options (smart_case, max_file_size, time_budget_ms).",
+          "title": "Comparing v0.6.4...v0.7.0 · dmtrKovalenko/fff",
+          "url": "https://github.com/dmtrKovalenko/fff/compare/v0.6.4...v0.7.0"
+        },
+        {
+          "url": "https://dotfyle.com/plugins/dmtrKovalenko/fff.nvim",
+          "relevance": "medium",
+          "snippet": "Dotfyle plugin registry page tracking dmtrKovalenko/fff.nvim breaking changes, prebuilt binary integration history, and configuration examples from real users.",
+          "title": "dmtrKovalenko/fff.nvim on Dotfyle"
+        },
+        {
+          "snippet": "Issue discussion regarding binary download vs compilation and practical setup patterns for find_files and live_grep in Neovim.",
+          "relevance": "medium",
+          "title": "fff crashes neovim - Issue #298 · dmtrKovalenko/fff",
+          "url": "https://github.com/dmtrKovalenko/fff/issues/298"
+        }
+      ]
+    }
+  },
+  {
+    "index": 3,
+    "key": "v2:f955e08ea847f76f566c1300a54a835877c3699bbdcfb143cb5f028c4e4f4307",
+    "agentId": "ad7933b0f6b6782bf",
+    "data": {
+      "results": [
+        {
+          "url": "https://github.com/dmtrKovalenko/fff",
+          "relevance": "high",
+          "title": "GitHub - dmtrKovalenko/fff: The fastest and the most accurate file search SDK for AI agents, Neovim, Rust, C, Python, Bun and NodeJS",
+          "snippet": "Official FFF repository architecture: Rust core (`crates/fff-search`, `crates/fff-grep`), MCP server binary (`crates/fff-mcp`), Node.js/Bun SDK (`@ff-labs/fff-node`, `@ff-labs/fff-bun`), and Pi agent extension (`packages/pi-fff`). Provides fast in-memory file/grep search for Claude Code, Cursor, Codex, OpenCode, and Cline."
+        },
+        {
+          "url": "https://github.com/dmtrKovalenko/fff/blob/main/packages/pi-fff/README.md",
+          "title": "packages/pi-fff/README.md at main · dmtrKovalenko/fff",
+          "relevance": "high",
+          "snippet": "Pi AI coding agent extension (`@ff-labs/pi-fff`) docs: integrates FFF as native tool provider (`fffind`, `ffgrep`, `fff-multi-grep`), supports `tools-and-ui`, `tools-only`, and `override` modes with frecency ranking and no subprocess spawning overhead."
+        },
+        {
+          "url": "https://github.com/dmtrKovalenko/fff/blob/main/packages/fff-node/README.md",
+          "snippet": "Node.js/Bun SDK (`@ff-labs/fff-node`) usage for custom AI agent harnesses: `FileFinder.create({ basePath, aiMode: true })` with warm in-memory index, typo-resistant fuzzy path search, definition classification, and sub-10ms response times.",
+          "relevance": "high",
+          "title": "packages/fff-node/README.md at main · dmtrKovalenko/fff"
+        },
+        {
+          "url": "https://github.com/dmtrKovalenko/fff/blob/main/install-mcp.ps1",
+          "relevance": "high",
+          "title": "fff/install-mcp.ps1 at main · dmtrKovalenko/fff",
+          "snippet": "Official `fff-mcp` installer and client setup instructions for AI coding assistants including Claude Code (`claude mcp add -s user fff -- ...`), OpenCode (`opencode.json`), Codex, and standard stdio `.mcp.json`."
+        },
+        {
+          "url": "https://pi.dev/packages/@ff-labs/pi-fff",
+          "snippet": "Pi extension package registry page for `@ff-labs/pi-fff` detailing tool replacement benchmarks vs standard `fd`/`rg` spawns and cursor-based pagination for LLM agent loops.",
+          "title": "@ff-labs/pi-fff · Packages · Pi",
+          "relevance": "medium"
+        }
+      ]
+    }
+  },
+  {
+    "index": 4,
+    "key": "v2:ed902ae0f9b6bca2e643d8b9affd5311b24cf159b7b246cca45cf05436ec14e7",
+    "agentId": "a3fdff0154bc2d20d",
+    "data": {
+      "results": [
+        {
+          "title": "dmtrKovalenko/fff GitHub Repository",
+          "url": "https://github.com/dmtrKovalenko/fff",
+          "relevance": "high",
+          "snippet": "High-performance file and content search toolkit in Rust. Modular workspace includes crates/fff-core (fff-search), crates/fff-grep, crates/fff-query-parser, crates/fff-c, crates/fff-nvim, crates/fff-python, and crates/fff-mcp."
+        },
+        {
+          "relevance": "high",
+          "url": "https://github.com/dmtrKovalenko/fff/blob/main/README.md",
+          "snippet": "Details core architecture: resident in-memory content indexing, background watcher, SIMD fuzzy matching (neo_frizbee), mimalloc, frecency scoring, and zero-spawn programmatic search vs ripgrep/fzf.",
+          "title": "FFF Architecture & Technical Highlights (README.md)"
+        },
+        {
+          "snippet": "Rust workspace configuration specifying members (fff-core, fff-grep, fff-query-parser, fff-mcp, fff-c, fff-nvim, fff-python) and shared high-performance dependencies like heed, rayon, glidesort, and mimalloc.",
+          "url": "https://github.com/dmtrKovalenko/fff/blob/main/Cargo.toml",
+          "relevance": "high",
+          "title": "FFF Cargo Workspace Configuration (Cargo.toml)"
+        },
+        {
+          "url": "https://github.com/dmtrKovalenko/fff#mcp-server",
+          "title": "FFF MCP Server Overview & Agent Tools",
+          "snippet": "MCP server component (fff-mcp) providing fffind, ffgrep, and fff-multi-grep tools for AI agents with frecency memory, git-aware annotations, and definition classification.",
+          "relevance": "medium"
+        },
+        {
+          "snippet": "Published Rust crate documentation for fff-search exposing the core search APIs.",
+          "url": "https://docs.rs/fff-search/latest/fff_search/",
+          "relevance": "medium",
+          "title": "fff-search Documentation on Docs.rs"
+        }
+      ]
+    }
+  },
+  {
+    "index": 5,
+    "key": "v2:f2049d79188675fcc8f4e3aabf14bd07d1758abb9cbe9c11b7841d5274bd1b1a",
+    "agentId": "af73766236657f8b1",
+    "data": {
+      "sourceQuality": "secondary",
+      "claims": [
+        {
+          "importance": "central",
+          "quote": "path constraint targeting an unindexed file silently widens to a repo-wide fuzzy search",
+          "claim": "When ffgrep targets an unindexed file via path constraint, it silently widens search to repo-wide fuzzy search instead of restricting results to that file."
+        },
+        {
+          "importance": "central",
+          "quote": "Workspace index excludes target file. pathTargetsFile detects filename extension, then fallback uses only pattern, omitting original path constraint.",
+          "claim": "Exact search finds no match in unindexed files, and the fuzzy fallback drops the path constraint entirely."
+        },
+        {
+          "quote": "routePathConstraint rejects workspace-relative paths without ../, so auxiliary finders never handle them.",
+          "claim": "routePathConstraint rejects workspace-relative paths without ../, preventing auxiliary finders from handling them.",
+          "importance": "supporting"
+        }
+      ],
+      "publishDate": "2026-08-28"
+    }
+  },
+  {
+    "index": 6,
+    "key": "v2:3b60a7a56fc8830d982ba04fb7eff52cd9c9e47fbce0dda201d6d2b4ab8a8641",
+    "agentId": "a45375c2a19955131",
+    "data": {
+      "claims": [
+        {
+          "claim": "FileFinder.grep() ignores timeBudgetMs when search text produces zero matches, scanning all candidate files regardless of timeout setting.",
+          "quote": "FileFinder.grep() does not respect timeBudgetMs when searching for text that produces zero matches. When a 5ms budget is specified, a zero-match query across 10,000 files still searches all 10,000 files, taking ~59ms and returning nextCursor: null.",
+          "importance": "central"
+        },
+        {
+          "claim": "The time check condition in the implementation depends on having more than one match (all_matches.len() > 1), preventing cancellation when zero matches are found.",
+          "quote": "The time check condition appears to be gated on having found matches (all_matches.len() > 1), so zero-match searches never trigger cancellation.",
+          "importance": "central"
+        },
+        {
+          "claim": "The Node SDK grep API is synchronous and lacks cancellation tokens, making timeBudgetMs the sole mechanism for capping execution time.",
+          "quote": "Because the Node SDK API is synchronous with no cancellation token support, timeBudgetMs is the only mechanism callers have to bound grep execution time.",
+          "importance": "supporting"
+        }
+      ],
+      "sourceQuality": "secondary",
+      "publishDate": "2026-08-27"
+    }
+  },
+  {
+    "index": 7,
+    "key": "v2:e42785dde678ea930daad95ade28acab6bf47663e9db0377df87bf9872b4c1ba",
+    "agentId": "aad778d0ed7354739",
+    "data": {
+      "publishDate": "2026-08-29",
+      "claims": [
+        {
+          "claim": "FileFinder.create deterministically crashes with SIGSEGV (exit code 139) on Android arm64 when basePath contains three or more immediate subdirectories.",
+          "importance": "central",
+          "quote": "Android arm64 FileFinder.create crashes with three or more direct subdirectories"
+        },
+        {
+          "claim": "FileFinder.create works as expected with zero, one, or two immediate subdirectories.",
+          "importance": "supporting",
+          "quote": "Zero, one, or two immediate subdirectories work."
+        },
+        {
+          "claim": "The crash occurs in native code before JavaScript execution can catch it, making try/catch ineffective.",
+          "quote": "Crash cannot be handled with JavaScript try/catch.",
+          "importance": "supporting"
+        }
+      ],
+      "sourceQuality": "forum"
+    }
+  },
+  {
+    "index": 8,
+    "key": "v2:9ccb2206a81f690303d288e77a18caecebf92db3a93f21bf173ca9cf666d2a2b",
+    "agentId": "ae7a775773690bf5a",
+    "data": {
+      "publishDate": "2026-08-28",
+      "claims": [
+        {
+          "quote": "fffind path globs fail when matching indexed files located beneath hidden directories such as .pi, .config, or .agents.",
+          "claim": "`fffind` path glob searches fail to match indexed files located under hidden dot-directories.",
+          "importance": "central"
+        },
+        {
+          "quote": "These searches fail: {\"pattern\":\"settings.json\",\"path\":\"**/settings.json\"} ... Returned error: \"No files found matching pattern\"",
+          "claim": "Glob pattern searches using `**/settings.json` fail with an error when target files reside under dot-directories.",
+          "importance": "supporting"
+        },
+        {
+          "quote": "This search succeeds: {\"pattern\":\"settings.json\",\"path\":\"home/.pi/**\"}",
+          "claim": "Explicit directory prefix glob paths matching dot-directories like `home/.pi/**` succeed.",
+          "importance": "supporting"
+        }
+      ],
+      "sourceQuality": "primary"
+    }
+  },
+  {
+    "index": 9,
+    "key": "v2:7049bce350187e87b28d3facec598dfd8b3f8243be287a524198741d97e51954",
+    "agentId": "afc532852e71f74c9",
+    "data": {
+      "claims": [
+        {
+          "claim": "Absolute-path grep operations in pi-fff can enter synchronous native FFI calls that block the JavaScript event loop indefinitely.",
+          "quote": "Absolute-path searches sometimes enter synchronous native FFI while earlier auxiliary-finder work remains active. This blocks JavaScript’s event loop, so timers, Promise.race, and grep budgets cannot stop execution.",
+          "importance": "central"
+        },
+        {
+          "claim": "Auxiliary finder startup timeouts in pi-fff fail to terminate underlying native work when concurrent native activity or finder reuse occurs.",
+          "quote": "Auxiliary finder startup timeout does not terminate native work; finder reuse and concurrent native activity can trigger the wedge.",
+          "importance": "supporting"
+        },
+        {
+          "quote": "Isolate external-path grep in child processes with exact-root workers, root deduplication, serialized creation, bounded pooling, and termination on startup, request, abort, or shutdown.",
+          "importance": "supporting",
+          "claim": "Running external-path grep inside dedicated child process workers with termination controls recovers the search and prevents process freezes."
+        }
+      ],
+      "sourceQuality": "secondary",
+      "publishDate": "2026-08-30"
+    }
+  },
+  {
+    "index": 10,
+    "key": "v2:b42c51b6fb51bc28717dfc24f7c50ca924d442aa87a370c2d933b0874ae66745",
+    "agentId": "a9b24246f66095dc5",
+    "data": {
+      "sourceQuality": "secondary",
+      "publishDate": "2026-08-27",
+      "claims": [
+        {
+          "importance": "central",
+          "claim": "ffgrep applies requested limit to both page size and per-file match count, causing cursor pagination to miss matches beyond a single file's cap.",
+          "quote": "ffgrep applies requested limit to both page size and per-file match count. Cursor pagination tracks file offsets, so matches exceeding one file’s cap become unreachable."
+        },
+        {
+          "quote": "Default limit=20 returned 23 matches across two pages; 10 matches from noise.ts disappeared. limit=50 returned all 33, confirming indexing succeeded.",
+          "claim": "When querying 33 indexed matches across four files with default limit=20, 10 matches in noise.ts were omitted across pages until limit was raised to 50.",
+          "importance": "supporting"
+        },
+        {
+          "importance": "supporting",
+          "quote": "Status: Closed; linked pull request: #832",
+          "claim": "Issue #825 is tracked and closed via linked pull request #832."
+        }
+      ]
+    }
+  },
+  {
+    "index": 11,
+    "key": "v2:05c591914eb8d56fe42728922962b59d26c5599386e44064234b15ccd91dbf73",
+    "agentId": "a05e473043697c91a",
+    "data": {
+      "claims": [
+        {
+          "importance": "central",
+          "quote": "2f1e51e: feat(windows): support both \"\\\" and \"/\" for path separator on windows (#442) (Dmitriy Kovalenko, 2026-05-04)",
+          "claim": "Version 0.7.0 of dmtrKovalenko/fff includes Windows support for both backslash and forward slash path separators."
+        },
+        {
+          "quote": "573a783: feat(neovim): add forward query history cycling (cycle_forward_query) (#435) (thuan1412, 2026-05-02)",
+          "claim": "Version 0.7.0 introduces query history forward cycling (cycle_forward_query) for Neovim.",
+          "importance": "central"
+        },
+        {
+          "claim": "Version 0.7.0 updates MCP tool parameter handling by accepting pattern as an alias for query.",
+          "quote": "52b1e86: fix(mcp): accept 'pattern' as an alias for 'query' on grep/find_files (Dmitriy Kovalenko, 2026-05-03)",
+          "importance": "supporting"
+        },
+        {
+          "claim": "Version 0.7.0 fixes LMDB memory growth and deprecates unsafe no-lock mode.",
+          "quote": "24a4a7a: fix: bound LMDB growth + deprecate unsafe no-lock mode (#441) (Dmitriy Kovalenko, 2026-05-03)",
+          "importance": "supporting"
+        }
+      ],
+      "publishDate": "2026-05-04",
+      "sourceQuality": "primary"
+    }
+  },
+  {
+    "index": 12,
+    "key": "v2:6e1ac9e177d374e6070e86f252b2c01dfea62f643e23aa701558ce173074a7d0",
+    "agentId": "aab6840adbe42b4e0",
+    "data": {
+      "claims": [
+        {
+          "claim": "FFF is a Rust-based file search library and toolkit designed for long-running editors, IDEs, and AI agents rather than a standalone CLI tool.",
+          "importance": "central",
+          "quote": "FFF is a file search library, not a CLI."
+        },
+        {
+          "claim": "FFF maintains a resident in-memory index, background file watcher, and cached metadata to achieve sub-10ms warm search queries on large codebases.",
+          "quote": "Resident index avoids repeated process startup, filesystem walking, metadata collection, and ignore parsing.",
+          "importance": "central"
+        },
+        {
+          "claim": "FFF integrates with multiple environments including Neovim, MCP clients (Claude Code, Cursor, Cline), Node.js, Python, and C ABI bindings.",
+          "quote": "MCP server for Claude Code, Codex, OpenCode, Cursor, Cline, and other MCP clients.",
+          "importance": "supporting"
+        }
+      ],
+      "publishDate": "2026-09-02",
+      "sourceQuality": "primary"
+    }
+  },
+  {
+    "index": 13,
+    "key": "v2:e6b758c26a16ee7775deb4ad8eb0d90d72544b1901eb9808134febb0cb29f452",
+    "agentId": "a18279ffa40067f0f",
+    "data": {
+      "publishDate": "2026-03-18",
+      "sourceQuality": "forum",
+      "claims": [
+        {
+          "importance": "central",
+          "claim": "Typing a single character into fff crashes Neovim without an identified root cause at the time of report.",
+          "quote": "I just type one letter and it crashes"
+        },
+        {
+          "importance": "supporting",
+          "claim": "The crash behavior also reproduces when running fff in grep search mode.",
+          "quote": "Also happens with fff grep search"
+        }
+      ]
+    }
+  },
+  {
+    "index": 14,
+    "key": "v2:b4712d75e45db2452b50e3820db354a6a7e373b0653e44b8db75c1189426ebc8",
+    "agentId": "ae60d81d6923019eb",
+    "data": {
+      "sourceQuality": "primary",
+      "claims": [
+        {
+          "importance": "central",
+          "quote": "Node.js file-search SDK backed by Rust.",
+          "claim": "fff is a Node.js file-search SDK backed by a compiled Rust native backend."
+        },
+        {
+          "importance": "central",
+          "quote": "Each instance maintains its own native index. Initial scanning runs asynchronously; searches support pagination.",
+          "claim": "Each FileFinder instance manages its own native in-process index and performs initial scanning asynchronously."
+        },
+        {
+          "importance": "supporting",
+          "claim": "fff supports content search across plain-text, regex, and multi-occurrence modes alongside live indexing and typo-resistant fuzzy matching.",
+          "quote": "Content search with plain-text, regex, and multi-occurrence modes"
+        },
+        {
+          "importance": "supporting",
+          "quote": "macOS: ARM64, x64; Linux: x64 and ARM64, glibc or musl; Windows: x64, ARM64",
+          "claim": "The library provides multi-platform precompiled binaries covering macOS (ARM64, x64), Linux (x64, ARM64 on glibc/musl), and Windows (x64, ARM64)."
+        }
+      ]
+    }
+  },
+  {
+    "index": 15,
+    "key": "v2:02f228013d58b54461c32cc41d4ea21c0d2d7f8660c8dcfc3501a202dcdc6f0d",
+    "agentId": "a5b72fc047d59c41c",
+    "data": {
+      "claims": [
+        {
+          "claim": "pi-fff adds FFF-powered search to pi using Rust-native, SIMD-accelerated indexing without launching subprocesses.",
+          "importance": "central",
+          "quote": "`@ff-labs/pi-fff` adds FFF-powered search to pi, using Rust-native, SIMD-accelerated indexing and local persistence."
+        },
+        {
+          "quote": "`fff-multi-grep`: OR search across multiple literal patterns using Aho–Corasick.",
+          "claim": "The extension provides dedicated search tools including fffind, ffgrep, and fff-multi-grep with Aho–Corasick multi-pattern search.",
+          "importance": "central"
+        },
+        {
+          "claim": "Search state and frecency data are persisted locally using LMDB stores without remote network calls in extension code.",
+          "quote": "README states: “No shell execution” and “No network calls in the extension code.”",
+          "importance": "supporting"
+        }
+      ],
+      "sourceQuality": "primary"
+    }
+  },
+  {
+    "index": 16,
+    "key": "v2:9f96812be4ca9aca32fb9f6992d697e772714744cd78dd296a695dd7d57df922",
+    "agentId": "a998b0433739519b9",
+    "data": {
+      "sourceQuality": "primary",
+      "claims": [
+        {
+          "quote": "Install directory: `$env:LOCALAPPDATA\\fff-mcp\\bin`",
+          "claim": "install-mcp.ps1 downloads and installs fff-mcp as fff-mcp.exe to $env:LOCALAPPDATA\\fff-mcp\\bin by default on Windows.",
+          "importance": "central"
+        },
+        {
+          "importance": "central",
+          "claim": "The script automatically detects AMD64 and ARM64 system architectures to pull matching Windows release binaries via the GitHub API.",
+          "quote": "Architecture detection: `AMD64`, `ARM64`"
+        },
+        {
+          "claim": "The installer provides configuration commands to register the fff MCP server directly with Claude Code and Codex.",
+          "importance": "supporting",
+          "quote": "claude mcp add -s user fff -- <binary-path>"
+        },
+        {
+          "importance": "supporting",
+          "claim": "Environment variables FFF_MCP_VERSION, FFF_MCP_INSTALL_DIR, and FFF_MCP_PATH_SCOPE can be used to customize installation parameters without CLI arguments.",
+          "quote": "$env:FFF_MCP_VERSION\\n$env:FFF_MCP_INSTALL_DIR\\n$env:FFF_MCP_PATH_SCOPE"
+        }
+      ]
+    }
+  },
+  {
+    "index": 17,
+    "key": "v2:fba97c96296b9ad550b1ad913dceacd0fbe2230999bae5939d91dc891c23c539",
+    "agentId": "acddb0a4df39ca549",
+    "data": {
+      "claims": [
+        {
+          "claim": "FFF is an open-source, MIT-licensed in-memory file search library and toolkit designed for long-running editors, IDEs, and AI agents.",
+          "importance": "central",
+          "quote": "FFF is MIT-licensed, open-source file-search library for long-running editors, IDEs, agents, and coding tools."
+        },
+        {
+          "quote": "3-9 SECONDS per ripgrep spawn and sub-10 ms per FFF query.",
+          "importance": "central",
+          "claim": "FFF maintains an in-memory index with background file watching to achieve sub-10ms query times on repeated searches compared to spawning ripgrep."
+        },
+        {
+          "quote": "fff-search, fff-grep, and fff-query-parser provide Rust search, grep, and query parsing. fff-c exposes stable C ABI through libfff_c.",
+          "claim": "FFF features a modular architecture written in Rust (`fff-search`, `fff-grep`, `fff-query-parser`) exposing a C ABI via `fff-c` (`libfff_c`) for multiple language bindings and an MCP server.",
+          "importance": "supporting"
+        },
+        {
+          "importance": "supporting",
+          "claim": "Content indexing in FFF requires approximately 360 bytes of memory per file (estimated ~36 MB for 100,000 files).",
+          "quote": "Content index costs about 360 bytes per eligible file; README estimates roughly 36 MB for 100k files."
+        }
+      ],
+      "sourceQuality": "primary"
+    }
+  },
+  {
+    "index": 18,
+    "key": "v2:c0b38196b12d8e574412235c11befdb40e103f3154a222f5966d6045cfa4e942",
+    "agentId": "aba792b2db5ced334",
+    "data": {
+      "claims": [
+        {
+          "claim": "FFF.nvim requires Neovim version 0.10.0 or higher.",
+          "quote": "FFF.nvim requires neovim 0.10.0 or higher",
+          "importance": "central"
+        },
+        {
+          "claim": "FFF.nvim integrates as an MCP search tool for AI agents such as Claude Code and Codex.",
+          "importance": "central",
+          "quote": "install FFF as a dependency for your AI agent"
+        },
+        {
+          "importance": "supporting",
+          "quote": "existing rustup toolchain",
+          "claim": "Source compilation uses an existing Rust toolchain when prebuilt binaries are not used."
+        }
+      ],
+      "sourceQuality": "primary"
+    }
+  },
+  {
+    "index": 19,
+    "key": "v2:ade148f8957d6dcf127c99a54b97be58616a0853385c5efb0f9bb224511dc8f5",
+    "agentId": "a036b11a04b03ef8b",
+    "data": {
+      "claims": [
+        {
+          "claim": "fff.nvim is a file search SDK designed for AI agents, Neovim, Rust, C, Python, Bun, and NodeJS.",
+          "quote": "The fastest and the most accurate file search SDK for AI agents, Neovim, Rust, C, Python, Bun and NodeJS",
+          "importance": "central"
+        },
+        {
+          "claim": "fff.nvim provides prebuilt binaries, eliminating the requirement to build from source using cargo.",
+          "quote": "feat!: Prebuilt binaries (no more need in cargo build) (#156)",
+          "importance": "supporting"
+        },
+        {
+          "importance": "supporting",
+          "claim": "fff.nvim supports responsive layouts that adapt on small screens.",
+          "quote": "feat!: Make layout flex on small screens & responsive (#255)"
+        },
+        {
+          "claim": "When no selection is made, fff.nvim adds all items to the quickfix list.",
+          "quote": "feat!: add all items to quickfix list if none are selected (#216)",
+          "importance": "tangential"
+        }
+      ],
+      "sourceQuality": "secondary"
+    }
+  },
+  {
+    "index": 20,
+    "key": "v2:c1b72ebd067570503b15813243c506b2065ef301cb8f73b3b1124d3637d919fa",
+    "agentId": "ad84190a0a0f1059e",
+    "data": {
+      "sourceQuality": "primary",
+      "publishDate": "2026-09-03",
+      "claims": [
+        {
+          "quote": "members = [\n  \"crates/fff-c\",\n  \"crates/fff-core\",\n  \"crates/fff-mcp\",\n  \"crates/fff-nvim\",\n  \"crates/fff-python\",\n  \"crates/fff-query-parser\",\n  \"crates/fff-grep\",\n]",
+          "importance": "central",
+          "claim": "FFF is structured as a Cargo workspace consisting of seven member crates under the crates/ directory."
+        },
+        {
+          "claim": "The workspace defines profile optimizations including fat LTO and opt-level 3 for release builds.",
+          "importance": "supporting",
+          "quote": "[profile.release]\nopt-level = 3\nlto = \"fat\"\ncodegen-units = 1\nstrip = \"debuginfo\""
+        },
+        {
+          "claim": "The workspace configures shared dependencies including mimalloc, git2 with vendored-libgit2, mlua with luajit, and heed.",
+          "quote": "git2 = { version = \"0.21.0\", default-features = false, features = [\n  \"vendored-libgit2\",\n] }\nglidesort = \"0.1\"\nglobset = \"0.4\"\nheed = \"0.22.0\"\nignore = \"0.4.22\"\nmemmap2 = \"0.9\"\nmimalloc = \"0.1.47\"",
+          "importance": "supporting"
+        }
+      ]
+    }
+  },
+  {
+    "index": 21,
+    "key": "v2:986f8441f0e1ac93d5ce9e816aa8826ff9371082909bab9408046c55a80e7250",
+    "agentId": "a4dde8703227c25aa",
+    "data": {
+      "claims": [
+        {
+          "claim": "@ff-labs/pi-fff is a Pi extension package providing FFF-powered file-name and content search, maintained in the dmtrKovalenko/fff repository under packages/pi-fff.",
+          "quote": "Pi extension adding FFF-powered file-name and content search. It supplements built-in tools or replaces find/grep. ... Pi package directory: https://github.com/dmtrKovalenko/fff/tree/main/packages/pi-fff",
+          "importance": "central"
+        },
+        {
+          "claim": "FFF (fast-file-finder) is a Rust-native file finder featuring SIMD acceleration, background indexing, fuzzy matching, and frecency ranking.",
+          "importance": "central",
+          "quote": "FFF: Rust-native file finder with SIMD acceleration, background indexing, fuzzy matching, frecency ranking, Git awareness, caching, and multi-pattern search."
+        },
+        {
+          "quote": "Tools: fffind, ffgrep, fff-multi-grep. ... Runtime: Local search only; no network calls, telemetry, or shell execution.",
+          "importance": "supporting",
+          "claim": "The package provides three primary search tools (fffind, ffgrep, fff-multi-grep) and operates strictly on local search with no network calls or telemetry."
+        }
+      ],
+      "sourceQuality": "primary",
+      "publishDate": "2026-08-30"
+    }
+  },
+  {
+    "index": 22,
+    "key": "v2:3ce2e85e49e11a77ed44242f834f72d5320b073e207b8a0292257f11144d431f",
+    "agentId": "a25181171cc98f6ca",
+    "data": {
+      "counterSource": "",
+      "evidence": "Verified against primary source https://github.com/dmtrKovalenko/fff/blob/main/README.md and LICENSE. FFF is explicitly an MIT-licensed open-source file search library/toolkit featuring in-memory indexing, built for long-running editors, IDEs, and AI agents. Claim matches source exactly without contradiction.",
+      "refuted": false,
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 23,
+    "key": "v2:776a38ddc79a6d4d939d42d01633ddad6620312cc71f8cd447dfac4706a41684",
+    "agentId": "a2f441ebeeac01d28",
+    "data": {
+      "counterSource": "",
+      "evidence": "Primary repository README and repo metadata confirm that FFF (dmtrKovalenko/fff) is MIT-licensed, open source, and explicitly described as 'a file search toolkit for humans and AI agents' and 'fastest and the most accurate file search SDK for AI agents, Neovim, Rust, C, Python, Bun and NodeJS' featuring a 'lightweight in-memory content index' for long-running editors and agents. Claim accurately reflects primary source with no contradiction.",
+      "refuted": false,
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 24,
+    "key": "v2:07bb895bf5fafb73bf9256a4a4421aa3a92f8682d2b1b7df37cec157fedbcb5a",
+    "agentId": "a80940a16dd50b68f",
+    "data": {
+      "evidence": "Primary source verified directly at https://raw.githubusercontent.com/dmtrKovalenko/fff/main/Cargo.toml. [workspace] members explicitly defines exactly seven crates under crates/: crates/fff-c, crates/fff-core, crates/fff-mcp, crates/fff-nvim, crates/fff-python, crates/fff-query-parser, crates/fff-grep. Claim matches repository structure exactly.",
+      "counterSource": "",
+      "confidence": "high",
+      "refuted": false
+    }
+  },
+  {
+    "index": 25,
+    "key": "v2:085eb93a8bf4b9efd5040c529be066097195b3fd767feaf6c5efa055e4dd53e0",
+    "agentId": "a0f8cd41656c54cd3",
+    "data": {
+      "counterSource": "",
+      "refuted": false,
+      "evidence": "Claim verified directly against primary source (https://github.com/dmtrKovalenko/fff/blob/main/packages/pi-fff/README.md). Repository explicitly documents: pi-fff integrates FFF search into pi using Rust native bindings (no subprocess spawning) and SIMD-accelerated indexing. Claim accurately represents source without exaggeration or refuting evidence.",
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 26,
+    "key": "v2:278bc34b009f5a8675127f91b447c72a874a6c970b077a5c71f3297c379db2e3",
+    "agentId": "aa4e8dfa35e4de8c1",
+    "data": {
+      "confidence": "high",
+      "evidence": "README in repository dmtrKovalenko/fff explicitly confirms exact description: 'FFF is MIT-licensed, open-source file-search library for long-running editors, IDEs, agents, and coding tools' with in-memory architecture resident in long-lived process. Primary source directly supports claim without overreach.",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/blob/main/README.md",
+      "refuted": false
+    }
+  },
+  {
+    "index": 27,
+    "key": "v2:564b6e1d11d7d265faf9d0606c79096c22dc62024be074e683bee1cab9b08137",
+    "agentId": "a1a37c53aaa1787bb",
+    "data": {
+      "evidence": "Claim confirmed in official repository docs and codebase (README.md, crates/fff-core/src/file_picker.rs, crates/fff-core/src/watcher/background_watcher.rs). FFF runs resident process with in-memory index + background fs watcher (`notify`), enabling sub-10ms query latency vs 3-9s subprocess spawn cost of ripgrep on repeated runs.",
+      "refuted": false,
+      "confidence": "high",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/blob/main/README.md"
+    }
+  },
+  {
+    "index": 28,
+    "key": "v2:6c4ce1677da408532b0b55b639d0cd3161b1f2f70a893522bcd9dfb4ec1b1330",
+    "agentId": "a24dba0c0f4cfcc68",
+    "data": {
+      "counterSource": "https://github.com/dmtrKovalenko/fff/blob/main/README.md",
+      "refuted": false,
+      "confidence": "high",
+      "evidence": "Primary source explicitly verifies the architecture and benchmark: FFF is a library maintaining an in-memory resident index/file cache with a background file watcher ('The index updates as files change. You never pay for a rescan on the hot path'). On large repositories (e.g. 500k-file Chromium), it reports 'sub-10 ms per FFF query' versus '3-9 SECONDS per ripgrep spawn' on repeated searches. Crates.io docs (fff-search) also corroborate background indexing/watching. No contradicting or refuting technical evidence found."
+    }
+  },
+  {
+    "index": 29,
+    "key": "v2:378f72151f4f80699d927b34960855f187ab71df85f17e396ba2e4dd39bf13a8",
+    "agentId": "a9f2c1e6553e0f63a",
+    "data": {
+      "confidence": "high",
+      "evidence": "Cargo.toml at dmtrKovalenko/fff defines workspace with exactly 7 member crates under crates/: crates/fff-c, crates/fff-core, crates/fff-mcp, crates/fff-nvim, crates/fff-python, crates/fff-query-parser, crates/fff-grep. Claim verified against primary source.",
+      "counterSource": "https://raw.githubusercontent.com/dmtrKovalenko/fff/main/Cargo.toml",
+      "refuted": false
+    }
+  },
+  {
+    "index": 30,
+    "key": "v2:a907cb24c0185c7f1a14a4d8210d1a8eb25ac94a7daf684fe3d1868bda3d2a33",
+    "agentId": "acca05a7df257daa1",
+    "data": {
+      "refuted": false,
+      "counterSource": "https://github.com/dmtrKovalenko/fff/blob/main/packages/pi-fff/README.md",
+      "evidence": "The primary source README.md for @ff-labs/pi-fff confirms: 1) It is an extension for pi that replaces find/grep with FFF. 2) FFF is described as a 'Rust-native, SIMD-accelerated file finder'. 3) Under Key Advantages, it states: 'No subprocess spawning — FFF is a Rust native library called through the Node binding. No fd/rg process per call.' The claim is fully accurate and directly supported by the documentation and architecture of packages/pi-fff.",
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 31,
+    "key": "v2:e93fec514a95693951243dd716e1844e9ae50ad64e522773adaa0001c24220d1",
+    "agentId": "ac35ca984dc80203e",
+    "data": {
+      "evidence": "Claim directly matches official README documentation from primary repository https://github.com/dmtrKovalenko/fff. Documentation explicitly confirms: (1) in-memory index with background file watching ('Background file watcher. The index updates as files change.', 'FFF keeps the index and the file cache resident in one long-lived process'), (2) sub-10ms query times on repeated searches ('sub-10 ms per FFF query'), and (3) comparison to spawning ripgrep ('3-9 SECONDS per ripgrep spawn and sub-10 ms per FFF query', 'every call forks a new process... FFF will pay for itself starting from the second call'). Accurate technical summary without overreach or distortion.",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/blob/main/README.md",
+      "refuted": false,
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 32,
+    "key": "v2:3777c6edecc44d3471b998e773af1070aeefa16c337f644678c5d3aa40746c54",
+    "agentId": "a244d0908b7d7a618",
+    "data": {
+      "confidence": "high",
+      "evidence": "Primary source verification from repository Cargo.toml confirms workspace members are exactly 7 member crates under crates/ (crates/fff-c, crates/fff-core, crates/fff-mcp, crates/fff-nvim, crates/fff-python, crates/fff-query-parser, crates/fff-grep). Directory listing of crates/ also confirms these 7 directories. Claim is fully accurate and supported.",
+      "refuted": false,
+      "counterSource": ""
+    }
+  },
+  {
+    "index": 33,
+    "key": "v2:b8b1a299eeb649a0edfa62eb0775e76f9b7768d801be6fdc61ea5ba636e4176e",
+    "agentId": "a3e89374f859a1b60",
+    "data": {
+      "counterSource": "https://github.com/dmtrKovalenko/fff/blob/main/packages/pi-fff/README.md",
+      "confidence": "high",
+      "evidence": "Claim confirmed by primary source repository (dmtrKovalenko/fff/packages/pi-fff/README.md & index.ts). Extension provides dedicated search tools fffind (fuzzy file search), ffgrep (frecency-ranked content search), and fff-multi-grep (multi-pattern content search using SIMD Aho-Corasick). Quote directly supports claim. No contradictions found.",
+      "refuted": false
+    }
+  },
+  {
+    "index": 34,
+    "key": "v2:514a757a490bc33c6cdd20bc16e0d2caa9c0f2ed0308475b8bb3501fe37150f6",
+    "agentId": "aa3b6313096176554",
+    "data": {
+      "confidence": "high",
+      "counterSource": "",
+      "evidence": "Claim verified directly in dmtrKovalenko/fff primary repository source (packages/pi-fff/README.md and packages/pi-fff/src/index.ts). The pi-fff extension registers dedicated tools `fffind`, `ffgrep`, and `fff-multi-grep`, where `fff-multi-grep` performs multi-pattern OR content search using SIMD-accelerated Aho-Corasick algorithm.",
+      "refuted": false
+    }
+  },
+  {
+    "index": 35,
+    "key": "v2:4bba5d39a531784d080a8fc9c0c20625c25a3bf65891513e83f30ca997023e52",
+    "agentId": "a03ffce429155ee05",
+    "data": {
+      "confidence": "high",
+      "refuted": false,
+      "evidence": "The claim is accurate and directly supported by the primary source repository (dmtrKovalenko/fff) under packages/pi-fff/README.md. The documentation and package definition explicitly state that `@ff-labs/pi-fff` provides an extension for pi that uses FFF (Rust-native, SIMD-accelerated) calling into Node/Rust native bindings without spawning `fd` or `rg` subprocesses.",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/blob/main/packages/pi-fff/README.md"
+    }
+  },
+  {
+    "index": 36,
+    "key": "v2:c8da0e1530b2182439c0906c45cdca4d8d25c8c41cab5795639e171e67867d08",
+    "agentId": "ac36de26ea313deed",
+    "data": {
+      "evidence": "Primary repository documentation (`packages/pi-fff/README.md` and main `README.md` at `https://github.com/dmtrKovalenko/fff`) explicitly documents `fffind`, `ffgrep`, and `fff-multi-grep` as dedicated search tools, where `fff-multi-grep` provides OR-logic multi-pattern content search powered by SIMD-accelerated Aho-Corasick. Source code (`packages/pi-fff/src/index.ts`) confirms tool definitions and descriptions.",
+      "refuted": false,
+      "counterSource": "",
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 37,
+    "key": "v2:a37fc3038c3a23cb402c16f11001b33b7bf38d7a09cf3793369bb8ed6e2172be",
+    "agentId": "a85c5e510a9e438c3",
+    "data": {
+      "evidence": "Primary GitHub repository (dmtrKovalenko/fff) confirms fff is written in Rust (crates/fff-search, crates/fff-grep) and exposes Node.js bindings via @ff-labs/fff-node (packages/fff-node) wrapping C FFI bindings (crates/fff-c) to the compiled Rust backend. Claim is exact and supported.",
+      "refuted": false,
+      "confidence": "high",
+      "counterSource": ""
+    }
+  },
+  {
+    "index": 38,
+    "key": "v2:d008e942cc0949bd0b5ab1d1d388f712087586a4570199fa9a5c95593c383c5b",
+    "agentId": "a627b5eacd40a4c52",
+    "data": {
+      "evidence": "Verified via dmtrKovalenko/fff repository README and packages/fff-node documentation. Primary sources confirm: 'Each FileFinder instance owns an independent native index. Create one, wait for the initial scan, then run as many searches as you like' and 'Initial scan is non-blocking / async (waitForScan)'. Claim is accurate and supported directly by primary repository docs.",
+      "confidence": "high",
+      "counterSource": "",
+      "refuted": false
+    }
+  },
+  {
+    "index": 39,
+    "key": "v2:8bd125dea533a6d88111bc42bd7f74273e2cf876c92141b15e74cd4c2febf7b3",
+    "agentId": "a4b1b8bf3e250ae8b",
+    "data": {
+      "confidence": "high",
+      "evidence": "Primary source inspection of dmtrKovalenko/fff/install-mcp.ps1 confirms:\n1. Default target install directory: `if (-not $InstallDir) { $InstallDir = Join-Path $env:LOCALAPPDATA 'fff-mcp\\bin' }` and parameter doc `.PARAMETER InstallDir Target install directory. Default: $env:LOCALAPPDATA\\fff-mcp\\bin.`\n2. Binary name on Windows: `$BinaryName = 'fff-mcp'`, downloaded/moved to `$dest = Join-Path $InstallDir \"$BinaryName.exe\"` (i.e. `fff-mcp.exe`).\nThe claim is accurate, current, and directly supported by primary script source.",
+      "refuted": false
+    }
+  },
+  {
+    "index": 40,
+    "key": "v2:e0d21c2c75943c306d321ef97276f55fabcf9b6c395ce1dcd4c296eb501b1418",
+    "agentId": "acb44a76969685ea0",
+    "data": {
+      "confidence": "high",
+      "refuted": false,
+      "counterSource": "",
+      "evidence": "install-mcp.ps1 in dmtrKovalenko/fff repository defines $BinaryName = 'fff-mcp', sets default InstallDir via 'if (-not $InstallDir) { $InstallDir = Join-Path $env:LOCALAPPDATA \"fff-mcp\\bin\" }', downloads $BinaryName-$Target.exe, and installs it to $dest = Join-Path $InstallDir \"$BinaryName.exe\" (i.e. $env:LOCALAPPDATA\\fff-mcp\\bin\\fff-mcp.exe). Claim is exact and fully verified against primary source."
+    }
+  },
+  {
+    "index": 41,
+    "key": "v2:285f7687c1e4e5282f76f463ea971104e91c6f73006b01ec8d0a332e950e3996",
+    "agentId": "a7e674fab9865c490",
+    "data": {
+      "refuted": false,
+      "confidence": "high",
+      "evidence": "Directly verified against primary source code repository dmtrKovalenko/fff (install-mcp.ps1). The script defines default parameter `$InstallDir = $env:FFF_MCP_INSTALL_DIR` and fallback `if (-not $InstallDir) { $InstallDir = Join-Path $env:LOCALAPPDATA 'fff-mcp\\bin' }`. In Install-Binary function, it places downloaded binary into `$InstallDir` as `$BinaryName.exe` (`$BinaryName = 'fff-mcp'`). The claim accurately reflects primary source code without overreach or contradictions."
+    }
+  },
+  {
+    "index": 42,
+    "key": "v2:d797c8f646f6894b7fb8d5ede49daa0f66c0e31fe82dadebbeb82ef57bff01f5",
+    "agentId": "acd60265aa7baac64",
+    "data": {
+      "refuted": false,
+      "counterSource": "",
+      "evidence": "In `install-mcp.ps1`, function `Get-Target` inspects `HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment` `PROCESSOR_ARCHITECTURE` to match `'AMD64'` to `'x86_64-pc-windows-msvc'` and `'ARM64'` to `'aarch64-pc-windows-msvc'`, then queries GitHub releases API `https://api.github.com/repos/dmtrKovalenko/fff/releases` in `Get-LatestReleaseTag` to locate and download corresponding Windows executable assets. Claim is fully supported by primary source code.",
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 43,
+    "key": "v2:4d796cd86c14665cb7e81c3d1eef4c9a39137e3ed4497f039073a7274eaf79cd",
+    "agentId": "ae8597f92db4e26ba",
+    "data": {
+      "confidence": "high",
+      "evidence": "In `install-mcp.ps1`, function `Get-Target` reads registry key `HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment` property `PROCESSOR_ARCHITECTURE` to detect 'AMD64' -> 'x86_64-pc-windows-msvc' and 'ARM64' -> 'aarch64-pc-windows-msvc'. Function `Get-LatestReleaseTag` queries GitHub API `https://api.github.com/repos/$Repo/releases` via `Invoke-RestMethod` to find releases containing `$BinaryName-$Target.exe`. The claim is fully accurate and supported by primary source code.",
+      "refuted": false,
+      "counterSource": "https://github.com/dmtrKovalenko/fff/blob/main/install-mcp.ps1"
+    }
+  },
+  {
+    "index": 44,
+    "key": "v2:5bb272606599c90c047bff56ec50020bdeeea672ea76b38379a801d508f1514f",
+    "agentId": "a441e17749afa2685",
+    "data": {
+      "refuted": false,
+      "confidence": "high",
+      "counterSource": "",
+      "evidence": "Direct verification against github.com/dmtrKovalenko/fff shows `packages/pi-fff` in the mono-repo root. README lists `@ff-labs/pi-fff` (installed via `pi install npm:@ff-labs/pi-fff` or `git:github.com/dmtrKovalenko/fff`), providing FFF-powered search (`fffind`, `ffgrep`, `fff-multi-grep`) to replace or supplement built-in pi tools. Claim is accurate and verified by primary repo source."
+    }
+  },
+  {
+    "index": 45,
+    "key": "v2:e1083851121c1267116da89b110bc3b450bef70b53fa3b28f1c3afa24ea1de77",
+    "agentId": "a4332a67e55283c9a",
+    "data": {
+      "counterSource": "",
+      "evidence": "Checked dmtrKovalenko/fff repository structure on GitHub. packages/pi-fff exists, published under npm package name @ff-labs/pi-fff, providing FFF file search / grep integration for pi coding agent. Claim exact match to repository code and documentation.",
+      "confidence": "high",
+      "refuted": false
+    }
+  },
+  {
+    "index": 46,
+    "key": "v2:18f48d0b0d9e86dc8601f7c822d06d500ebe234ad76b954d1fac463cb7b85440",
+    "agentId": "a47e37521b6b71add",
+    "data": {
+      "evidence": "Direct evidence from primary repository (https://github.com/dmtrKovalenko/fff): FFF is a file-search library/SDK providing Node.js/Bun SDKs (`@ff-labs/fff-node`, `packages/fff-node`) powered by a compiled Rust core backend (`crates/fff-search`, `crates/fff-grep`, `crates/fff-query-parser` via C FFI `crates/fff-c`). The claim is fully accurate and matches official repository documentation.",
+      "refuted": false,
+      "confidence": "high",
+      "counterSource": ""
+    }
+  },
+  {
+    "index": 47,
+    "key": "v2:8419d424d1af5a7d15d6e45e40e8328db98e3ae2dcc0bb8b604434c1d291eaf9",
+    "agentId": "a8d128e2781767880",
+    "data": {
+      "refuted": false,
+      "counterSource": "",
+      "confidence": "high",
+      "evidence": "Primary source https://raw.githubusercontent.com/dmtrKovalenko/fff/main/packages/fff-node/README.md explicitly states: 'Each FileFinder instance owns an independent native index. Create one, wait for the initial scan, then run as many searches as you like.' and in Quick Start code comments: '// Wait for the initial scan (async, non-blocking) await finder.waitForScan(5000);'. The claim accurately describes the documented behavior of FileFinder."
+    }
+  },
+  {
+    "index": 48,
+    "key": "v2:d0989bcf705ba085c23d28d1e83ca110b1716163b61682b87721fc97f87a926a",
+    "agentId": "ac2fbe1c110ba4e51",
+    "data": {
+      "evidence": "Claim is accurate and supported by primary sources. Repository dmtrKovalenko/fff contains packages/pi-fff in its tree, and it is published to npm as @ff-labs/pi-fff providing FFF-powered file search and grep extensions for Pi coding agent.",
+      "refuted": false,
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 49,
+    "key": "v2:d0f3859dfd7a2748cac56800e8f1841c6603d704b7d47b6356fe1bffea14f696",
+    "agentId": "ae07b99aa4cb741dd",
+    "data": {
+      "refuted": false,
+      "counterSource": "",
+      "confidence": "high",
+      "evidence": "dmtrKovalenko/fff repository structure contains packages/fff-node (@ff-labs/fff-node) which is a TypeScript/Node.js/Bun file-search SDK. It connects via C FFI (crates/fff-c libfff_c) to the compiled Rust native backend (crates/fff-search, crates/fff-grep). The primary source README explicitly describes it as a 'Node.js file-search SDK backed by Rust.' Claim is accurate and supported by codebase structure and primary docs."
+    }
+  },
+  {
+    "index": 50,
+    "key": "v2:141780170a285626fdfe18350b967a2dd3bed435c426d5752888cc63f65b50dd",
+    "agentId": "a934ca359cf500d79",
+    "data": {
+      "refuted": false,
+      "evidence": "Claim verified against primary repository (dmtrKovalenko/fff) and package metadata. Repository confirms: Rust core (crates/fff-search, crates/fff-grep), SIMD acceleration (memmem, frizbee-derived SIMD fuzzy matching, SIMD Aho-Corasick), background indexing/file watcher, fuzzy matching (typo-resistant, Smith-Waterman), and frecency ranking. Claim accurate and fully supported by primary documentation.",
+      "confidence": "high",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/blob/main/README.md"
+    }
+  },
+  {
+    "index": 51,
+    "key": "v2:99050b6e8679b7f2449c5455f5225ff30d63832cc26013986faafe70ac692d23",
+    "agentId": "ae206fc8a16978f9f",
+    "data": {
+      "counterSource": "",
+      "refuted": false,
+      "evidence": "Primary repository documentation directly verifies claim. README defines FFF as \"A file search toolkit for humans and AI agents\" and notes \"plenty of AI harnesses and code editors need the same thing: accurate, fast file search as a library. That is what fff is.\" It highlights performance over CLIs like ripgrep and fzf in long-running processes, supporting SDK/library architecture over standalone CLI.",
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 52,
+    "key": "v2:0ff7c0bf60275eec879ad3f9a8c5401ef682f5766075d43bb26e56b3612a1a50",
+    "agentId": "afa33a2d5a80edadb",
+    "data": {
+      "refuted": false,
+      "confidence": "high",
+      "counterSource": "https://github.com/dmtrKovalenko/fff",
+      "evidence": "Primary repository dmtrKovalenko/fff and crates.io (fff-search) confirm exact technical claims: Rust-native file finder core (crates/fff-search), SIMD-accelerated matching, background indexer/watcher, fuzzy matching with typo resistance, and frecency-ranked file access. Claim is fully factual and verified against upstream repository."
+    }
+  },
+  {
+    "index": 53,
+    "key": "v2:1bcdcfe3877c0829b9b3768b4b416350045313dd49102333f6743caa0c77ecec",
+    "agentId": "a7852193cfbaeff27",
+    "data": {
+      "evidence": "Primary repository documentation and codebase at dmtrKovalenko/fff directly verify the claim: FFF maintains a resident in-memory index, background file watcher via `notify`, and mmap/cached metadata to avoid repeated rescans and achieve sub-10ms warm search queries on large codebases (e.g. 500k-file Chromium checkout). Claim is accurate, not refuted.",
+      "confidence": "high",
+      "counterSource": "https://github.com/dmtrKovalenko/fff",
+      "refuted": false
+    }
+  },
+  {
+    "index": 54,
+    "key": "v2:5b91d153cd76e44d6a12b06098e41c49230df05ea659639c89bd88d770a236c6",
+    "agentId": "a7664a2035b7f2787",
+    "data": {
+      "confidence": "high",
+      "counterSource": "",
+      "evidence": "Claim accurately reflects primary source repo README: \"FFF is a file search library, not a CLI... FFF keeps the index and the file cache resident in one long-lived process and exposes the same Rust core through four thin layers...\". Also matches \"A file search toolkit for humans and AI agents. Really fast.\" and \"designed for long-running editors, IDEs, and AI agents rather than a standalone CLI tool.\" No refuting evidence found.",
+      "refuted": false
+    }
+  },
+  {
+    "index": 55,
+    "key": "v2:f3d851c083b545ecaded7647e6a76061cab05c6ce72a52d56540b0989b000f5b",
+    "agentId": "a804a893912a29264",
+    "data": {
+      "confidence": "high",
+      "evidence": "Primary repository dmtrKovalenko/fff, official documentation (docs.rs/fff-search), and packages/pi-fff fully confirm all elements of the claim: FFF is a Rust-native file finder/toolkit featuring SIMD-accelerated fuzzy matching (via frizbee SIMD Smith-Waterman / SIMD memmem / AVX2 / NEON), background indexing/watching via background threads and notify crate, fuzzy matching with typo resistance, and LMDB-backed frecency ranking.",
+      "refuted": false,
+      "counterSource": "None"
+    }
+  },
+  {
+    "index": 56,
+    "key": "v2:56b90c68e13a7ed0e696fc837225a89104fb70a0ac9ac63fd7bc342ec5976c97",
+    "agentId": "aa3ddc87ee2d60f78",
+    "data": {
+      "evidence": "The repository README and source code (crates/fff-core/src/file_picker.rs) confirm FFF keeps an in-memory resident index, uses a background file watcher, and employs memory-mapped metadata / content caches to achieve sub-10ms warm search queries on large repos (e.g. 500k-file Chromium checkout vs 3-9s ripgrep). The quote accurately reflects primary source architecture and benchmarks.",
+      "refuted": false,
+      "confidence": "high",
+      "counterSource": "https://github.com/dmtrKovalenko/fff"
+    }
+  },
+  {
+    "index": 57,
+    "key": "v2:ca86aa12c3300bc4cc597025924d8305c49fdab94921c2fc35c94767c23e6f4f",
+    "agentId": "a57d97998718ffec7",
+    "data": {
+      "evidence": "README directly confirms: \"FFF keeps the index and the file cache resident in one long-lived process... every subsequent search hits warm memory. On a 500k-file Chromium checkout, that is the difference between 3-9 SECONDS per ripgrep spawn and sub-10 ms per FFF query.\" Also states: \"Background file watcher. The index updates as files change. You never pay for a rescan on the hot path.\" and stores metadata (git status, frecency, timestamps). Claim matches primary source design architecture exactly.",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/blob/main/README.md",
+      "confidence": "high",
+      "refuted": false
+    }
+  },
+  {
+    "index": 58,
+    "key": "v2:2f0af649ec8fdedb1702c840d54e795f5e121d0c784c02afdd9d973afd232b8f",
+    "agentId": "a1b8cae8c54492537",
+    "data": {
+      "refuted": false,
+      "counterSource": "https://raw.githubusercontent.com/dmtrKovalenko/fff/main/packages/fff-node/README.md",
+      "confidence": "high",
+      "evidence": "The README for @ff-labs/fff-node directly verifies this: 'Each FileFinder instance owns an independent native index. Create one, wait for the initial scan, then run as many searches as you like.' and code comments demonstrate asynchronous initial scanning: '// Wait for the initial scan (async, non-blocking) await finder.waitForScan(5000);'. The claim accurately reflects primary repository documentation."
+    }
+  },
+  {
+    "index": 59,
+    "key": "v2:f8fcfec802ba2d1b29ef01ec154079da8f6b1506935512fb054888a3b8e21cfa",
+    "agentId": "a70b24acc2783b150",
+    "data": {
+      "counterSource": "https://github.com/dmtrKovalenko/fff",
+      "confidence": "high",
+      "evidence": "Claim fully verified and supported by primary source repository (dmtrKovalenko/fff). FFF provides an MCP server binary (crates/fff-mcp) explicitly documented and tested for integration with AI coding assistants including Claude Code and Codex. Setup instructions, installer scripts (install-mcp.sh, install-mcp.ps1), and tool bindings (ffgrep, fffind, fff-multi-grep) are officially implemented and maintained in the repository.",
+      "refuted": false
+    }
+  },
+  {
+    "index": 60,
+    "key": "v2:21ac4ed2de95da5e4d5bc8f28df5feb9956f38df92b3361da35f91a760633b64",
+    "agentId": "ab2a4f2a58bd022c2",
+    "data": {
+      "refuted": false,
+      "evidence": "Primary repository README (dmtrKovalenko/fff) directly confirms that FFF provides an MCP server (crates/fff-mcp) designed for AI agents, specifically documenting setup instructions for Claude Code, Codex, OpenCode, Cursor, and Cline with search tools ffgrep, fffind, and fff-multi-grep. Quote: 'Works with Claude Code, Codex, OpenCode, Cursor, Cline, and any MCP-capable client.' and 'install FFF as a dependency for your AI agent'.",
+      "confidence": "high",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/blob/1b79eecb58a73fdfb8045ed9919ef9af487357be/README.md"
+    }
+  },
+  {
+    "index": 61,
+    "key": "v2:06af1aa28789270f3848d284264432d8f0398467a03031dc4aef8ac27a24318a",
+    "agentId": "ac0228dfe1e172bbf",
+    "data": {
+      "confidence": "high",
+      "counterSource": "None",
+      "evidence": "Repository documentation (README.md at commit 1b79eec and tree snapshots) explicitly states 'FFF.nvim requires neovim 0.10.0 or higher' under the Neovim guide section. No conflicting sources or lower version requirements found.",
+      "refuted": false
+    }
+  },
+  {
+    "index": 62,
+    "key": "v2:9bafef35ab8629233b70f09dc2996e1fb4519bfeccab87ea0d7af17cc1fb2995",
+    "agentId": "a9366aa0567048fea",
+    "data": {
+      "evidence": "Primary release notes for v0.7.0 and PR #442 (commit 2f1e51e2624545944de7dfe66a8cd214d37020d3) verify the feature 'feat(windows): support both \\ and / for path separator on windows'. The claim accurately reflects the release contents.",
+      "confidence": "high",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/releases/tag/v0.7.0",
+      "refuted": false
+    }
+  },
+  {
+    "index": 63,
+    "key": "v2:f2225e5ecf1553abb95b529fc21aa79cf49cf4cafdb0b86c9b56861cf0074eaf",
+    "agentId": "ab2b9eec1dc4ff609",
+    "data": {
+      "refuted": false,
+      "counterSource": "https://github.com/dmtrKovalenko/fff/blob/main/README.md",
+      "evidence": "Primary source is the official repository README.md (and commit/issue history) for dmtrKovalenko/fff (fff.nvim), which explicitly states the system requirement: \"FFF.nvim requires neovim 0.10.0 or higher\" (relies on Neovim 0.10+ APIs like winfixbuf and native features). No contradicting evidence found.",
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 64,
+    "key": "v2:5357c77abc2028258837791a3d19f8852a69a7bc367f2d6e8093a678fd1d47ff",
+    "agentId": "ae6079ddf4c5037df",
+    "data": {
+      "evidence": "Verified in commit 2f1e51e ('feat(windows): support both \\\\ and / for path separator on windows (#442)') included in dmtrKovalenko/fff release v0.7.0 (compare v0.6.4...v0.7.0). Direct primary source confirmed.",
+      "counterSource": "",
+      "confidence": "high",
+      "refuted": false
+    }
+  },
+  {
+    "index": 65,
+    "key": "v2:4f4ae7a93e023ac134cbd43556c129c52a35affff4a28df304e61d2806f17f46",
+    "agentId": "aa2de2d951e67a7dd",
+    "data": {
+      "refuted": false,
+      "confidence": "high",
+      "counterSource": "None",
+      "evidence": "dmtrKovalenko/fff release v0.7.0 (commit 2f1e51e merged via PR #442, published 2026-05-04) explicitly introduced feat(windows): support both '\\' and '/' for path separator on windows. Primary GitHub release notes and compare view confirm exact claim and version."
+    }
+  },
+  {
+    "index": 66,
+    "key": "v2:6e9bbc0a2fdfcf823417b14b40beffc7ddd48aa80da5323bf44958dd3fa201e5",
+    "agentId": "aa2e49ee6c62f1dbb",
+    "data": {
+      "refuted": false,
+      "counterSource": "https://github.com/dmtrKovalenko/fff/releases/tag/v0.7.0",
+      "evidence": "Primary release notes for v0.7.0 and commit 573a783 (#435) confirm addition of `cycle_forward_query` (default keymap `<C-Down>`) in v0.7.0 for Neovim/picker_ui. Claim accurately reflects release history without contradiction.",
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 67,
+    "key": "v2:ab44ba6de4c9d12ad619482a9e63f1eef94ddcff0b1fa9ce67512ae811bfddb8",
+    "agentId": "ac29caa3d5b406108",
+    "data": {
+      "evidence": "The primary repository README for dmtrKovalenko/fff explicitly documents an MCP server crate (crates/fff-mcp) and gives specific integration instructions for Claude Code and Codex: 'Works with Claude Code, Codex, OpenCode, Cursor, Cline, and any MCP-capable client.' It includes setup instructions for Codex (`codex mcp add fff ...`) and recommended prompt instructions for Claude Code (`CLAUDE.md`). The claim accurately reflects the primary repository capabilities without overreach or misrepresentation.",
+      "confidence": "high",
+      "counterSource": "",
+      "refuted": false
+    }
+  },
+  {
+    "index": 68,
+    "key": "v2:860865f4ab8545fd2946ddec3d01899d15edf4b2e69db0bb4960fec97e8f98f6",
+    "agentId": "ae19754edd6ed8ebd",
+    "data": {
+      "confidence": "high",
+      "evidence": "Commit 573a783d2fc29481f952dedec49daa9214a08258 ('feat(neovim): add forward query history cycling (cycle_forward_query) (#435)') was merged into v0.7.0 (release notes specifically list 'feat(picker_ui): add forward query history cycling (cycle_forward_query) by @thuan1412'). The claim accurately reflects the primary release notes and commit history.",
+      "refuted": false,
+      "counterSource": "https://github.com/dmtrKovalenko/fff/releases/tag/v0.7.0"
+    }
+  },
+  {
+    "index": 69,
+    "key": "v2:d80c8185962fc7545ec4ee1381c57ccc702149a3c7337e9cfb84a9f8d12a4cd1",
+    "agentId": "a4fc40b6241b06b4c",
+    "data": {
+      "evidence": "The primary documentation for fff.nvim (doc/fff.nvim.txt: 'For Neovim >= 0.10.0' and repository README.md) explicitly specifies that fff.nvim requires Neovim version 0.10.0 or higher. No contradicting evidence exists.",
+      "confidence": "high",
+      "counterSource": "",
+      "refuted": false
+    }
+  },
+  {
+    "index": 70,
+    "key": "v2:e04d926dfdfd422ca154010a0705f4e27a0d7a085d3497b3cde4107c636b50d5",
+    "agentId": "a38a68f7145b7767b",
+    "data": {
+      "refuted": false,
+      "evidence": "Inspection of dmtrKovalenko/fff/install-mcp.ps1 confirms exact match. In Get-Target: reads HKLM PROCESSOR_ARCHITECTURE; switches 'AMD64' -> 'x86_64-pc-windows-msvc' and 'ARM64' -> 'aarch64-pc-windows-msvc'. In Get-LatestReleaseTag: queries https://api.github.com/repos/dmtrKovalenko/fff/releases to find matching asset tag. In Install-Binary: downloads matching binary release. Claim fully verified.",
+      "confidence": "high",
+      "counterSource": ""
+    }
+  },
+  {
+    "index": 71,
+    "key": "v2:95d0d87a678beaa564d83d169bcececa72aad7a36775a80b01d88bdee612fea7",
+    "agentId": "a5027daa69e9717ca",
+    "data": {
+      "counterSource": "",
+      "evidence": "Official repository (https://github.com/dmtrKovalenko/fff) explicitly states: \"The fastest and the most accurate file search SDK for AI agents, Neovim, Rust, C, Python, Bun and NodeJS\" and \"FFF is a file search library, not a CLI.\" It is written in Rust and designed for editor integrations and AI agent toolchains. Claim is fully accurate and verified against primary source.",
+      "confidence": "high",
+      "refuted": false
+    }
+  },
+  {
+    "index": 72,
+    "key": "v2:8515ec05c3e406d42388f26e6c1e01c66aa3b732a08f3fc01aba4bcc496af914",
+    "agentId": "aa26abc26ffe159ef",
+    "data": {
+      "evidence": "Claim confirmed accurate. Issue #828 on dmtrKovalenko/fff describes fffind path globs failing to match indexed files under hidden dot-directories (.pi, .config, .agents) due to missing ZLOB_PERIOD flag in zlob compiler flags. Resolved in PR #829. Claim not refuted.",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/issues/828",
+      "confidence": "high",
+      "refuted": false
+    }
+  },
+  {
+    "index": 73,
+    "key": "v2:b5b33774ea04b31d04cfdca532a56319ba1a9776505c8d2cc8aa3026d0b59f46",
+    "agentId": "aed895cf8ef50abb0",
+    "data": {
+      "confidence": "high",
+      "counterSource": "",
+      "refuted": false,
+      "evidence": "Release v0.7.0 of dmtrKovalenko/fff includes commit 573a783 / PR #435 titled \"feat(neovim): add forward query history cycling (cycle_forward_query) (#435)\", adding the keymap and function M.cycle_forward_query() to navigate query history forward. Claim is completely accurate and supported by primary commit and release notes."
+    }
+  },
+  {
+    "index": 74,
+    "key": "v2:10fea274faded14ade97487ffb2cb39504a4f46b6e7ba112af9eed976c750d68",
+    "agentId": "a89879b56a8aaedf4",
+    "data": {
+      "refuted": false,
+      "evidence": "Issue #828 directly confirms bug in zlob flag compilation where missing ZLOB_PERIOD caused fffind wildcards/globs to fail when matching indexed files under dot-directories (e.g., .pi, .config, .agents), fixed in PR #829. Claim accurately reflects primary defect.",
+      "confidence": "high",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/issues/828"
+    }
+  },
+  {
+    "index": 75,
+    "key": "v2:e73a44b83745e3a7cf1f9c25577ea344aca7abb74c3225b142c193d4432591f8",
+    "agentId": "a021bf9e6208252ad",
+    "data": {
+      "confidence": "high",
+      "refuted": false,
+      "evidence": "Issue #828 directly confirms and reproduces the claim: fffind path glob searches (e.g. `**/settings.json`) failed to match indexed files under hidden dot-directories (`.pi`, `.config`, `.agents`). The root cause was `zlob` compiled without `ZLOB_PERIOD`, causing wildcards not to cross leading-dot path components. This was confirmed as a bug on origin/main and fixed in PR #829.",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/issues/828"
+    }
+  },
+  {
+    "index": 76,
+    "key": "v2:342342db1e9bef2f3a28edffa465c44755d75fc756ea8812cde5481153cfb6db",
+    "agentId": "adfd47b10118c73c8",
+    "data": {
+      "evidence": "Claim conflate plugin and toolkit. fff.nvim specifically Neovim plugin frontend (Lua/mlua). Repo rename to 'fff' because fff whole toolkit/SDK with multiple packages (crates/fff-search, crates/fff-c, crates/fff-mcp, packages/fff-node, packages/fff-bun, packages/pi-fff). Furthermore, \"fastest and most accurate\" tagline marketing claim.",
+      "confidence": "high",
+      "counterSource": "https://github.com/dmtrKovalenko/fff",
+      "refuted": true
+    }
+  },
+  {
+    "index": 77,
+    "key": "v2:28fa7c61a4d58b026885743c30c8e4ec725a606638a520b1a60c0a3248075d3a",
+    "agentId": "a14c3b43ca46d17a0",
+    "data": {
+      "refuted": false,
+      "confidence": "high",
+      "counterSource": "https://github.com/dmtrKovalenko/fff",
+      "evidence": "Repository description and README for dmtrKovalenko/fff explicitly state: \"The fastest and the most accurate file search SDK for AI agents, Neovim, Rust, C, Python, Bun and NodeJS\". It provides crates (fff-search, fff-c, fff-nvim, fff-mcp), npm/bun packages (@ff-labs/fff-node, @ff-labs/fff-bun), Python wheels (fff-search), and Neovim Lua bindings. Claim is accurate and supported by primary source repository."
+    }
+  },
+  {
+    "index": 78,
+    "key": "v2:a8ee48532d03ffd8c41bc6fb8401cddc7d85d3cea7141cdae0b9c52981de220d",
+    "agentId": "af7daab51d380e1f4",
+    "data": {
+      "refuted": true,
+      "counterSource": "https://github.com/dmtrKovalenko/fff",
+      "confidence": "high",
+      "evidence": "1. Claim conflates project names and scope: `fff.nvim` is specifically the Neovim plugin component/Lua binding (`crates/fff-nvim`, `lua/`). The overall project/toolkit was renamed from `fff.nvim` to `fff`.\n2. The overarching project `fff` (Rust core `crates/fff-search` + C FFI + language bindings) is the file search toolkit/SDK supporting AI agents, Neovim, Rust, C, Bun, and NodeJS.\n3. The supporting quote cited is an unverified promotional tagline from GitHub/Dotfyle repository description (\"The fastest and the most accurate file search SDK...\"), which is marketing copy rather than an objectively verified benchmark.\n4. Therefore, attributing the multi-language SDK capabilities to `fff.nvim` specifically is inaccurate (it is the Neovim-specific integration of the broader `fff` project)."
+    }
+  },
+  {
+    "index": 79,
+    "key": "v2:e417cd4510d512603517448b8b6644918e65ccee74200d2ae097f60de7033b81",
+    "agentId": "a1170d1c375f601c9",
+    "data": {
+      "refuted": true,
+      "counterSource": "https://github.com/dmtrKovalenko/fff/issues/826",
+      "confidence": "low",
+      "evidence": "Claim is derived solely from an unverified secondary issue report (issue #826). No primary source confirmation or code evidence proves that timeBudgetMs is completely ignored during zero-match queries across all versions; unverified bug report on fast-moving codebase defaults to refuted under skeptical threshold."
+    }
+  },
+  {
+    "index": 80,
+    "key": "v2:79292f9a7b5f0e685297d2e833b9ca90a7c1185da07b62b0917ee9c41ddd1239",
+    "agentId": "ab8890823a788d3ac",
+    "data": {
+      "confidence": "high",
+      "evidence": "In commit 4da1a22e140730bf14ff5a4f63859581a7eff300 ('perf: Optimize arm64 & macos grep & general unindexed grep (#566)'), crates/fff-core/src/file_picker.rs directly contains: `if !need_abort && let Some(budget) = time_budget && all_matches.len() > 1 && search_start.elapsed() > budget { need_abort = true; }`. This confirms the time-budget cancellation check requires `all_matches.len() > 1` and does not trigger on zero matches.",
+      "refuted": false,
+      "counterSource": ""
+    }
+  },
+  {
+    "index": 81,
+    "key": "v2:be5c6479c0df3a2f807fd25da5806295bd20f96ad13895be63429944d0d68f62",
+    "agentId": "a87982dd2863cad3c",
+    "data": {
+      "refuted": true,
+      "counterSource": "https://github.com/dmtrKovalenko/fff/commit/4da1a22e140730bf14ff5a4f63859581a7eff300",
+      "evidence": "In commit 4da1a22e (crates/fff-core/src/grep.rs), explicit abort check exists independently: `let mut need_abort = ctx.abort_signal.load(Ordering::Relaxed);`. Only time-budget timeout check is gated by `all_matches.len() > 1` (`if !need_abort && let Some(budget) = time_budget && all_matches.len() > 1 && search_start.elapsed() > budget { need_abort = true; }`). Explicit cancellation via abort_signal works with zero matches. Claim conflates time budget expiration with cancellation.",
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 82,
+    "key": "v2:c5f18be98314ebbc970fa83bce16e64ba34070fe98d7d352e92871d0acf41e26",
+    "agentId": "ad347cd592d23d090",
+    "data": {
+      "refuted": true,
+      "counterSource": "https://github.com/dmtrKovalenko/fff/issues/768, https://github.com/dmtrKovalenko/fff/blob/main/packages/pi-fff/src/index.ts, and https://github.com/dmtrKovalenko/fff/issues/365",
+      "evidence": "Claim refuted due to conflation and factual inaccuracy. In fff core and fff-node API, `pageSize` (total matches per page across files) and `maxMatchesPerFile` (per-file match cap) are distinct options. Issue #768 revealed that `pi-fff`'s `ffgrep` previously applied `limit` only to `maxMatchesPerFile` (and not `pageSize`), which caused it to return *too many* matches across multiple files rather than conflating them. Furthermore, while cursor pagination in fff tracks `file_offset` (meaning matches past a file's `maxMatchesPerFile` cap are omitted per file design, see issue #365), ffgrep does NOT apply requested limit to both as a single linked cap causing cursor breakdown; `pageSize` and `maxMatchesPerFile` are separate parameters, and `maxMatchesPerFile` is configured explicitly or defaulted in SDK/config.",
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 83,
+    "key": "v2:b579fc39d0b139f768d835e2c8dd8b001cf5c2b1462878a9dbeb2138161d28a2",
+    "agentId": "ae255d63a226926b5",
+    "data": {
+      "counterSource": "https://github.com/dmtrKovalenko/fff/issues/825, https://github.com/dmtrKovalenko/fff/pull/832",
+      "evidence": "GitHub issue #825 (and merged fix PR #832 'fix: decouple ffgrep per-file cap from page size (#825)') directly confirms the bug. In `pi-fff`, `ffgrep` passed the same value for `pageSize` and `maxMatchesPerFile` (`picker.grep(query, { maxMatchesPerFile: pageSize, pageSize, cursor })`), while FFF grep cursors tracked file-level offsets. Consequently, any matches exceeding `maxMatchesPerFile` within a single file became permanently unreachable during cursor pagination. The claim is exact and well-grounded in primary source repository evidence.",
+      "refuted": false,
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 84,
+    "key": "v2:f172dba607873fee1dd1d3a11d414ad51dc9554d56ce38bd8824f883e75eddcc",
+    "agentId": "a93d9fa8e9e439382",
+    "data": {
+      "confidence": "high",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/commit/4da1a22e140730bf14ff5a4f63859581a7eff300",
+      "refuted": false,
+      "evidence": "In commit 4da1a22e (`perf: Optimize arm64 & macos grep & general unindexed grep`), the Rust grep engine condition specifically checks `if let Some(budget) = time_budget && all_matches.len() > 1 && search_start.elapsed() > budget { need_abort = true; }`. Because of `all_matches.len() > 1`, when a search produces zero matches (`all_matches.len() == 0`), the time budget abort check never triggers, scanning all files regardless of `timeBudgetMs` setting. The claim is verified directly by the repository's source code."
+    }
+  },
+  {
+    "index": 85,
+    "key": "v2:d37c632b1956d651ce03aa813068d0f4089014074e65a5f42c5cf366c0a7f072",
+    "agentId": "a44825b601a4bdb73",
+    "data": {
+      "counterSource": "",
+      "confidence": "high",
+      "refuted": false,
+      "evidence": "Verified directly against dmtrKovalenko/fff issue #825 ('[Bug]: pi-fff ffgrep cursor drops matches beyond the per-file limit'). Issue confirms pi-fff ffgrep set maxMatchesPerFile equal to pageSize/limit, while cursor pagination only tracked file offset, making matches exceeding the single file's cap unreachable on subsequent pages. Fixed and merged in PR #832. Claim is fully supported and accurate."
+    }
+  },
+  {
+    "index": 86,
+    "key": "v2:bba6711813c309c9343713f8fa917e811fd2c2b5c3c52f64a21ed92d7ad1994f",
+    "agentId": "a603238a1f7084131",
+    "data": {
+      "evidence": "Direct inspection of GitHub issue #826 and PR #827 confirms exact behavior and root cause. In crates/fff-core/src/grep/grep.rs, deadline checks were gated on `all_matches.len() > 1`. When search produces 0 matches, time_budget was never applied, scanning all candidate files and returning nextCursor: null. PR #827 acknowledges this historical behavior and adds `enforce_time_budget` to opt into hard bounds for zero-match queries. Claim is fully factual and verified against primary repo source.",
+      "refuted": false,
+      "confidence": "high",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/issues/826 and https://github.com/dmtrKovalenko/fff/pull/827"
+    }
+  },
+  {
+    "index": 87,
+    "key": "v2:83f7d6b0de7ecddedaa89d32ebca11154e2ba37189b676847d56c67f590f810b",
+    "agentId": "a8baf692cd70b421b",
+    "data": {
+      "refuted": false,
+      "confidence": "high",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/issues/826, https://github.com/dmtrKovalenko/fff/pull/827",
+      "evidence": "Verified via dmtrKovalenko/fff issue #826 and PR #827. In grep.rs, plain/regex search time check condition `if !need_abort && let Some(budget) = time_budget && all_matches.len() > 1 && search_start.elapsed() > budget` explicitly requires `all_matches.len() > 1` before checking time budget expiry. When 0 matches exist, cancellation/time budgeting is never triggered, scanning all files. Claim accurately reflects the codebase implementation and behavior described in the primary issue and PR #827 fix."
+    }
+  },
+  {
+    "index": 88,
+    "key": "v2:cbf4701855c1368ec490adcf2e18e5fa6c60b52b8654c224eff1839d78542247",
+    "agentId": "a830dc4e1348e5d95",
+    "data": {
+      "counterSource": "https://github.com/dmtrKovalenko/fff/issues/746",
+      "evidence": "Issue #843 does not exist or misattributes the problem; the actual recorded bug was Issue #746 ('broad absolute home-path ffgrep can appear to hang without returning a result'). The underlying issue was not an indefinite block caused by entering synchronous FFI during active auxiliary finders, but unbounded execution when picker.grep() ran without timeBudgetMs combined with a race in AuxFinderPool.acquire(). This was resolved in PR #750 ('fix(pi-fff): dedup concurrent aux finders and bound grep time'). Claim overstates behavior as 'blocks JavaScript event loop indefinitely'.",
+      "confidence": "high",
+      "refuted": true
+    }
+  },
+  {
+    "index": 89,
+    "key": "v2:46f0c80fc3de13aa82c82a886bf6bad5a03e2a756e89fa30700c9b8b431aa8dd",
+    "agentId": "ade5e4c0e09e68e96",
+    "data": {
+      "counterSource": "",
+      "confidence": "high",
+      "evidence": "Claim verified by primary source GitHub issue dmtrKovalenko/fff#830 and PR #831. Issue title: 'ffgrep: path constraint targeting an unindexed file silently widens to a repo-wide fuzzy search'. Code analysis in issue confirms: when pathTargetsFile is true and 0 exact matches occur on unindexed files, fuzzyQuery drops path constraint (fuzzyQuery = pattern), widening search repo-wide.",
+      "refuted": false
+    }
+  },
+  {
+    "index": 90,
+    "key": "v2:2e1cfe397e7f934a14caaba8bf89b57d2a81aec8330f0c8d02c9381c729d4202",
+    "agentId": "a106591be3e5f2c5f",
+    "data": {
+      "confidence": "high",
+      "refuted": false,
+      "evidence": "GitHub Issue #830 confirms behavior in ffgrep: when path points to an unindexed file (e.g. node_modules), exact grep returns 0 matches because workspace index excludes node_modules; pathTargetsFile detects trailing file extension and sets fuzzyQuery = pattern (omitting path constraint), falling back to repo-wide fuzzy search. Claim is accurate and directly supported by issue body and code snippet.",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/issues/830"
+    }
+  },
+  {
+    "index": 91,
+    "key": "v2:f9f0ec4110b0e4fb74f08b2a652005b7415a3f49c89d0cadd321132d0b93cc5d",
+    "agentId": "ab296c10d9f7ed115",
+    "data": {
+      "evidence": "Issue #830 confirms exact bug report and code snippet: when target file outside index (e.g. node_modules) returns 0 matches, pathTargetsFile evaluates to true via extension check, setting fuzzyQuery = pattern (omitting path constraint) and running repo-wide fuzzy search. Claim is accurate and supported by primary source issue details.",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/issues/830",
+      "refuted": false,
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 92,
+    "key": "v2:a71e5a1d76bfdc62ac3f9d3df5d20a979d0729c4c1a4164fe38d2f0685f56962",
+    "agentId": "a4ef9944bbf3de753",
+    "data": {
+      "confidence": "high",
+      "refuted": true,
+      "evidence": "Issue #843 does not exist or quote is fabricated/hallucinated. Actual issue is #746 ('[Bug]: broad absolute home-path ffgrep can appear to hang without returning a result'). In pi-fff, synchronous native N-API/FFI call picker.grep() runs on main JS thread without timeBudgetMs during large absolute path scans, preventing AbortSignal/Promise.race interruption, but does not block indefinitely due to 'earlier auxiliary-finder work remaining active'. Fixed via PR #750. Also, claim text borrows phrasing from Go's syscall/js documentation rather than legitimate fff architecture discussions.",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/issues/746"
+    }
+  },
+  {
+    "index": 93,
+    "key": "v2:04d4ee8f373910170c9e0dcc98042f8958dd72227e0183b2a09af919ab45fb6c",
+    "agentId": "ac3cd53e7ab917912",
+    "data": {
+      "counterSource": "https://github.com/dmtrKovalenko/fff/blob/main/packages/pi-fff/src/index.ts, commit d500af2b8f02ebad57d801b17ebcb7f0ef14c57f",
+      "evidence": "Claim overreaches. In `pi-fff` (`packages/pi-fff/src/index.ts`), fuzzy fallback only drops path constraint when target is a specific file (`pathTargetsFile = /\\.[a-zA-Z][a-zA-Z0-9]{0,9}$/.test(lastSeg)` -> `fuzzyQuery = pathTargetsFile ? pattern : query`). For directory path constraints or unpinned paths, `fuzzyQuery` retains `query` with full path/exclude constraints to prevent leaking matches from excluded directories. Claim states fallback drops path constraint entirely without qualifying file vs directory distinction.",
+      "confidence": "high",
+      "refuted": true
+    }
+  },
+  {
+    "index": 94,
+    "key": "v2:8257d9df9928a92a8afe0d24a9d73eacd1a031e0283ef1e947db301d7f380016",
+    "agentId": "a88a54b55bbdff315",
+    "data": {
+      "counterSource": "https://github.com/dmtrKovalenko/fff/issues/746, https://github.com/dmtrKovalenko/fff/blob/main/packages/pi-fff/src/index.ts, https://github.com/dmtrKovalenko/fff/pull/750",
+      "refuted": true,
+      "evidence": "Claim misidentifies issue URL and distorts mechanism. Issue #843 does not exist or relate to this; actual issue is #746 ('[Bug]: broad absolute home-path ffgrep can appear to hang without returning a result'). In issue #746, synchronous native `picker.grep()` calls lacked `timeBudgetMs`, and concurrent `AuxFinderPool.acquire()` calls duplicated broad filesystem scans (e.g. over $HOME) rather than indefinitely blocking the Node/Bun JS event loop via unresolved FFI. Fix in PR #750 bounded grep time with `GREP_TIME_BUDGET_MS` and deduplicated aux finders. Claim overreaches into speculative permanent event loop deadlock.",
+      "confidence": "high"
+    }
+  },
+  {
+    "index": 95,
+    "key": "v2:fcc097a591303a24b68cbf39014f5979a947dbfbb39d0aa1b194a6e3db425d3b",
+    "agentId": "a1aa6cb38634b5982",
+    "data": {
+      "counterSource": "https://github.com/dmtrKovalenko/fff/issues/697",
+      "refuted": true,
+      "confidence": "high",
+      "evidence": "Claim misattributes root cause. ffgrep drop path/exclude constraint on zero-match fuzzy fallback in pi-fff (#697), not because file unindexed. Triage (#697) and PR #699 / commit 829bfa9 show fallback passed raw pattern to picker.grep discarding buildQuery constraints across any zero-match query. For unindexed/ignored files, core fff strictly returns empty (#446, #714), never silently widening unindexed paths to repo-wide fuzzy search. Issue #830 is non-existent/hallucinated citation."
+    }
+  },
+  {
+    "index": 96,
+    "key": "v2:889bfe4181adbc243d3905bdd727acd1cb85c6322d0d4b82c983279a837f9e49",
+    "agentId": "af8cdd00eb4367629",
+    "data": {
+      "refuted": false,
+      "confidence": "high",
+      "evidence": "Inspection of `packages/pi-fff/src/index.ts` (and related issues #697 / PR #699) shows the exact design and implementation: when ffgrep's path constraint targets a specific file (`pathTargetsFile = /\\.[a-zA-Z][a-zA-Z0-9]{0,9}$/.test(lastSeg)`), if exact content match returns 0 items, ffgrep falls back to fuzzy content search with `fuzzyQuery = pattern` across the picker/workspace. The code comment explicitly documents this intentional behavior: \"When the caller pinned a specific file (path has an extension), the fuzzy fallback broadens across the whole picker — the file may just be misnamed. For directory constraints (or no path), we keep the constrained query so the fallback does not leak matches from excluded / out-of-scope directories.\" Thus, the claim describing this behavior is verified and not refuted.",
+      "counterSource": "https://github.com/dmtrKovalenko/fff/blob/main/packages/pi-fff/src/index.ts"
+    }
+  },
+  {
+    "index": 97,
+    "key": "v2:a6fc63f48ea3ad83d2767b5a6f1ab56974c3f577291b3fc90f7cf9802576b3b8",
+    "agentId": "ac589242576adfb95",
+    "data": {
+      "findings": [
+        {
+          "confidence": "high",
+          "sources": [
+            "https://github.com/dmtrKovalenko/fff/blob/main/README.md",
+            "https://github.com/dmtrKovalenko/fff"
+          ],
+          "evidence": "Verified directly against primary repository README (dmtrKovalenko/fff) and Cargo.toml. FFF maintains resident in-memory indexes and exposes APIs across Rust, C, Node.js, Neovim, and MCP layers.",
+          "claim": "FFF is an open-source, MIT-licensed in-memory file search library and toolkit designed for long-running editors, IDEs, and AI agents rather than a standalone CLI tool.",
+          "vote": "3-0"
+        },
+        {
+          "claim": "FFF maintains a resident in-memory index with background file watching to achieve sub-10ms query times on warm searches across large codebases without spawning ripgrep subprocesses.",
+          "sources": [
+            "https://github.com/dmtrKovalenko/fff/blob/main/README.md",
+            "https://github.com/dmtrKovalenko/fff",
+            "https://pi.dev/packages/@ff-labs/pi-fff"
+          ],
+          "evidence": "Primary repository documentation confirms in-memory resident indexing, notify-based background watching, SIMD acceleration, and frecency ranking, avoiding per-query filesystem rescan overhead.",
+          "vote": "3-0",
+          "confidence": "high"
+        },
+        {
+          "confidence": "high",
+          "sources": [
+            "https://github.com/dmtrKovalenko/fff/blob/main/Cargo.toml",
+            "https://github.com/dmtrKovalenko/fff/blob/main/packages/fff-node/README.md",
+            "https://github.com/dmtrKovalenko/fff/blob/main/packages/pi-fff/README.md",
+            "https://github.com/dmtrKovalenko/fff/blob/1b79eecb58a73fdfb8045ed9919ef9af487357be/README.md"
+          ],
+          "claim": "FFF is organized as a Cargo workspace with member crates and multi-language packages including Node.js bindings (@ff-labs/fff-node), a Pi agent extension (@ff-labs/pi-fff), and a Neovim plugin (FFF.nvim).",
+          "evidence": "Cargo.toml defines 7 crates (fff-c, fff-core, fff-mcp, fff-nvim, fff-python, fff-query-parser, fff-grep). Monorepo also houses packages/pi-fff and packages/fff-node. FFF.nvim requires Neovim >= 0.10.0.",
+          "vote": "3-0"
+        },
+        {
+          "sources": [
+            "https://github.com/dmtrKovalenko/fff/blob/main/install-mcp.ps1",
+            "https://github.com/dmtrKovalenko/fff/blob/1b79eecb58a73fdfb8045ed9919ef9af487357be/README.md",
+            "https://github.com/dmtrKovalenko/fff/blob/main/packages/pi-fff/README.md"
+          ],
+          "vote": "3-0",
+          "claim": "FFF provides an MCP server binary (fff-mcp) and automated installers for AI agents such as Claude Code and Codex, including Windows PowerShell architecture detection (AMD64/ARM64).",
+          "confidence": "high",
+          "evidence": "install-mcp.ps1 automatically checks processor architecture, downloads the matching prebuilt Windows binary via GitHub API, and places fff-mcp.exe in $env:LOCALAPPDATA\\fff-mcp\\bin. FFF provides fffind, ffgrep, and fff-multi-grep MCP tools."
+        },
+        {
+          "evidence": "Release comparison v0.6.4...v0.7.0 and commit records (PR #442 and PR #435) confirm path separator normalization and forward query history keybinding addition.",
+          "sources": [
+            "https://github.com/dmtrKovalenko/fff/compare/v0.6.4...v0.7.0"
+          ],
+          "vote": "3-0",
+          "claim": "Version 0.7.0 added dual Windows path separator support (\\ and /) and query history forward cycling (cycle_forward_query) for Neovim.",
+          "confidence": "high"
+        },
+        {
+          "confidence": "medium",
+          "sources": [
+            "https://github.com/dmtrKovalenko/fff/issues/825",
+            "https://github.com/dmtrKovalenko/fff/issues/826",
+            "https://github.com/dmtrKovalenko/fff/issues/828",
+            "https://github.com/dmtrKovalenko/fff/issues/830"
+          ],
+          "evidence": "Documented across GitHub issues #825, #826, #828, and #830 with corresponding PR fixes (#827, #829, #831, #832). Root causes involved match-length gating on timeout checks, coupled page-size/file-cap arguments, missing ZLOB_PERIOD flags, and unindexed fallback logic.",
+          "claim": "Historical issues identified in FFF include zero-match timeBudgetMs bypass in FileFinder.grep(), pagination limits masking multi-match files in ffgrep, hidden-directory glob misses in fffind, and path constraint stripping on unindexed files.",
+          "vote": "2-1"
+        }
+      ],
+      "caveats": "Known bug claims (timeBudgetMs bypass, ffgrep pagination cap, path constraint drop) originate from GitHub issues and merged PRs; fixes exist in subsequent patch releases. Windows installer behavior verified specifically for install-mcp.ps1 script.",
+      "openQuestions": [
+        "Are all recent grep timeout budget and pagination fixes fully backported across all downstream language wrappers (Python, Node.js, C FFI)?",
+        "What is the current memory footprint ceiling when maintaining resident file caches on repositories larger than 1M files?"
+      ],
+      "summary": "dmtrKovalenko/fff is an MIT-licensed, Rust-native in-memory file search library and toolkit designed for long-running editors, IDEs, and AI agents (such as Claude Code and Codex) rather than a standalone CLI. It keeps an in-memory index with background file watching and SIMD acceleration to achieve sub-10ms warm search times without spawning ripgrep subprocesses. The repository is structured as a Cargo workspace with multi-language packages (Node.js SDK, Neovim plugin requiring Neovim >= 0.10.0, Pi extension `@ff-labs/pi-fff`, and an MCP server `fff-mcp`). FFF provides dedicated search tools like `fffind`, `ffgrep`, and `fff-multi-grep` (Aho-Corasick), alongside automated cross-platform installation scripts."
+    }
+  }
+]

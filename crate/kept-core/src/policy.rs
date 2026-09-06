@@ -27,7 +27,7 @@ pub enum PolicyError {
     Yaml(#[from] serde_yaml::Error),
 }
 
-/// NOTE-001: `config.yaml` เป็นการตั้งค่าของผู้ใช้เท่านั้น; ระบบใช้ค่าใน struct เป็น fallback แต่ไม่ rewrite ไฟล์เดิมของผู้ใช้
+// NOTE-001: `config.yaml` เป็นการตั้งค่าของผู้ใช้เท่านั้น; ระบบใช้ค่าใน struct เป็น fallback แต่ไม่ rewrite ไฟล์เดิมของผู้ใช้
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserConfig {
@@ -49,7 +49,7 @@ pub struct ConfigDefaults {
     pub semantic: SemanticSearchSettings,
 }
 
-/// NOTE-001: ตั้งค่าผ่าน model ID และ endpoint; provider รองรับ "ollama" (default) และ "jina" เท่านั้น
+// NOTE-002: ตั้งค่าผ่าน model ID และ endpoint; provider รองรับ "ollama" (default) และ "jina" เท่านั้น
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct SemanticSearchSettings {
@@ -74,7 +74,7 @@ pub struct NamingProfile {
     pub naming: NamingSettings,
 }
 
-/// NOTE-001: path scope ต้องมาจาก absolute path จริงที่ผู้ใช้เลือกหรือพิมพ์ ไม่เดาจาก root ของการ scan
+// NOTE-003: path scope ต้องมาจาก absolute path จริงที่ผู้ใช้เลือกหรือพิมพ์ ไม่เดาจาก root ของการ scan
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct NamingScope {
@@ -101,7 +101,7 @@ pub struct ScopeOverrides {
     pub naming: NamingSettings,
 }
 
-/// NOTE-001: field ทั้งหมด optional เพื่อให้ defaults → profile → scope overrides merge ได้โดยไม่ทำให้ profile ที่ต่างกันนิดเดียวชนกัน
+// NOTE-004: field ทั้งหมด optional เพื่อให้ defaults → profile → scope overrides merge ได้โดยไม่ทำให้ profile ที่ต่างกันนิดเดียวชนกัน
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct NamingSettings {
@@ -538,7 +538,7 @@ fn home_dir() -> Result<PathBuf, PolicyError> {
         .ok_or_else(|| PolicyError::InvalidConfig("cannot resolve user home directory".to_string()))
 }
 
-/// NOTE-001: สร้าง starter config เพียงเมื่อยังไม่มีไฟล์ ห้าม rewrite การตั้งค่าที่ผู้ใช้แก้เอง
+// NOTE-004: สร้าง starter config เพียงเมื่อยังไม่มีไฟล์ ห้าม rewrite การตั้งค่าที่ผู้ใช้แก้เอง
 pub fn create_user_config_if_missing(path: &Path) -> Result<bool, PolicyError> {
     if path.exists() {
         return Ok(false);
@@ -558,7 +558,7 @@ pub fn load_user_config(path: &Path) -> Result<UserConfig, PolicyError> {
     Ok(config)
 }
 
-/// NOTE-001: config ถูกเขียนได้เมื่อผู้ใช้สั่ง task-level mutation เท่านั้น และต้อง validate ก่อนเขียนทุกครั้งเพื่อไม่สร้าง YAML ที่ doctor อ่านไม่ได้
+// NOTE-005: config ถูกเขียนได้เมื่อผู้ใช้สั่ง task-level mutation เท่านั้น และต้อง validate ก่อนเขียนทุกครั้งเพื่อไม่สร้าง YAML ที่ doctor อ่านไม่ได้
 pub fn save_user_config(path: &Path, config: &UserConfig) -> Result<(), PolicyError> {
     config.validate()?;
     let content = serde_yaml::to_string(config)?;
@@ -692,7 +692,7 @@ pub fn resolve_naming_rule(
     }))
 }
 
-/// NOTE-001: naming analysis อ่าน ScanIndex เดียวกับ scan/review เพื่อไม่ traversal ซ้ำ และไม่เสนอ rule ให้ไฟล์นอก absolute scope ของผู้ใช้
+// NOTE-006: naming analysis อ่าน ScanIndex เดียวกับ scan/review เพื่อไม่ traversal ซ้ำ และไม่เสนอ rule ให้ไฟล์นอก absolute scope ของผู้ใช้
 pub fn analyze_index_naming(
     index: &crate::scanner::ScanIndex,
     config: &UserConfig,
@@ -1015,7 +1015,7 @@ fn apply_replacements(mut stem: String, naming: &NamingSettings) -> String {
     stem
 }
 
-/// NOTE-001: shortcut เป็น keymap ของ token ในชื่อไฟล์ ไม่ใช่ keyboard shortcut; ทำก่อน aliases เพื่อให้ alias ของ profile override ได้ตาม merge order
+// NOTE-007: shortcut เป็น keymap ของ token ในชื่อไฟล์ ไม่ใช่ keyboard shortcut; ทำก่อน aliases เพื่อให้ alias ของ profile override ได้ตาม merge order
 fn apply_shortcuts(stem: String, naming: &NamingSettings) -> String {
     if naming.shortcuts.is_empty() {
         return stem;

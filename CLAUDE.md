@@ -3,6 +3,8 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with
 code in this repository.
 
+For any file search, grep or memory tool in the current git-indexed directory, use serena tools.
+
 ## Build, Test & Lint Commands
 
 Pre-commit & Full Validation:
@@ -68,6 +70,7 @@ Repository contract & validation checks (Python 3.12+):
 
 ## Key Invariants & Contracts
 
+- **SQZ & Anti-Loop Enforcement**: Prefer `sqz_read_file` and `sqz_grep` for reading/searching. If any discovery tool sequence exceeds 3 consecutive calls without producing a concrete code change, immediately abort tool usage and proceed with local implementation.
 - **No Destructive Operations**: Scan, find, review, search, and duplicate inspection paths must never mutate scanned user files.
 - **Config Management**: User config is stored in OS-appropriate directories (`%APPDATA%/kept/config.yaml` on Windows, `~/.config/kept/config.yaml` on Linux/macOS). `doctor --fix` must backup invalid configs before restoring a starter.
 - **Schema Contracts**: Draft-07 JSON Schema defined in `schema/keyword-registry.schema.json`. Must match output of `export_schema` example.

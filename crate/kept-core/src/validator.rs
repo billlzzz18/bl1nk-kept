@@ -15,7 +15,7 @@ impl Validator {
         Self { registry }
     }
 
-    /// NOTE-001: ตรวจ alias ซ้ำข้ามกลุ่ม โดยข้าม entry ที่กำลังแก้ไขได้
+    // NOTE-001: ตรวจ alias ซ้ำข้ามกลุ่ม โดยข้าม entry ที่กำลังแก้ไขได้
     pub fn check_duplicate_aliases(
         &self,
         group_id: &str,
@@ -146,7 +146,7 @@ impl Validator {
             validate_field(field_name, value, field_schema, &self.registry, &mut errors);
         }
 
-        // NOTE-001: ส่วนที่ไม่ใช่ base field ถือเป็น custom field และตรวจจำนวน/ชนิดตาม group policy
+        // NOTE-002: ส่วนที่ไม่ใช่ base field ถือเป็น custom field และตรวจจำนวน/ชนิดตาม group policy
         if group.custom_field_allowed.enabled {
             let custom_fields: Vec<(&String, &Value)> = entry
                 .as_object()

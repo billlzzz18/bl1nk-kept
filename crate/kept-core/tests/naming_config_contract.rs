@@ -159,6 +159,8 @@ scopes:
                 size: 1,
                 modified_unix: 0,
                 kind: "file".into(),
+                is_binary: None,
+                git_status: None,
             },
             FileRecord {
                 path: "reports/q1-report.pdf".into(),
@@ -167,6 +169,8 @@ scopes:
                 size: 1,
                 modified_unix: 0,
                 kind: "file".into(),
+                is_binary: None,
+                git_status: None,
             },
             FileRecord {
                 path: "other/Q1_Report.pdf".into(),
@@ -175,6 +179,8 @@ scopes:
                 size: 1,
                 modified_unix: 0,
                 kind: "file".into(),
+                is_binary: None,
+                git_status: None,
             },
         ],
         issues: Vec::new(),

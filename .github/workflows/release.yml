@@ -9,12 +9,67 @@ permissions:
   contents: write
 
 jobs:
+  build-mcp:
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            binary: bl1nk-kept-mcp
+          - runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            binary: bl1nk-kept-mcp
+          - runner: macos-13
+            target: x86_64-apple-darwin
+            binary: bl1nk-kept-mcp
+          - runner: macos-latest
+            target: aarch64-apple-darwin
+            binary: bl1nk-kept-mcp
+          - runner: windows-latest
+            target: x86_64-pc-windows-msvc
+            binary: bl1nk-kept-mcp.exe
+          - runner: windows-11-arm
+            target: aarch64-pc-windows-msvc
+            binary: bl1nk-kept-mcp.exe
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build MCP binary
+        run: cargo build --release -p kept-mcp --bin bl1nk-kept-mcp
+      - name: Package MCP asset
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+          BINARY: ${{ matrix.binary }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          asset="dist/bl1nk-kept-mcp-${TARGET}${BINARY##*.}"
+          [[ "$BINARY" != *.exe ]] && asset="dist/bl1nk-kept-mcp-${TARGET}"
+          cp "target/release/$BINARY" "$asset"
+          if command -v sha256sum >/dev/null; then sha256sum "$asset" > "$asset.sha256"; else shasum -a 256 "$asset" > "$asset.sha256"; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mcp-${{ matrix.target }}
+          path: dist/*
+
   publish:
+    needs: build-mcp
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: mcp-*
+          path: dist/mcp
+          merge-multiple: true
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -50,7 +105,7 @@ jobs:
       - name: Build release source archives
         run: python3 tools/package_source.py
 
-      - name: Publish source archives
+      - name: Publish source and MCP assets
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
@@ -58,6 +113,7 @@ jobs:
           gh release create "$TAG" \
             "dist/bl1nk-kept-${TAG#v}-source.zip" \
             "dist/bl1nk-kept-${TAG#v}-source.tar.gz" \
+            dist/mcp/* \
             --verify-tag \
             --title "$TAG" \
             --generate-notes

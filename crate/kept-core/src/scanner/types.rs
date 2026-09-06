@@ -19,6 +19,10 @@ pub struct FileRecord {
     #[serde(rename = "modifiedUnix")]
     pub modified_unix: u64,
     pub kind: String,
+    #[serde(rename = "isBinary", default)]
+    pub is_binary: Option<bool>,
+    #[serde(rename = "gitStatus", default)]
+    pub git_status: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

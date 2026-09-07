@@ -44,7 +44,6 @@
 | CLI-006 | Naming settings ต้องรองรับ case, separator, number/word/length/whitespace, alias, shortcut, similarity, replacement, reposition, variables, prefix และ profile | `COMPLETE` | `policy.rs` has typed model, shortcut transform and semantic validation; `config defaults/profile/scope setting set/unset` use the same catalog; focused core and smoke contracts pass | Re-run catalog lifecycle smoke when adding a field |
 | CLI-007 | Profile/scope ต้องจัดการได้เป็นงานจริง: list, add, edit, remove และเรียง deterministic | `COMPLETE` | `config profile` lifecycle and `config scope` lifecycle smoke tests; `scope list` prints depth/priority resolve order | Re-run smoke after scope precedence changes |
 | CLI-008 | `config edit` เป็น advanced YAML escape hatch ไม่ใช่ UX หลัก | `COMPLETE` | `kept config` landing summary plus defaults/profile/scope command families; `config edit` labelled advanced in smoke-covered docs | Preserve task-level flow when extending config |
-
 | CLI-009 | `review` วิเคราะห์ naming แบบ read-only และต้องไม่ rename/apply/rollback | `COMPLETE` | naming review contracts, CLI smoke | Keep mutation boundary intact |
 | CLI-010 | Registry `search --group` ต้องมี task-level way to inspect, add, edit, remove และ order groups; ต้องอธิบายชนิด group ที่รองรับ | `COMPLETE` | Public `group types/list/show/add/set/remove/move` and `group field list/add/remove`; lifecycle and schema smoke tests use a validated temporary registry | Keep registry group separate from naming profile/scope |
 | CLI-011 | Interactive UX ใช้เลข/ลูกศร/j-k; non-interactive commands ต้องไม่พยายามเปิด dialog | `PARTIAL` | review/setup menus; terminal handling regression fixed | Cover all future interactive command paths in smoke suite |
@@ -75,6 +74,7 @@
 - Do not package or send a final source archive after a public CLI change until `just check` passes and the archive itself executes `just cli-smoke` after extraction.
 
 ## Context Admission, Evidence & Idea Backlog (Updated 2026-09-06)
+
 - **Architecture State:** Contract ของ `Observation` รองรับ `SourceKind`, `ResourceEvent`, `StructurePayload`, `Evidence` และ `Provenance` (Single Source of Truth สำหรับ timestamp).
 - **FFF Core & Judge:** FFF ทำหน้าที่ Acquisition (`look`/`view`), Tree-sitter ทำหน้าที่ Code AST Structure, SQZ logic ทำหน้าที่ Command Output Formatter และ Context Admission Decision (`PASS`, `REFERENCE`, `DELTA`, `COMPRESS`).
 - **Idea / Research Reference:** ไอเดียการวิเคราะห์เปรียบเทียบ `zvec` (Alibaba in-process vector database) ถูกบันทึกไว้ที่ `docs/ideas/ZVEC_INTEGRATION_IDEA.md` เพื่อใช้ประเมินต่อใน Phase 10 (Hybrid Retrieval Engine via Feature Flag).

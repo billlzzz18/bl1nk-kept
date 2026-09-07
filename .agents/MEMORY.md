@@ -31,7 +31,7 @@
 | OPS-002 | รันเลข `NOTE-001:`, `NOTE-002:` ตามประเด็น; คอมเมนต์ภายในภาษาไทย; Rustdoc/Public API และ Error messages ในโค้ดเป็นภาษาอังกฤษ | `COMPLETE` | ตรวจสอบและจัดระเบียบ `crate/kept-mcp/` และแยก public doc / internal NOTE ครบถ้วน | Review code changes ทุกครั้ง; rustdoc/error เป็น English; internal rationale เป็น Thai พร้อมรันเลข `NOTE-xxx:` |
 | OPS-003 | TDD: red test ก่อน production code ทุก behavior ใหม่ | `PARTIAL` | Cargo/core/CLI contracts และ smoke suite มี | ตรวจ ledger evidence ก่อนปิดแต่ละ requirement |
 | OPS-004 | เก็บ `.learnings/` เสมอ; เป็น memory เอเจนต์ ไม่ใช่ product input | `COMPLETE` | `AGENTS.md`, package contract, `.learnings/ERRORS.md` | คงไว้ในทุก source archive |
-| OPS-005 | ADR ภาษาไทย; research ที่ตัดสินใจแล้วเป็น ADR, ที่ยังไม่ตัดสินใจอยู่ `plan.md` | `COMPLETE` | `docs/adr/0001_*`, `0002_*`, `plan.md` | ใช้กับ decision ใหม่เท่านั้น |
+| OPS-005 | ADR ภาษาไทย; research ที่ตัดสินใจแล้วเป็น ADR, ที่ยังไม่ตัดสินใจอยู่ `plan.md` | `COMPLETE` | `docs/adr/0001_*`, `0002_*`, `0003_*`, `plan.md` | ใช้กับ decision ใหม่เท่านั้น |
 | OPS-006 | Source ZIP/TAR.GZ ต้องสะอาดแต่เก็บ research/schema/benchmarks/.learnings | `COMPLETE` | `tools/package_source.py`, archive contract tests | Inspect listing ทุกครั้งหลัง package |
 | OPS-007 | ก่อน public contract ใหม่ ต้องได้รับการยืนยัน; rename/apply/rollback แยก contract | `COMPLETE` | `SPEC.md` no-mutation boundary | คง `NOT APPROVED` สำหรับ mutation |
 | OPS-008 | Final response แสดงเฉพาะการตัดสินใจสำคัญ แต่ต้องไม่ปิดงานก่อน audit requirement ครบ | `PARTIAL` | รอบก่อนปิดเร็วเกินไป; ledger นี้เป็น corrective control | Checklist ledger + `just check` + archive proof ก่อน final |

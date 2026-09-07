@@ -11,68 +11,68 @@ use crate::helpers::{
 
 #[derive(Subcommand)]
 pub enum ConfigCommands {
-    /// แสดง field, type และค่าที่ naming config รองรับ.
+    /// Show supported naming config fields, types, and allowed values.
     Fields,
-    /// ดูและแก้ baseline naming defaults.
+    /// Inspect and modify baseline naming defaults.
     Defaults {
         #[command(subcommand)]
         cmd: DefaultCommands,
     },
-    /// จัดการ naming profiles ใน config.yaml.
+    /// Manage naming profiles in config.yaml.
     Profile {
         #[command(subcommand)]
         cmd: ProfileCommands,
     },
-    /// จัดการ path scopes ที่ผู้ใช้ระบุแบบ absolute.
+    /// Manage absolute path scopes in config.yaml.
     Scope {
         #[command(subcommand)]
         cmd: ScopeCommands,
     },
-    /// เปิด config.yaml ใน nano หรือ editor ที่ผู้ใช้กำหนด.
+    /// Open config.yaml in the configured editor.
     Edit,
 }
 
 #[derive(Subcommand)]
 pub enum DefaultCommands {
-    /// แสดง YAML ของ defaults.naming.
+    /// Show YAML representation of defaults.naming.
     Show,
-    /// ตั้ง default naming field.
+    /// Set a default naming field value.
     Set { field: String, value: String },
-    /// ล้าง default naming field.
+    /// Unset a default naming field value.
     Unset { field: String },
 }
 
 #[derive(Subcommand)]
 pub enum ProfileCommands {
-    /// แสดง profiles ทั้งหมดพร้อมคำอธิบายและ extensions.
+    /// List all profiles with descriptions and managed extensions.
     List,
-    /// แสดง YAML ของ profile หนึ่งรายการ.
+    /// Show YAML representation of a specific profile.
     Show { name: String },
-    /// เพิ่ม profile ใหม่.
+    /// Add a new naming profile.
     Add {
         name: String,
         #[arg(long)]
         description: Option<String>,
     },
-    /// ลบ profile ที่ไม่มี scope อ้างถึง.
+    /// Remove an unreferenced naming profile.
     Remove { name: String },
-    /// ตั้งค่า naming field ของ profile.
+    /// Set a naming field value for a profile.
     Set {
         name: String,
         field: String,
         value: String,
     },
-    /// ล้างค่า naming field ของ profile เพื่อกลับไปใช้ defaults.
+    /// Unset a naming field on a profile to inherit from defaults.
     Unset { name: String, field: String },
 }
 
 #[derive(Subcommand)]
 pub enum ScopeCommands {
-    /// แสดง scopes ตาม resolve precedence: path ลึกก่อน แล้ว priority สูงก่อน.
+    /// List scopes ordered by precedence (deepest path, then highest priority).
     List,
-    /// แสดง YAML ของ scope หนึ่งรายการ.
+    /// Show YAML representation of a specific scope.
     Show { path: PathBuf },
-    /// เพิ่ม scope ใหม่ให้ profile ที่มีอยู่.
+    /// Add a new path scope mapped to an existing profile.
     Add {
         profile: String,
         path: PathBuf,
@@ -81,7 +81,7 @@ pub enum ScopeCommands {
         #[arg(long, default_value_t = true, value_parser = clap::value_parser!(bool))]
         recursive: bool,
     },
-    /// แก้ profile, priority หรือ recursive ของ scope.
+    /// Update profile, priority, or recursive settings for a scope.
     Set {
         path: PathBuf,
         #[arg(long)]
@@ -91,14 +91,14 @@ pub enum ScopeCommands {
         #[arg(long, value_parser = clap::value_parser!(bool))]
         recursive: Option<bool>,
     },
-    /// ลบ scope หนึ่งรายการ.
+    /// Remove a path scope.
     Remove { path: PathBuf },
-    /// จัดการ absolute exception paths ของ scope.
+    /// Manage absolute exception paths for a scope.
     Exception {
         #[command(subcommand)]
         cmd: ScopeExceptionCommands,
     },
-    /// ตั้งหรือล้าง naming overrides เฉพาะ scope.
+    /// Set or unset scope-specific naming overrides.
     Setting {
         #[command(subcommand)]
         cmd: ScopeSettingCommands,

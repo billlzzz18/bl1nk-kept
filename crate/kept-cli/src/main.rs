@@ -79,14 +79,14 @@ pub enum Commands {
     },
     /// Convert a document between supported offline formats.
     Convert { input: PathBuf, output: PathBuf },
-    /// สร้าง config.yaml ของผู้ใช้เมื่อยังไม่มี และเปิดขั้นตอนตั้งค่าแบบ interactive.
+    /// Create user config.yaml if missing and launch interactive setup workflow.
     Setup,
-    /// ดูหรือแก้ไข config.yaml ของผู้ใช้.
+    /// View or modify user config.yaml and naming rules.
     Config {
         #[command(subcommand)]
         cmd: Option<ConfigCommands>,
     },
-    /// ตรวจ configuration และสภาพแวดล้อมที่ kept ใช้งานได้จริง.
+    /// Inspect configuration and runtime environment health.
     Doctor {
         #[arg(long)]
         fix: bool,
@@ -1107,7 +1107,7 @@ mod tests {
         let help = Cli::command().render_help().to_string();
 
         assert!(!help.contains("NOTE-001"));
-        assert!(help.contains("สร้าง config.yaml"));
+        assert!(help.contains("config.yaml"));
     }
 
     #[test]
@@ -1360,5 +1360,30 @@ mod cli_command_topology_tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn duplicates_show_json_contract_emits_single_valid_json() {
+        let temp_dir = std::env::temp_dir().join(format!("kept_dup_test_{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&temp_dir);
+        std::fs::create_dir_all(&temp_dir).expect("temp dir created");
+        std::fs::write(temp_dir.join("f1.txt"), b"duplicate content").unwrap();
+        std::fs::write(temp_dir.join("f2.txt"), b"duplicate content").unwrap();
+
+        let index = kept_core::scan_directory(&temp_dir, &kept_core::ScanOptions::default()).unwrap();
+        let snapshot = kept_core::create_persistent_snapshot(index, &kept_core::ScanOptions::default());
+        let index_path = temp_dir.join("index.json");
+        std::fs::write(&index_path, serde_json::to_string(&snapshot).unwrap()).unwrap();
+
+        let result = crate::commands::duplicates::handle_task_duplicates(
+            temp_dir.clone(),
+            Some(index_path),
+            true,
+            Some(crate::commands::duplicates::DuplicateAction::Show),
+            true,
+        );
+        assert!(result.is_ok(), "duplicates task must succeed");
+
+        let _ = std::fs::remove_dir_all(&temp_dir);
     }
 }

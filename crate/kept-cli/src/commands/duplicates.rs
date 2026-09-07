@@ -219,40 +219,51 @@ pub fn handle_task_duplicates(
         "stats": stats,
     });
 
-    if json {
-        println!("{}", serde_json::to_string_pretty(&report)?);
-    } else {
-        let groups = report["groups"].as_array().map_or(&[][..], Vec::as_slice);
-        println!(
-            "Verified {} duplicate group(s) from the scan index.",
-            groups.len()
-        );
-        for (position, group) in groups.iter().enumerate() {
-            let kind = group["kind"].as_str().unwrap_or("unknown");
-            let items = group["items"].as_array().map_or(&[][..], Vec::as_slice);
-            println!("{}. {} ({} file(s))", position + 1, kind, items.len());
-            for item in items {
-                if let Some(path) = item.as_str() {
-                    println!("   - {path}");
-                }
-            }
-        }
-        let unreadable = report["stats"]["unreadable_files"].as_u64().unwrap_or(0);
-        if unreadable > 0 {
-            println!("Scan issue: {unreadable} candidate file(s) could not be read for hashing.");
-        }
-    }
-
     if yes && action.is_none() {
         anyhow::bail!("--yes ต้องใช้ร่วมกับ --action ที่ระบุชัดเจน");
     }
+
     if let Some(action) = action {
         if !yes && !io::stdin().is_terminal() {
             anyhow::bail!("โหมด non-interactive ต้องใช้ --action <name> พร้อม --yes");
         }
+        if json && action == DuplicateAction::Show {
+            // NOTE-001: เมื่อระบุทั้ง --json และ --action show ให้พิมพ์ JSON เพียงครั้งเดียว
+            println!("{}", serde_json::to_string_pretty(&report)?);
+            return Ok(());
+        }
+        if json {
+            println!("{}", serde_json::to_string_pretty(&report)?);
+        }
         return run_duplicate_action(action, &canonical_root, &report, yes);
     }
-    if !json && is_interactive_terminal() {
+
+    if json {
+        println!("{}", serde_json::to_string_pretty(&report)?);
+        return Ok(());
+    }
+
+    let groups = report["groups"].as_array().map_or(&[][..], Vec::as_slice);
+    println!(
+        "Verified {} duplicate group(s) from the scan index.",
+        groups.len()
+    );
+    for (position, group) in groups.iter().enumerate() {
+        let kind = group["kind"].as_str().unwrap_or("unknown");
+        let items = group["items"].as_array().map_or(&[][..], Vec::as_slice);
+        println!("{}. {} ({} file(s))", position + 1, kind, items.len());
+        for item in items {
+            if let Some(path) = item.as_str() {
+                println!("   - {path}");
+            }
+        }
+    }
+    let unreadable = report["stats"]["unreadable_files"].as_u64().unwrap_or(0);
+    if unreadable > 0 {
+        println!("Scan issue: {unreadable} candidate file(s) could not be read for hashing.");
+    }
+
+    if is_interactive_terminal() {
         if let Some(action) = choose_duplicate_action()? {
             run_duplicate_action(action, &canonical_root, &report, false)?;
         }

@@ -1,6 +1,5 @@
 # TODO.md แผนงาน kept
 
-<<<<<<< HEAD
 ---
 
 ## 🏆 ลำดับความสำคัญและ Gate Conditions (Priority Tiers)
@@ -13,12 +12,7 @@
 
 ---
 
-## P0 — Repository operating baseline
-
-## 1. Handoff, สัญญา และแผนงานที่ใช้งานจริง
-=======
 ## 🔴 [P0] — Core Stability & Quality Baseline (ฐานรากต้องแน่นก่อน)
->>>>>>> ce081d6 (feat: implement Section 4 MCP filesystem tools, FffManager, and context admission spec)
 
 ### 1. Handoff, สัญญา และ Governance ที่ใช้งานจริง
 - [ ] ปรับ `AGENTS.md` เมื่อเริ่ม implementation ให้มี repository map ของ FFF filesystem engine, `kept-vault`, package manifest, lockfile, package store, script runtime และ MCP tool modules ที่สร้างจริง
@@ -31,16 +25,12 @@
 
 ### 2. Observation Contract, Evidence Model, AST และ Judge Engine ใน kept-core
 
-<<<<<<< HEAD
-### 2.0 Test Debt & Code Quality Gate (ปิดความเสี่ยงก่อนขยายระบบ)
+#### 2.0 Test Debt & Code Quality Gate (ปิดความเสี่ยงก่อนขยายระบบ)
 - [ ] เพิ่ม Unit Tests ครอบคลุม cascading scope/naming logic ใน `crate/kept-core/src/policy.rs` โดยตรง (เป้าหมาย ≥ 20 unit test cases)
 - [ ] แยก Unit Tests ตรงใน `crate/kept-core/src/scanner/duplicate.rs` และ `mutation.rs` เพื่อทดสอบ execute & rollback simulation ระดับฟังก์ชัน
 - [ ] ตั้งค่า Restriction Lints ใน `clippy.toml` หรือ root crate ให้เตือน `clippy::unwrap_used` และ `clippy::expect_used` เป็น warning เพื่อควบคุมและทยอยลดจุด panic ใน production code
 
-### 2.1 Foundation: Observation, Identity & Evidence Data Model (ง่ายสุด - Layer 0 Contract)
-=======
 #### 2.1 Foundation: Observation, Identity & Evidence Data Model (Layer 0 Contract)
->>>>>>> ce081d6 (feat: implement Section 4 MCP filesystem tools, FffManager, and context admission spec)
 - [x] ทำ TDD red สำหรับ `Target` URI parser และ format invariants (`file://`, `symbol://`, `search://`, `context://`) ใน `crate/kept-core/tests/observation_contract.rs`
 - [x] สร้าง `Target` enum และ URI parser (`crate/kept-core/src/observation/target.rs`): parse canonical URI, resolve schemes, deterministic display
 - [x] สร้าง `Revision` และ `ContentIdentity` models (`crate/kept-core/src/observation/identity.rs`): แยก mtime/version จาก content hash (BLAKE3/SHA-256)
@@ -60,21 +50,18 @@
 - [x] เก็บ `ScanIssue` สำหรับ metadata/indexing failure โดยไม่ทำให้ผล scan ส่วนที่เข้าถึงได้หายไป
 - [x] ลบ traversal implementation เดิมเมื่อ adapter tests ผ่านและไม่มี code path เรียกใช้งานแล้ว
 
-<<<<<<< HEAD
-### 2.2.1 Symbol Extraction & Structural Acquisition (Tree-sitter AST)
+#### 2.2.1 Symbol Extraction & Structural Acquisition (Tree-sitter AST)
 - [ ] ทำ TDD red ทดสอบความแม่นยำของ symbol parsing ใน `source_graph.rs` ด้วย fixtures: multi-line function signatures, string literals/comments ที่มี `"fn "` หรือ `"struct "`, generic types, traits, enums และ macros
 - [ ] นำ `tree-sitter` และ `tree-sitter-rust` เข้ามาใน `Cargo.toml` เพื่อ parse AST สำหรับภาษา Rust แทน string matching
 - [ ] ออกแบบ fallback หรือ multi-language AST parser สำหรับภาษาสำคัญอื่นๆ
 - [ ] ผูกผลลัพธ์ AST เข้ากับ `StructurePayload` และ `StructureOutlineItem` ของ `Observation`
 
-### 2.3 Context Registry & Judge Engine Baseline (ท้าทาย - Context Admission Pipeline)
-=======
 #### 2.3 Context Registry & Judge Engine Baseline (Context Admission Pipeline)
->>>>>>> ce081d6 (feat: implement Section 4 MCP filesystem tools, FffManager, and context admission spec)
 - [x] ทำ TDD red สำหรับ `ContextRegistry` เก็บ snapshot revision ที่ agent เคยอ่านแล้ว เพื่อป้องกัน duplicate context reads
 - [x] สร้าง `ContextRegistry` (`crate/kept-core/src/context/registry.rs`) รองรับ `context://<target>@<rev>` tracking
 - [x] ทำ TDD red สำหรับ `Judge` admission decisions: `Pass`, `Reference`, `Delta`, `Drop`, `Warn`, `Block`
 - [x] สร้าง `Judge` engine v1 (`crate/kept-core/src/context/judge.rs`) สำหรับตัดสิน treat observations ก่อนส่งให้ agent / context stream
+
 
 ---
 

@@ -57,3 +57,7 @@ codeql-db/
 
 # Test / Misc ignored
 ignored.txt
+
+# Dogfooding artifacts and logs
+dogfood-cli-output/
+*.log

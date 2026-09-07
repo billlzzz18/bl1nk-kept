@@ -21,7 +21,7 @@ pub use duplicate::{
     ContentDuplicateStats, DuplicateAllowRule, DuplicateEvidence, DuplicateGroup, DuplicateOptions,
     DuplicateSearchStats,
 };
-pub use fff::{FffAdapterError, FffScanner};
+pub use fff::{FffAcquisitionMode, FffAdapterError, FffScanner};
 pub use filter::{
     build_treemap, filter_index, CustomFilter, CustomOperator, FileFilter, FilterSet, TreemapNode,
 };

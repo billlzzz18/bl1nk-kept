@@ -1,0 +1,157 @@
+{
+  "target_directory": "D:\\01work\\Active\\workspace\\bl1nk-kept",
+  "timestamp_utc": "2026-09-07T20:13:59.482437400+00:00",
+  "system_metadata": {
+    "os": "windows",
+    "rg_version": "ripgrep 15.2.0 (rev e89fff89ac)",
+    "target_file_count": 255
+  },
+  "grep_comparisons": [
+    {
+      "query": "Observation",
+      "query_type": "common identifier",
+      "rg_matches": 67,
+      "rg_latency_ms": 680.6126999999999,
+      "kept_matches": 68,
+      "kept_latency_ms": 283.3388,
+      "speed_ratio_kept_vs_rg": 0.41629960769171664
+    },
+    {
+      "query": "fn handle_",
+      "query_type": "common function prefix",
+      "rg_matches": 20,
+      "rg_latency_ms": 37.271499999999996,
+      "kept_matches": 20,
+      "kept_latency_ms": 102.1989,
+      "speed_ratio_kept_vs_rg": 2.742011993077821
+    },
+    {
+      "query": "struct ResourceState",
+      "query_type": "type declaration",
+      "rg_matches": 1,
+      "rg_latency_ms": 26.78,
+      "kept_matches": 1,
+      "kept_latency_ms": 76.94040000000001,
+      "speed_ratio_kept_vs_rg": 2.873054518297237
+    },
+    {
+      "query": "BL1NK_UNIQUE_NONEXISTENT_NEEDLE_XYZ",
+      "query_type": "miss query",
+      "rg_matches": 1,
+      "rg_latency_ms": 28.4225,
+      "kept_matches": 1,
+      "kept_latency_ms": 74.6981,
+      "speed_ratio_kept_vs_rg": 2.6281326413932624
+    }
+  ],
+  "admission_token_evaluations": [
+    {
+      "scenario": "Multi-turn repeat access on SPEC.md",
+      "turn": 1,
+      "target_uri": "file://SPEC.md",
+      "raw_token_estimate": 7466,
+      "emitted_token_estimate": 7466,
+      "decision": "PASS",
+      "token_savings_percent": 0.0
+    },
+    {
+      "scenario": "Multi-turn repeat access on SPEC.md",
+      "turn": 2,
+      "target_uri": "file://SPEC.md",
+      "raw_token_estimate": 7466,
+      "emitted_token_estimate": 13,
+      "decision": "REFERENCE",
+      "token_savings_percent": 99.82587731047416
+    },
+    {
+      "scenario": "Multi-turn repeat access on SPEC.md",
+      "turn": 3,
+      "target_uri": "file://SPEC.md",
+      "raw_token_estimate": 7466,
+      "emitted_token_estimate": 13,
+      "decision": "REFERENCE",
+      "token_savings_percent": 99.82587731047416
+    },
+    {
+      "scenario": "Multi-turn repeat access on SPEC.md",
+      "turn": 4,
+      "target_uri": "file://SPEC.md",
+      "raw_token_estimate": 7466,
+      "emitted_token_estimate": 20,
+      "decision": "WARN (LOOP)",
+      "token_savings_percent": 99.732118939191
+    },
+    {
+      "scenario": "Multi-turn repeat access on plan.md",
+      "turn": 1,
+      "target_uri": "file://plan.md",
+      "raw_token_estimate": 3749,
+      "emitted_token_estimate": 3749,
+      "decision": "PASS",
+      "token_savings_percent": 0.0
+    },
+    {
+      "scenario": "Multi-turn repeat access on plan.md",
+      "turn": 2,
+      "target_uri": "file://plan.md",
+      "raw_token_estimate": 3749,
+      "emitted_token_estimate": 13,
+      "decision": "REFERENCE",
+      "token_savings_percent": 99.65324086423047
+    },
+    {
+      "scenario": "Multi-turn repeat access on plan.md",
+      "turn": 3,
+      "target_uri": "file://plan.md",
+      "raw_token_estimate": 3749,
+      "emitted_token_estimate": 13,
+      "decision": "REFERENCE",
+      "token_savings_percent": 99.65324086423047
+    },
+    {
+      "scenario": "Multi-turn repeat access on plan.md",
+      "turn": 4,
+      "target_uri": "file://plan.md",
+      "raw_token_estimate": 3749,
+      "emitted_token_estimate": 20,
+      "decision": "WARN (LOOP)",
+      "token_savings_percent": 99.4665244065084
+    },
+    {
+      "scenario": "Multi-turn repeat access on README.md",
+      "turn": 1,
+      "target_uri": "file://README.md",
+      "raw_token_estimate": 2227,
+      "emitted_token_estimate": 2227,
+      "decision": "PASS",
+      "token_savings_percent": 0.0
+    },
+    {
+      "scenario": "Multi-turn repeat access on README.md",
+      "turn": 2,
+      "target_uri": "file://README.md",
+      "raw_token_estimate": 2227,
+      "emitted_token_estimate": 13,
+      "decision": "REFERENCE",
+      "token_savings_percent": 99.41625505163898
+    },
+    {
+      "scenario": "Multi-turn repeat access on README.md",
+      "turn": 3,
+      "target_uri": "file://README.md",
+      "raw_token_estimate": 2227,
+      "emitted_token_estimate": 13,
+      "decision": "REFERENCE",
+      "token_savings_percent": 99.41625505163898
+    },
+    {
+      "scenario": "Multi-turn repeat access on README.md",
+      "turn": 4,
+      "target_uri": "file://README.md",
+      "raw_token_estimate": 2227,
+      "emitted_token_estimate": 20,
+      "decision": "WARN (LOOP)",
+      "token_savings_percent": 99.10193084867535
+    }
+  ]
+}

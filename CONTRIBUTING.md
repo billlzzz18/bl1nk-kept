@@ -52,7 +52,11 @@ just package
 3. **Rust Toolchain & MSRV:**
    - โค้ดต้องคอมไพล์ผ่านบน Rust Stable (MSRV ตามที่ระบุใน `Cargo.toml`)
    - ผ่าน `cargo fmt` และ `cargo clippy --workspace --all-targets -- -D warnings` (0 warnings)
-4. **ความสะอาดของ Repository & CI Cost Guard:**
+4. **มาตรฐานภาษาและ Comment:**
+   - **Internal Note:** เขียนเหตุผลเชิงเทคนิคด้วย `// NOTE-001:`, `// NOTE-002:` รันลำดับเลขตามประเด็นเป็นภาษาไทย
+   - **Rustdoc (`///`) & Error Messages:** ใช้ภาษาอังกฤษล้วนสำหรับ Public API และ System Error Messages
+   - **เอกสารและคู่มือ:** ใช้ภาษาไทยเป็นหลัก
+5. **ความสะอาดของ Repository & CI Cost Guard:**
    - ละเว้นการ push artifact ชั่วคราว หรือรัน CI บนเอกสารโดยไม่จำเป็น
    - การเสนอไอเดียใหม่ให้บันทึกลง `docs/ideas/` ก่อนนำเข้า `plan.md`
 

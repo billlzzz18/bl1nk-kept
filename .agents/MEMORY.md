@@ -28,7 +28,7 @@
 | Requirement ID | Directive | Status | Evidence / gap | Next acceptance evidence |
 |---|---|---|---|---|
 | OPS-001 | ยึดโครงสร้างปัจจุบัน, ลบเฉพาะส่วนล้าสมัย/ซ้ำซ้อน, เอกสารแต่ละไฟล์มีหน้าที่เดียว | `PARTIAL` | Root source-of-truth และ repository contracts มีแล้ว | ตรวจทุกการเปลี่ยนว่าไม่สร้าง report/ticket ใหม่ใน product docs |
-| OPS-002 | คอมเมนต์ code ภาษาไทยด้วย `NOTE-001:` เมื่อมีเหตุผลที่ไม่ชัดเจน | `PARTIAL` | ใช้ใน code ที่แก้ล่าสุด | Review code changes ทุกครั้ง; user-facing help ต้องไม่แสดง marker |
+| OPS-002 | รันเลข `NOTE-001:`, `NOTE-002:` ตามประเด็น; คอมเมนต์ภายในภาษาไทย; Rustdoc/Public API และ Error messages ในโค้ดเป็นภาษาอังกฤษ | `COMPLETE` | ตรวจสอบและจัดระเบียบ `crate/kept-mcp/` และแยก public doc / internal NOTE ครบถ้วน | Review code changes ทุกครั้ง; rustdoc/error เป็น English; internal rationale เป็น Thai พร้อมรันเลข `NOTE-xxx:` |
 | OPS-003 | TDD: red test ก่อน production code ทุก behavior ใหม่ | `PARTIAL` | Cargo/core/CLI contracts และ smoke suite มี | ตรวจ ledger evidence ก่อนปิดแต่ละ requirement |
 | OPS-004 | เก็บ `.learnings/` เสมอ; เป็น memory เอเจนต์ ไม่ใช่ product input | `COMPLETE` | `AGENTS.md`, package contract, `.learnings/ERRORS.md` | คงไว้ในทุก source archive |
 | OPS-005 | ADR ภาษาไทย; research ที่ตัดสินใจแล้วเป็น ADR, ที่ยังไม่ตัดสินใจอยู่ `plan.md` | `COMPLETE` | `docs/adr/0001_*`, `0002_*`, `plan.md` | ใช้กับ decision ใหม่เท่านั้น |

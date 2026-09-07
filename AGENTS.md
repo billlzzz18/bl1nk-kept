@@ -25,3 +25,9 @@
 - **FFF เป็น Acquisition Core:** ใช้ `look` สำหรับตรวจ identity/outline (ต้นทุนต่ำ) และ `view` เมื่อต้องการ materialize context
 - **Judge เป็นตัวตัดสิน Context:** ไม่ส่งข้อความซ้ำซ้อน พิจารณา treatment: `PASS`, `REFERENCE`, `DELTA`, `COMPRESS`
 - **ห้ามตัดสินใจแทนผู้ใช้:** เมื่องานมีทางเลือก เชิงนโยบาย ให้เสนอ blank checkbox `[ ]` ให้ผู้ใช้เลือก
+- **มาตรฐาน Comment & ภาษาใน Source Code:**
+  - **Internal Rationale:** ใช้ `// NOTE-001:`, `// NOTE-002:` รันเลขตามประเด็น โดยเขียนคำอธิบายภาษาไทยสำหรับอ่านเอง/ในทีม (ห้ามใช้ `///` ปน)
+  - **Public Rustdoc (`///`):** ใช้ภาษาอังกฤษล้วนสำหรับ Public APIs, Structs, CLI Help
+  - **Error Messages ในโค้ด:** ใช้ภาษาอังกฤษล้วนตามมาตรฐานระบบ
+  - **Project Docs & Guidelines:** ใช้ภาษาไทยสำหรับเอกสารจัดการงาน คู่มือ และคำอธิบายสำหรับผู้ใช้
+

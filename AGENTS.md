@@ -4,14 +4,14 @@
 
 ---
 
-## 0. กฎเหล็กการเขียนโค้ด Rust (Rust Core Standards)
+## 0. Rust Core Standards
 
-### 1. ความปลอดภัยและการจัดการข้อผิดพลาด (Safety & Error Handling)
+### 1. Safety & Error Handling
 - **ห้าม panic / หลีกเลี่ยง `unwrap()`:** ให้ใช้ `?`, `match`, หรือ `if let` เสมอ
 - **ห้ามกลืน error ด้วย `let _ =`:** สำหรับการทำงานที่อาจ fail ต้องส่งต่อด้วย `?` หรือ log เสมอ (ห้ามละเลยเงียบ ๆ)
 - **ระวัง Index Out of Bounds:** หลีกเลี่ยง `arr[i]` ตรง ๆ ให้ใช้ `.get(i)` เพื่อความปลอดภัย
 
-### 2. ปรัชญาการพัฒนา (Coding Philosophy & Ergonomics)
+### 2. Coding Philosophy & Ergonomics
 - **เน้น Correctness ก่อน Performance:** โค้ดต้องถูกต้องและอ่านเข้าใจง่ายก่อนเสมอ ยกเว้นส่วนที่เป็น hot path และมี benchmark กำกับ
 - **ใช้ชื่อเต็มสำหรับตัวแปร:** ไม่ใช้ตัวย่อกำกวม (เช่น `query` แทน `q`, `buffer` แทน `buf`)
 - **ห้ามสร้างไฟล์ย่อยพร่ำเพรื่อ:** พัฒนาต่อในโมดูลเดิมที่มีอยู่ เว้นแต่จะเป็น logical component ใหม่จริง ๆ
@@ -23,20 +23,20 @@
   });
   ```
 
-### 3. โครงสร้างโมดูล (Rust 2018+ Module Structure)
+### 3. Module Structure
 - **ห้ามสร้าง `mod.rs`:** ให้ใช้ Rust modern path convention เช่น `src/scanner.rs` คู่กับโฟลเดอร์ `src/scanner/fff.rs` เพื่อไม่ให้เปิดแท็บ `mod.rs` ซ้ำกันหลายแท็บ
 
-### 4. วินัยของ Agent (Agent Discipline & Rule Hygiene)
+### 4. Agent Discipline & Rule Hygiene
 - **ห้ามคิดเองเออเองเกินสั่ง:** ทำงานตามขอบเขต (scope) ที่ตกลงกันไว้อย่างเคร่งครัด
 - **กฎคือ "กับดักที่ต้องเลี่ยง" (Traps to avoid):** ไม่ใช่แผนที่ architecture ที่เปลี่ยนบ่อย
 
 ---
 
-## 1. สภาพแวดล้อมและเครื่องมือ (Environment & Tools)
+## 1. Environment & Tools
 
 เพื่อให้การทำงานร่วมกันเป็นไปอย่างราบรื่น Agent ต้องเข้าใจทรัพยากรที่มีอยู่ใน Workspace ดังนี้:
 
-### 1. ระบบบริหารจัดการ Context (Context Management System)
+### 1. Context Management System
 - **`FFF` (Foresight, Filter, Fusion):** แกนหลักในการสำรวจและจัดการข้อมูล
 - **`look`:** ใช้สำหรับสำรวจ `identity` และ `outline` (ต้นทุนต่ำ เหมาะกับการค้นหาเป้าหมาย)
 - **`view`:** ใช้สำหรับดึงข้อมูลเนื้อหาจริง (Materialization) เมื่อจำเป็นต้องอ่านรายละเอียด
@@ -47,7 +47,7 @@
 - **`GitProvider`** และ **`GitCommands`**: เครื่องมือมาตรฐานสำหรับจัดการ Git repositories
 - **`GitLogReader`**: ใช้สำหรับอ่านประวัติ commit และข้อมูลการแก้ไข
 
-### 3. การทำงานกับไฟล์ (File System)
+### 3. File System
 - **`FilesystemProvider`** และ **`FilesystemCommands`**: มาตรฐานการเข้าถึงไฟล์และไดเรกทอรี
 - **Context URI Pattern**:
   - **Local Files**: `file:///path/to/file`
@@ -59,7 +59,7 @@
   - ห้ามสร้าง path นอก workspace โดยตรง ต้องใช้ prefix ที่ถูกต้องเท่านั้น
   - ใช้ `look` เสมอเพื่อตรวจสอบความมีอยู่ของไฟล์ก่อน `view` เพื่อหลีกเลี่ยงค่าใช้จ่ายและข้อผิดพลาด
 
-### 4. การทำงานกับเอกสาร (Documents)
+### 4. Documents
 - **`DocProvider`**, **`DocReader`**, **`DocWriter`**: เครื่องมือจัดการไฟล์เอกสาร
 - **`Converter`**: เครื่องมือแปลงไฟล์ (รองรับ GFM, DOCX, PDF, NFM)
 - **Context URI Pattern**:
@@ -70,7 +70,7 @@
   - ใช้ `Converter` สำหรับการแปลงรูปแบบ
   - สามารถใช้ `view` กับ Remote Document URIs ได้โดยตรง
 
-### 5. การทำงานกับข้อมูลตาราง (Tables)
+### 5. Tables
 - **`TableProvider`** และ **`TableReader`**: เครื่องมือจัดการข้อมูลตาราง
 - **`QueryExecutor`**: สำหรับ Query ข้อมูลด้วย SQL
 - **Context URI Pattern**:
@@ -85,7 +85,7 @@
 
 ---
 
-## 2. ลำดับขั้นตอนการเริ่มงาน (Start Here)
+## 2. Start Here
 
 1. **อ่าน `.agents/MEMORY.md`:** ระบุ Requirement ID และตรวจสอบตารางสถานะ `MISSING`/`PARTIAL`
 2. **อ่าน `TODO.md`:** เลือก checkbox ลำดับความสำคัญสูงสุดที่สอดคล้องกับ Requirement
@@ -94,7 +94,7 @@
 
 ---
 
-## 3. วงจรการทำงาน (Work Loop & Acceptance Criteria)
+## 3. Work Loop & Acceptance Criteria
 
 1. **TDD เคร่งครัด:** เขียน failing test ที่ตรงเป้าหมายก่อนเขียน production code เสมอ
 2. **Implement เล็กที่สุด:** ปรับแก้โค้ดเท่าที่จำเป็นเพื่อให้ test ผ่าน
@@ -104,7 +104,7 @@
 
 ---
 
-## 4. สถาปัตยกรรมและกฎสำคัญ (Core Architecture & Rules)
+## 4. Core Architecture & Rules
 
 - **FFF เป็น Acquisition Core:** ใช้ `look` สำหรับตรวจ identity/outline (ต้นทุนต่ำ) และ `view` เมื่อต้องการ materialize context
 - **Judge เป็นตัวตัดสิน Context:** ไม่ส่งข้อความซ้ำซ้อน พิจารณา treatment: `PASS`, `REFERENCE`, `DELTA`, `COMPRESS`

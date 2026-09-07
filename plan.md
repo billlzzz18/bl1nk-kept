@@ -83,8 +83,13 @@ gantt
   - **Tree-sitter AST Integration:** นำ `tree-sitter` และ `tree-sitter-rust` เข้ามาสกัด structural symbols (`outline`, `symbol://`) แทนที่ regex
   - **Context Admission Pipeline:** ติดตั้ง Judge Engine ใน `crate/kept-core` เพื่อประเมิน diff/token cost และกำหนด treatment (`PASS`, `REFERENCE`, `DELTA`, `COMPRESS`)
   - **Context Registry & State Tracking:** บันทึก session context และ revision changes เพื่อป้องกันการส่งต่อเนื้อหาซ้ำซ้อน
+  - **P0.1 Behavioral Waste Gate:** บังคับ `Reference` สำหรับ In-Context Amnesia และ `RequireOutcome` สำหรับ Unproductive Acquisition; ติดตั้ง memoization layer สำหรับ query/path hashes และ track wasted-call metric; เป็น dependency ของ P0.2 และ P0.3
+  - **P0.2 Zero-Regression Memory Store:** สร้าง immutable Correction Ledger โดย SQLite เป็น enforcement authority และ Vault/Markdown เป็น append-only audit projection; บังคับ `A ≠ a` ก่อน acquisition หรือ tool dispatch
+  - **P0.3 Semantic & Scope Disambiguation:** Router บังคับ intent contract, canonical scope และ `look` ก่อน `view`; ทำ two-tier check (literal rule -> intent congruence); ทำหลัง P0.1 และ P0.2 เพื่อใช้ outcome และ correction evidence เดียวกัน
+  - **Cross-Cutting Judge Infra:** เพิ่ม Decision Confidence Score (ไม่ใช่ binary pass/block) และระบบวัด override-rate metric เพื่อป้องกันปัญหา false positive block/warn
   - **Component Benchmark (FFF vs rg):** ทำชุดทดสอบวัด throughput, latency, memory ระหว่าง FFF content grep กับ ripgrep (`rg`) บน cold/warm cache
-- **Exit Gate:** การอ่านไฟล์ผ่าน `kept inspect` และเครื่องมือ MCP สามารถส่งคืน Treatment ที่ประหยัดโทเค็นได้ถูกต้องตามผลทดสอบ พร้อมมีผลวัด latency เทียบเคียงกับ `rg`
+  - **Design Contract:** รายละเอียด taxonomy, invariant, data contract และ verification อยู่ใน [Cognitive Guardrail Architecture](docs/specs/cognitive_guardrail_architecture.md)
+- **Exit Gate:** การอ่านไฟล์ผ่าน `kept inspect` และเครื่องมือ MCP สามารถส่งคืน Treatment ที่ประหยัดโทเค็นได้ถูกต้องตามผลทดสอบ พร้อมมีผลวัด latency เทียบเคียงกับ `rg`; P0.1 → P0.2 → P0.3 บังคับ guardrail ก่อน acquisition/tool dispatch ได้ครบตาม [Cognitive Guardrail Architecture](docs/specs/cognitive_guardrail_architecture.md)
 
 ### Phase 2: Retrieval & Semantic Search (P1 Priority)
 

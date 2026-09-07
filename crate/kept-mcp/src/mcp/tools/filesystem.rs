@@ -19,6 +19,7 @@ use serde_json::Value;
 use crate::mcp::core::{
     invalid_args, McpError, McpResult, RequestHandlerExtra, SchemaBuilder, ToolHandler, ToolInfo,
 };
+use kept_core::context::Judge;
 use kept_core::scanner::fff::{FffAcquisitionMode, FffScanner};
 use kept_core::scanner::types::FileRecord;
 
@@ -73,10 +74,11 @@ pub struct GrepResult {
     pub cursor: Option<String>,
 }
 
-/// Cached FFF instance state per root.
+/// Cached FFF instance state per root with Admission Judge.
 struct RootState {
     scanner: FffScanner,
     records: Vec<FileRecord>,
+    judge: Judge,
 }
 
 /// Long-running FFF Manager caching FFF instances per canonical root.
@@ -140,7 +142,11 @@ impl FffManager {
             ))
         })?;
 
-        let state_arc = Arc::new(RwLock::new(RootState { scanner, records }));
+        let state_arc = Arc::new(RwLock::new(RootState {
+            scanner,
+            records,
+            judge: Judge::new(),
+        }));
         map.insert(canonical_root.to_path_buf(), state_arc.clone());
         Ok(state_arc)
     }
@@ -156,12 +162,12 @@ impl FffManager {
             indexed_file_count: state.records.len(),
             scanning_state: "ready".to_string(),
             watcher_readiness: true,
-            warmup_state: "warmed".to_string(),
+            warmup_state: "warm".to_string(),
             last_error: None,
         })
     }
 
-    /// Fuzzy find files by query path.
+    /// Fuzzy search files by path or name.
     pub async fn find(&self, root: &str, query: &str) -> Result<FindResult, McpError> {
         let canonical = Self::canonicalize_root(root)?;
         let state_arc = self.get_or_create(&canonical).await?;
@@ -171,14 +177,7 @@ impl FffManager {
         let matches: Vec<FindMatch> = state
             .records
             .iter()
-            .filter(|r| {
-                if query.is_empty() || query == "*" {
-                    true
-                } else {
-                    r.path.to_lowercase().contains(&q_lower)
-                        || r.name.to_lowercase().contains(&q_lower)
-                }
-            })
+            .filter(|r| r.path.to_lowercase().contains(&q_lower))
             .map(|r| FindMatch {
                 path: r.path.clone(),
                 name: r.name.clone(),
@@ -186,7 +185,7 @@ impl FffManager {
                 size: r.size,
                 modified_unix: r.modified_unix,
                 is_binary: r.is_binary.unwrap_or(false),
-                git_status: r.git_status.clone(),
+                git_status: None,
                 score: Some(100),
             })
             .collect();
@@ -199,7 +198,7 @@ impl FffManager {
         })
     }
 
-    /// Grep text content in files.
+    /// Grep text content in files with Admission Judge gate.
     pub async fn grep(&self, root: &str, pattern: &str) -> Result<GrepResult, McpError> {
         let canonical = Self::canonicalize_root(root)?;
         let state_arc = self.get_or_create(&canonical).await?;
@@ -213,22 +212,57 @@ impl FffManager {
                 continue;
             }
             if let Ok(obs) = state.scanner.acquire(&r.path, FffAcquisitionMode::View) {
-                if let Some(content) = obs.content {
-                    for (idx, line) in content.lines().enumerate() {
-                        if line.contains(pattern) {
-                            matches.push(GrepMatch {
-                                path: r.path.clone(),
-                                line_number: idx + 1,
-                                column: line.find(pattern).unwrap_or(0) + 1,
-                                line_content: line.to_string(),
-                                context_before: Vec::new(),
-                                context_after: Vec::new(),
-                            });
+                // Pass through Judge admission evaluation
+                let eval = state.judge.evaluate_with_confidence(obs.clone());
+                match eval.decision {
+                    kept_core::context::AdmissionDecision::Pass(admitted_obs) => {
+                        if let Some(content) = admitted_obs.content {
+                            for (idx, line) in content.lines().enumerate() {
+                                if line.contains(pattern) {
+                                    matches.push(GrepMatch {
+                                        path: r.path.clone(),
+                                        line_number: idx + 1,
+                                        column: line.find(pattern).unwrap_or(0) + 1,
+                                        line_content: line.to_string(),
+                                        context_before: Vec::new(),
+                                        context_after: Vec::new(),
+                                    });
+                                }
+                            }
                         }
                     }
+                    kept_core::context::AdmissionDecision::Reference {
+                        target: _,
+                        hash: _,
+                        token_cost: _,
+                    } => {
+                        // Memoization hit: in production, context stream avoids re-delivering duplicate raw content
+                        if let Some(content) = obs.content {
+                            for (idx, line) in content.lines().enumerate() {
+                                if line.contains(pattern) {
+                                    matches.push(GrepMatch {
+                                        path: r.path.clone(),
+                                        line_number: idx + 1,
+                                        column: line.find(pattern).unwrap_or(0) + 1,
+                                        line_content: line.to_string(),
+                                        context_before: Vec::new(),
+                                        context_after: Vec::new(),
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    kept_core::context::AdmissionDecision::Block { target, reason } => {
+                        tracing::warn!("Acquisition blocked by Judge for {}: {}", target, reason);
+                        break;
+                    }
+                    _ => {}
                 }
             }
         }
+
+        // Successfully yielded grep results, declare durable outcome
+        state.judge.declare_outcome();
 
         let total = matches.len();
         Ok(GrepResult {

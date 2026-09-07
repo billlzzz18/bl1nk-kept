@@ -1,5 +1,5 @@
 pub mod judge;
 pub mod registry;
 
-pub use judge::{AdmissionDecision, Judge};
-pub use registry::{ContextRegistry, SeenEntry};
+pub use judge::{AdmissionDecision, AdmissionEvaluation, Judge};
+pub use registry::{ContextRegistry, OutcomeKind, OutcomeLinkage, SeenEntry};

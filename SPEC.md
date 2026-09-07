@@ -255,21 +255,25 @@ Interactive TUI ใช้ domain model เดียวกับ CLI/MCP สำ�
 ระบบ Context Admission มีหน้าที่ควบคุมการส่งมอบ Context ให้กับ AI Agent/Client เพื่อลดความซ้ำซ้อนของ Token และรักษาความถูกต้องของข้อมูล
 
 ### 11.1 Observation Model & Target Locator
+
 ทุกการเข้าถึงข้อมูลต้องถูกแปลงให้อยู่ในรูป `Observation`:
 - **Source:** แหล่งที่มา เช่น `File`, `Grep`, `TreeSitter`, `Parser`, `Fts`, `Bm25`, `Vector`
 - **Target URI:** ระบุทรัพยากรแบบไม่คลุมเครือ (`file://`, `symbol://`, `search://`, `document://`, `context://`)
 - **Revision & ContentIdentity:** ติดตาม timestamp/token และ Hash Digest ของเนื้อหา
 
 ### 11.2 Acquisition Layer (FFF & Structure)
+
 - `look`: ดึง identity, size, revision, outline แบบประหยัด token โดยไม่อ่านเนื้อหาทั้งหมด
 - `view`: materialize เนื้อหาตาม range หรือ symbol เมื่อจำเป็น
 - โครงสร้างโค้ดใช้ Tree-sitter AST, โครงสร้างเอกสารใช้ `kept-doc` Universal IR
 
 ### 11.3 Context Registry & State Tracking
+
 - บันทึกประวัติและ state ของ resource ที่ Agent เคยเห็นลงใน Session Store
 - ติดตาม `ResourceState` และ revision tracking ป้องกัน duplicate reads
 
 ### 11.4 Judge Engine & Treatments
+
 ประเมิน `Observation` เทียบกับ Context History และ Policy เพื่อเลือก Decision:
 - `PASS`: ข้อมูลใหม่ ส่งมอบเนื้อหาเต็ม
 - `REFERENCE`: ข้อมูลเดิมที่เคยเห็นและยังไม่เปลี่ยนแปลง (ส่งคืนเฉพาะ pointer 13 tokens)

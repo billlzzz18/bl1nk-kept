@@ -18,11 +18,14 @@ Complete release preparation. Do not stop at status or summary.
 8. Stage only intended files.
 9. Run `git commit`. Native `.git/hooks/pre-commit` runs `just check`; stop if it fails.
 10. After commit succeeds, create version tag:
+
     ```text
     git tag vX.Y.Z
     ```
+
     Release gate catches tag command after pre-commit has already passed.
 11. Push branch and tag:
+
     ```text
     git push origin HEAD
     git push origin refs/tags/vX.Y.Z

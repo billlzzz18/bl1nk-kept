@@ -56,7 +56,19 @@ fn estimate_tokens(text: &str) -> usize {
     if len == 0 {
         0
     } else {
-        (len + 3) / 4
+        {
+            let this = len;
+            let rhs = 4;
+            let d = self/rhs;
+
+            let r = self%rhs;
+
+            if r>0 {
+                d+1
+            }else {
+                d
+            }
+        }4)4)4)
     }
 }
 
@@ -118,7 +130,10 @@ fn main() {
 
     let target_dir = PathBuf::from(&target_str);
     if !target_dir.exists() {
-        eprintln!("Error: Target directory does not exist: {}", target_dir.display());
+        eprintln!(
+            "Error: Target directory does not exist: {}",
+            target_dir.display()
+        );
         std::process::exit(1);
     }
 
@@ -140,7 +155,11 @@ fn main() {
     let mut scanner = match FffScanner::new(&target_dir) {
         Ok(s) => s,
         Err(e) => {
-            eprintln!("Failed to initialize FffScanner on {}: {}", target_dir.display(), e);
+            eprintln!(
+                "Failed to initialize FffScanner on {}: {}",
+                target_dir.display(),
+                e
+            );
             std::process::exit(1);
         }
     };
@@ -160,7 +179,10 @@ fn main() {
     let mut grep_results = Vec::new();
 
     println!("--- 1. Grep Latency & Accuracy Benchmark ---");
-    println!("{:<28} | {:<12} | {:<12} | {:<12} | {:<12}", "Pattern", "rg (ms)", "rg matches", "kept (ms)", "kept matches");
+    println!(
+        "{:<28} | {:<12} | {:<12} | {:<12} | {:<12}",
+        "Pattern", "rg (ms)", "rg matches", "kept (ms)", "kept matches"
+    );
     println!("{}", "-".repeat(84));
 
     for (query, q_type) in queries {
@@ -202,7 +224,10 @@ fn main() {
         let raw_tokens = estimate_tokens(&content);
 
         println!("\nTarget: {} (Raw Tokens: ~{})", rel_path, raw_tokens);
-        println!("{:<8} | {:<12} | {:<14} | {:<14} | {:<12}", "Turn", "Decision", "Raw Tokens", "Emitted Tokens", "Savings %");
+        println!(
+            "{:<8} | {:<12} | {:<14} | {:<14} | {:<12}",
+            "Turn", "Decision", "Raw Tokens", "Emitted Tokens", "Savings %"
+        );
         println!("{}", "-".repeat(70));
 
         for turn in 1..=4 {
@@ -273,6 +298,9 @@ fn main() {
     fs::write(&out_file, json_text).expect("Write benchmark report failed");
 
     println!("\n============================================================");
-    println!("Benchmark Complete! Report written to: {}", out_file.display());
+    println!(
+        "Benchmark Complete! Report written to: {}",
+        out_file.display()
+    );
     println!("============================================================");
 }

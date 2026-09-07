@@ -54,6 +54,7 @@ tmpyt0svnk7/
 # CodeQL database
 codeql-db/
 *.codeql
+codeql-custom-queries-rust
 
 # Test / Misc ignored
 ignored.txt

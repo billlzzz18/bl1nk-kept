@@ -76,3 +76,99 @@ fn test_judge_fresh_observation_passes_and_registers() {
         other => panic!("Expected Warn, got {:?}", other),
     }
 }
+
+#[test]
+fn test_judge_decision_has_confidence_score_and_rationale() {
+    let judge = Judge::new();
+    let target = Target::parse("file://src/lib.rs").unwrap();
+    let revision = Revision::new(1725000000, None);
+    let identity = ContentIdentity::from_bytes(b"pub fn add() {}");
+
+    let source = Source {
+        kind: SourceKind::File,
+        adapter: "fff".to_string(),
+        target: target.clone(),
+        revision: revision.clone(),
+        identity: identity.clone(),
+    };
+
+    let observation = Observation {
+        id: "obs_lib".to_string(),
+        source: source.clone(),
+        target: target.clone(),
+        revision: revision.clone(),
+        event: None,
+        structure: None,
+        evidence: Vec::new(),
+        content: Some("pub fn add() {}".to_string()),
+        metadata: serde_json::json!({}),
+        provenance: Provenance {
+            actor: "agent".to_string(),
+            session_id: Some("sess_01".to_string()),
+            input_digest: None,
+            timestamp: 1725000000,
+        },
+    };
+
+    // AdmissionEvaluation includes decision, confidence (0.0 - 1.0), and rationale
+    let eval = judge.evaluate_with_confidence(observation.clone());
+    assert!(eval.confidence >= 0.95);
+    assert!(!eval.rationale.is_empty());
+    assert!(matches!(eval.decision, AdmissionDecision::Pass(_)));
+
+    // Second evaluation should be Reference with high confidence and count in wasted call metric
+    let eval2 = judge.evaluate_with_confidence(observation);
+    assert!(eval2.confidence >= 0.90);
+    assert!(matches!(
+        eval2.decision,
+        AdmissionDecision::Reference { .. }
+    ));
+    assert_eq!(judge.wasted_call_count(), 1);
+}
+
+#[test]
+fn test_unproductive_acquisition_requires_outcome_declaration() {
+    let judge = Judge::new();
+    let target1 = Target::parse("file://src/a.rs").unwrap();
+    let target2 = Target::parse("file://src/b.rs").unwrap();
+    let target3 = Target::parse("file://src/c.rs").unwrap();
+
+    let make_obs = |id: &str, target: Target| Observation {
+        id: id.to_string(),
+        source: Source {
+            kind: SourceKind::File,
+            adapter: "fff".to_string(),
+            target: target.clone(),
+            revision: Revision::new(1, None),
+            identity: ContentIdentity::from_bytes(id.as_bytes()),
+        },
+        target,
+        revision: Revision::new(1, None),
+        event: None,
+        structure: None,
+        evidence: Vec::new(),
+        content: Some(id.to_string()),
+        metadata: serde_json::json!({}),
+        provenance: Provenance {
+            actor: "agent".to_string(),
+            session_id: Some("sess_01".to_string()),
+            input_digest: None,
+            timestamp: 1,
+        },
+    };
+
+    // 1st acquisition without outcome -> Pass
+    let _ = judge.evaluate_with_confidence(make_obs("obs_1", target1));
+    // 2nd acquisition without outcome -> Pass
+    let _ = judge.evaluate_with_confidence(make_obs("obs_2", target2));
+
+    // 3rd acquisition consecutive without declaring any outcome -> RequireOutcome / Block
+    let eval3 = judge.evaluate_with_confidence(make_obs("obs_3", target3));
+    match eval3.decision {
+        AdmissionDecision::Block { target, reason } => {
+            assert_eq!(target, "file://src/c.rs");
+            assert!(reason.contains("Unproductive acquisition"));
+        }
+        other => panic!("Expected Block due to missing outcome, got {:?}", other),
+    }
+}

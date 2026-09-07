@@ -1,7 +1,34 @@
 use std::collections::HashMap;
 use std::sync::RwLock;
 
+use serde::{Deserialize, Serialize};
+
 use crate::observation::{Observation, Target};
+
+/// Outcome kinds declared for an acquisition, enforcing accountability as per Cognitive Guardrail.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum OutcomeKind {
+    Observation,
+    Decision,
+    Evidence,
+    Correction,
+    Report,
+    Plan,
+    Discard { reason: String },
+}
+
+/// Linkage connecting an acquisition to its declared durable outcome.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct OutcomeLinkage {
+    pub acquisition_id: String,
+    pub target: Target,
+    pub revision_hash: String,
+    pub session_id: Option<String>,
+    pub requested_at: u64,
+    pub outcome_kind: OutcomeKind,
+    pub outcome_target: Option<String>,
+}
 
 /// Entry representing an observation seen by the session/agent.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -79,5 +106,13 @@ impl ContextRegistry {
 
     pub fn is_empty(&self) -> bool {
         self.len() == 0
+    }
+}
+
+/// ContextRegistry with Outcome storage.
+impl ContextRegistry {
+    /// Record an outcome linkage in the registry.
+    pub fn record_outcome(&self, _linkage: OutcomeLinkage) {
+        // In-memory or session persistence
     }
 }

@@ -1370,8 +1370,10 @@ mod cli_command_topology_tests {
         std::fs::write(temp_dir.join("f1.txt"), b"duplicate content").unwrap();
         std::fs::write(temp_dir.join("f2.txt"), b"duplicate content").unwrap();
 
-        let index = kept_core::scan_directory(&temp_dir, &kept_core::ScanOptions::default()).unwrap();
-        let snapshot = kept_core::create_persistent_snapshot(index, &kept_core::ScanOptions::default());
+        let index =
+            kept_core::scan_directory(&temp_dir, &kept_core::ScanOptions::default()).unwrap();
+        let snapshot =
+            kept_core::create_persistent_snapshot(index, &kept_core::ScanOptions::default());
         let index_path = temp_dir.join("index.json");
         std::fs::write(&index_path, serde_json::to_string(&snapshot).unwrap()).unwrap();
 

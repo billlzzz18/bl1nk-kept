@@ -79,11 +79,12 @@ gantt
 *เป้าหมาย: สร้างโครงข่ายการดึงข้อมูลและกรอง context ด้วย FFF, AST และ Judge Engine*
 
 - **Scope & Deliverables:**
-  - **FFF Engine Migration:** แทนที่การท่องไดเรกทอรีแบบ recursive ดั้งเดิมด้วย FFF adapter และรองรับ persistent scan snapshot ที่สมบูรณ์
-  - **Tree-sitter AST Integration:** นำ `tree-sitter` และ `tree-sitter-rust` เข้ามาแทนที่ regex/string matching สำหรับการแยก structural symbol ของโค้ด Rust
+  - **FFF Engine & Content Grep:** นำ FFF adapter มาครอบคลุมทั้ง file traversal, snapshot และ content grep (`filesystem_grep`, `filesystem_multi_grep`)
+  - **Tree-sitter AST Integration:** นำ `tree-sitter` และ `tree-sitter-rust` เข้ามาสกัด structural symbols (`outline`, `symbol://`) แทนที่ regex
   - **Context Admission Pipeline:** ติดตั้ง Judge Engine ใน `crate/kept-core` เพื่อประเมิน diff/token cost และกำหนด treatment (`PASS`, `REFERENCE`, `DELTA`, `COMPRESS`)
-  - **Context Registry:** พัฒนาตัวจัดเก็บ context revision บน SQLite พร้อม in-memory session cache เพื่อป้องกันการอ่านไฟล์ซ้ำซ้อน
-- **Exit Gate:** การอ่านไฟล์ผ่าน `kept inspect` และเครื่องมือ MCP สามารถส่งคืน Treatment ที่ประหยัดโทเค็นได้ถูกต้องตามผลทดสอบ
+  - **Context Registry & State Tracking:** บันทึก session context และ revision changes เพื่อป้องกันการส่งต่อเนื้อหาซ้ำซ้อน
+  - **Component Benchmark (FFF vs rg):** ทำชุดทดสอบวัด throughput, latency, memory ระหว่าง FFF content grep กับ ripgrep (`rg`) บน cold/warm cache
+- **Exit Gate:** การอ่านไฟล์ผ่าน `kept inspect` และเครื่องมือ MCP สามารถส่งคืน Treatment ที่ประหยัดโทเค็นได้ถูกต้องตามผลทดสอบ พร้อมมีผลวัด latency เทียบเคียงกับ `rg`
 
 ### Phase 2: Retrieval & Semantic Search (P1 Priority)
 
@@ -92,8 +93,9 @@ gantt
 - **Scope & Deliverables:**
   - **Thai Tokenizer:** พัฒนาตัวตัดคำภาษาไทยแบบ Bigram / Maximal Matching โดยไม่พึ่งพา runtime ภายนอกที่หนักเกินไป
   - **BM25 Lexical Engine:** สร้าง full-text search index ในเครื่องที่รองรับทั้ง path, filename, และ content
-  - **Disk-backed Vector Store:** พัฒนาตัวเก็บและค้นหา embedding (เชื่อมโยงกับโมเดลโลคอล เช่น `bge-m3` ผ่าน Ollama) พร้อมกลไก reranking
-- **Exit Gate:** คำสั่ง `kept search` สามารถคืนผลลัพธ์แบบผสมผสาน (Hybrid Score) ได้แม่นยำและรวดเร็ว
+  - **Disk-backed Vector Store & Reranking:** พัฒนาตัวเก็บและค้นหา embedding (เชื่อมโยงกับโมเดลโลคอล) พร้อมกลไก reranking
+  - **Unified Retrieval Planner:** ระบบ route query อัตโนมัติ (`exact` → grep, `path` → fuzzy, `concept` → BM25, `semantic` → vector)
+- **Exit Gate:** คำสั่ง `kept search` สามารถคืนผลลัพธ์แบบผสมผสาน (Hybrid Score) ได้แม่นยำ รวดเร็ว และคืนค่าในรูปแบบ `Observation` กลาง
 
 ### Phase 3: Universal Document IR & Adapters (P1 Priority)
 

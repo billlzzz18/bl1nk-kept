@@ -257,3 +257,98 @@ Interactive TUI ใช้ domain model เดียวกับ CLI/MCP สำ�
 - `DELTA`: ข้อมูลเดิมที่มีการเปลี่ยนแปลง (ส่งคืนเฉพาะ diff)
 - `COMPRESS`: บีบอัดเนื้อหาตามโครงสร้างเมื่อคุ้มค่า
 - `WARN` / `BLOCK`: แจ้งเตือนหรือระงับเมื่อ Agent ร้องขอข้อมูลซ้ำซ้อนเกินกำหนด (threshold ≥3 ครั้ง)
+
+## 12. Content Acquisition, Retrieval & Benchmark Discipline (FFF vs Ripgrep)
+
+ระบบของ `kept` ไม่ใช่แค่ File Metadata Filter แต่เป็น **Cognitive & Context-Aware Content Engine** ที่จัดการเนื้อหาโค้ดและเอกสารแบบครบวงจร
+
+### 12.1 สถาปัตยกรรม 8 ส่วน (FFF + Tree-sitter + Search + SQZ Judge)
+
+```text
+                     KEPT
+            user/client semantics
+                      │
+                      ▼
+             ┌─────────────────┐
+             │ Request / Intent│
+             └────────┬────────┘
+                      ▼
+            ┌───────────────────┐
+            │   FFF-based Core  │
+            │ acquire + observe │
+            └─────────┬─────────┘
+                      │
+      ┌───────────────┼────────────────┐
+      ▼               ▼                ▼
+File Operations    Structure        Retrieval
+FFF primitives    Tree-sitter      grep/fuzzy
+look/view          Parser           BM25/FTS
+watch/git          symbols          vector
+diff/apply         outline          rerank
+      └───────────────┼────────────────┘
+                      ▼
+                 Observation
+                      │
+                      ▼
+              ┌───────────────┐
+              │     JUDGE     │
+              │  SQZ-derived  │
+              └───────┬───────┘
+                      │
+      ┌───────────────┼────────────────┐
+      ▼               ▼                ▼
+    reuse           delta           select
+    pass            compress        warn/error
+      └───────────────┼────────────────┘
+                      ▼
+               Context Output
+                      │
+                      ▼
+                MCP / Client
+```
+
+1. **Object กลาง (`Observation`):** ทุกกลไก acquisition (FFF, Tree-sitter, Grep, BM25, Parser) ต้องคืน `Observation` ที่มี schema เดียวกัน ประกอบด้วย:
+   - `Source`: `File`, `Grep`, `Fuzzy`, `Glob`, `Git`, `Diff`, `TreeSitter`, `Parser`, `Fts`, `Bm25`, `Vector`, `Hybrid`
+   - `Target`: Identity ที่ชัดเจน (`file://...`, `symbol://...#...`, `search://...`)
+   - `Revision` & `ContentIdentity`: แยก revision ออกจาก content digest เพื่อตรวจจับ event การแก้ไข
+   - `ContentPayload`, `Evidence`, `Provenance`
+2. **FFF Acquisition & Observation Core:**
+   - ใช้ FFF เป็น library wrap capabilities: `find`, `grep`, `glob`, `look`, `view`, `watch`, `git`, `diff`, `apply`
+   - `look`: ต้นทุนต่ำ คืน identity, size, revision, outline โดยไม่อ่านไฟล์เต็ม
+   - `view`: materialize เนื้อหาตาม range หรือ symbol
+3. **State / Event Semantic:**
+   - ติดตาม `ResourceState` (id, revision, content_identity, last_event) ร่วมกับ watcher
+   - เมื่อไฟล์เปลี่ยน `revision++` และ invalidate observation เดิมทันที ทำให้ระบบรู้ว่า context เก่าหรือใหม่โดยไม่ต้องอ่านไฟล์ซ้ำ
+4. **Structural Acquisition (Tree-sitter & Document IR):**
+   - Tree-sitter รับหน้าที่แยก structure/symbols/outline ของ source code
+   - `kept-doc` รับหน้าที่แยก structure ของ Markdown, NFM, DOCX, PDF
+   - สนับสนุนการ view เจาะจงเฉพาะ `symbol://<path>#<symbol_name>`
+5. **Unified Retrieval Engine:**
+   - รวมกลไก `grep` (exact), `fuzzy`, `BM25/FTS`, `vector`, `rerank` ภายใต้ Retrieval Planner เดียว
+   - Public intent เป็น `search(query)` หรือ `find(query)` โดยระบบเลือกกลไกภายในที่เหมาะสมที่สุด
+6. **Judge Pipeline (SQZ Decision):**
+   - ประเมินตามขั้นตอน: `VALIDATE` → `CHANGE DETECTION` → `DUPLICATE DETECTION` → `RELEVANCE/SCOPE` → `POLICY` → `TREATMENT SELECTION` → `BUDGET` → `Context Admission`
+   - คืน `Decision`: `Pass`, `Reference`, `Compress`, `Delta`, `Select`, `Summarize`, `Defer`, `Drop`, `Warn`, `Block`
+7. **Context Registry:**
+   - จดจำประวัติ `ContextEntry` ใน session ทำให้ request ใหม่สามารถเลือกระหว่าง `REFERENCE` หรือ `DELTA` ได้
+8. **Measurable Compression:**
+   - Compression ต้องเป็น treatment ที่คำนวณ token reduction ratio และ latency เทียบกับ budget จริง
+
+### 12.2 Benchmark Discipline (FFF vs Ripgrep)
+
+การพัฒนา Acquisition และ Search Engine ต้องมี Benchmark กำกับเสมอเพื่อวัดประสิทธิผลเทียบกับมาตรฐานอุตสาหกรรม (โดยเฉพาะ Ripgrep / `rg`):
+
+1. **Component Benchmark (FFF vs rg):**
+   - วัด Throughput, Latency, Memory Usage และ Streaming behavior ระหว่าง FFF grep กับ `rg` บน cold cache และ warm cache
+   - วัด Tree-sitter symbol extraction latency, BM25 indexing speed และ Compression latency
+2. **Treatment Benchmark:**
+   - วัดการประหยัดโทเค็นของแต่ละ Treatment: `PASS` vs `COMPRESS` vs `SELECT` vs `DELTA` vs `REFERENCE`
+3. **Workflow Benchmark:**
+   - วัด End-to-end task (Understand repository, Fix bug, Refactor, Repeated inquiry, Large-file navigation)
+4. **Client Impact Benchmark (เปรียบเทียบระหว่าง Client ธรรมดา กับ Client + kept):**
+   - Context emitted reduction (%)
+   - Repeated reads reduction (%)
+   - Tool calls reduction (%)
+   - Time-to-completion (%)
+   - Judge overhead latency (ms/call)
+   - Task success rate (%)

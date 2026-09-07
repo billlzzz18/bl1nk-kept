@@ -17,8 +17,9 @@ use serde_json::{json, Value};
 
 use crate::mcp::core::{McpError, McpResult};
 
-/// NOTE-001: รักษา response contract `document` และ `block_count` ให้ conversion tools ทุก platform
-/// ใช้ serialization เดียวกัน เพื่อลดความเสี่ยงที่ schema ของ MCP แต่ละ adapter จะค่อย ๆ ต่างกัน
+/// Serialize document conversion response with unified document and block_count schema.
+// NOTE-001: รักษา response contract `document` และ `block_count` ให้ conversion tools ทุก platform
+// ใช้ serialization เดียวกัน เพื่อลดความเสี่ยงที่ schema ของ MCP แต่ละ adapter จะค่อย ๆ ต่างกัน
 pub(crate) fn serialize_document_response(
     document: &kept_doc::UniversalDocument,
 ) -> McpResult<Value> {

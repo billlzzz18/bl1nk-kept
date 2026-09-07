@@ -27,7 +27,7 @@ fn internal(e: impl std::fmt::Display) -> McpError {
     McpError::internal(e.to_string())
 }
 
-/// NOTE-001: หยุดทันทีเมื่อพอตาม limit — ไม่ย่อย tree ทั้งผืนแล้วค่อยตัดทิ้ง
+// NOTE-001: หยุดทันทีเมื่อพอตาม limit — ไม่ย่อย tree ทั้งผืนแล้วค่อยตัดทิ้ง
 fn collect_markdown_files(
     dir: &Path,
     depth: usize,

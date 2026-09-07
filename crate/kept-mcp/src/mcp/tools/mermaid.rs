@@ -41,10 +41,8 @@ impl ToolHandler for RenderMermaidSvgTool {
     }
 }
 
-// NOTE: a `render_mermaid_png` tool was intentionally omitted. The underlying
-// `mermaid-rs-renderer` only produces SVG here, so a PNG tool would have to
-// return SVG under a false `format: "png"` contract. Re-add it once real PNG
-// rendering is available.
+// NOTE-001: ไม่ได้ใส่ `render_mermaid_png` เข้ามาเพราะตัว `mermaid-rs-renderer`
+// รองรับเฉพาะการแปลงเป็น SVG เท่านั้น หากคืนค่า PNG จะกลายเป็นการส่งผลลัพธ์ผิดสัญญา (false contract)
 
 /// List the Mermaid diagram types supported by the renderer.
 pub struct ListDiagramTypesTool;

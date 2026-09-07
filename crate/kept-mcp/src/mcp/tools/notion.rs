@@ -11,9 +11,8 @@ use crate::mcp::core::{
 use kept_doc::converter::markdown::MarkdownConverter;
 use kept_doc::{FromPlatform, ToPlatform};
 
-// NOTE: fetching a live page + its blocks lives in `notion_live.rs`
-// (`get_notion_page_blocks`) so it reuses the server-side `NotionClient` bound
-// to `NOTION_TOKEN` instead of accepting a token through tool arguments.
+// NOTE-001: การดึง live page และ blocks แยกไปไว้ที่ `notion_live.rs` (`get_notion_page_blocks`)
+// เพื่อนำ `NotionClient` ที่ผูกกับ `NOTION_TOKEN` มาใช้ซ้ำ แทนที่จะรับ token ผ่าน tool arguments
 
 #[derive(Debug, Deserialize)]
 struct ContentInput {

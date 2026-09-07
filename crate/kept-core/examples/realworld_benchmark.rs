@@ -56,19 +56,7 @@ fn estimate_tokens(text: &str) -> usize {
     if len == 0 {
         0
     } else {
-        {
-            let this = len;
-            let rhs = 4;
-            let d = self/rhs;
-
-            let r = self%rhs;
-
-            if r>0 {
-                d+1
-            }else {
-                d
-            }
-        }4)4)4)
+        len.div_ceil(4)
     }
 }
 

@@ -65,6 +65,7 @@ gantt
 ```
 
 ### Phase 0: Core Hardening & Quality Gate (Foundations)
+
 *เป้าหมาย: ปิดหนี้การทดสอบและวางแนวป้องกันความปลอดภัยของโค้ดให้มั่นคงก่อนขยายฟีเจอร์*
 
 - **Scope & Deliverables:**
@@ -74,6 +75,7 @@ gantt
 - **Exit Gate:** `cargo test --workspace` และ `cargo clippy --workspace` ผ่าน 100% โดยไม่มี warning ตกค้าง
 
 ### Phase 1: Intelligence Core & Context Admission (P0 Priority)
+
 *เป้าหมาย: สร้างโครงข่ายการดึงข้อมูลและกรอง context ด้วย FFF, AST และ Judge Engine*
 
 - **Scope & Deliverables:**
@@ -84,6 +86,7 @@ gantt
 - **Exit Gate:** การอ่านไฟล์ผ่าน `kept inspect` และเครื่องมือ MCP สามารถส่งคืน Treatment ที่ประหยัดโทเค็นได้ถูกต้องตามผลทดสอบ
 
 ### Phase 2: Retrieval & Semantic Search (P1 Priority)
+
 *เป้าหมาย: ยกระดับการค้นหาเอกสารและโค้ดให้เข้าใจภาษาธรรมชาติและภาษาไทยอย่างแม่นยำ*
 
 - **Scope & Deliverables:**
@@ -93,6 +96,7 @@ gantt
 - **Exit Gate:** คำสั่ง `kept search` สามารถคืนผลลัพธ์แบบผสมผสาน (Hybrid Score) ได้แม่นยำและรวดเร็ว
 
 ### Phase 3: Universal Document IR & Adapters (P1 Priority)
+
 *เป้าหมาย: รองรับการอ่าน ตรวจสอบ และแปลงเอกสารหลากฟอร์แมตเข้าสู่โมเดลกลาง (Universal IR)*
 
 - **Scope & Deliverables:**
@@ -102,6 +106,7 @@ gantt
 - **Exit Gate:** คำสั่ง `kept doc inspect` และ `kept doc convert` ผ่าน regression test กับชุด fixture เอกสารจริง
 
 ### Phase 4: Vault & Ecosystem Expansion (P2 Priority)
+
 *เป้าหมาย: สร้างระบบจัดการแพ็กเกจ vault สคริปต์อัตโนมัติ และการเชื่อมต่อภายนอก*
 
 - **Scope & Deliverables:**
@@ -147,6 +152,7 @@ gantt
 ประเด็นทางเทคนิคที่อยู่ระหว่างการวิจัยและรอการสรุปเป็น ADR ก่อนเริ่ม implementation จริง:
 
 ### Evidence System
+
 | Issue Under Investigation | Required Information Before Decision | Impacted Area |
 |---|---|---|
 | Schema and storage location for run manifest | การรันซ้ำจริง 1 รอบ, การ replay 1 ครั้ง และตัวอย่าง correction | replay, rescore, comparable gain |
@@ -157,6 +163,7 @@ gantt
 | Baseline retention & correction record schema | สถานการณ์ผลถูก supersede พร้อม run ที่ comparable/incomparable | gain scoreboard |
 
 ### PDF Adapter
+
 | Issue Under Investigation | Required Information Before Decision | Impacted Area |
 |---|---|---|
 | Version, license, and Cargo feature graph for `pdf-inspector` | การตรวจสอบ dependency audit ของ release ที่เลือก | adapter dependency declaration |
@@ -166,6 +173,7 @@ gantt
 | CLI output format | Inspection/report review พร้อม page diagnostics | `kept doc inspect-pdf` |
 
 ### Benchmark Expansion
+
 | Issue Under Investigation | Required Information Before Decision | Impacted Area |
 |---|---|---|
 | Search workload and relevance fixtures | Workload distribution จริงที่ anonymize แล้ว หรือ public corpus | recall และ latency measurement |

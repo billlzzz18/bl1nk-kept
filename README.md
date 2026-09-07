@@ -2,7 +2,7 @@
 
 [Specification](SPEC.md) · [CLI Guide](get-start.md) · [Schema](schema/README.md) · [Benchmarks](benchmarks/README.md)
 
-**bl1nk-kept** คือ Rust workspace แบบ Local-first สำหรับจัดการคลังความรู้ (Vault), ระบบไฟล์, Universal Document IR และ **Intelligent Context Admission (FFF + Tree-sitter + SQZ Judge Engine)** เพื่อให้ AI Agent ได้รับ context ที่กระชับ ตรงจุด และลด token ซ้ำซ้อน
+**bl1nk-kept** คือ Rust workspace แบบ Local-first ที่เป็นทั้ง **Cognitive & Semantic Guardrail** (ป้องกัน AI Agent ตีความคำสั่งกำกวมผิด และยับยั้งพฤติกรรมการอ่านข้อมูลสูญเปล่า) ควบคู่กับ **Intelligent Context & Knowledge Vault Management** (FFF + Tree-sitter + SQZ Judge Engine) เพื่อให้มนุษย์และ AI ทำงานร่วมกันได้อย่างแม่นยำและประหยัดโทเค็นสูงสุด
 
 ---
 

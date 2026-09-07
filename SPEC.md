@@ -8,11 +8,15 @@
 
 **สถานะงาน:** `TODO.md` เป็นแหล่งเดียวของลำดับงานและหลักฐานการปิดงาน
 
-## 1. ขอบเขตผลิตภัณฑ์
+## 1. ขอบเขตและเป้าหมายหลักของผลิตภัณฑ์ (Core Purpose & Scope)
 
-`bl1nk-kept` คือ Rust workspace สำหรับจัดการความรู้ ไฟล์ เอกสาร และแพ็กเกจของ vault แบบ local-first ภายใต้ CLI เดียวคือ `kept` และ MCP server เดียวคือ `bl1nk-kept-mcp`.
+`bl1nk-kept` คือ Rust workspace แบบ local-first ที่ถูกสร้างขึ้นมาโดยมี **เป้าหมายหลัก 2 ประการ**:
 
-ระบบมีหน้าที่ค้นหา จัดทำดัชนี แปลง ตรวจสอบ เปรียบเทียบ และให้หลักฐานอ้างอิงแก่ข้อมูล โดยไม่ทำให้ fuzzy match, synonym, transliteration หรือ hypothesis กลายเป็นข้อมูลยอมรับโดยอัตโนมัติ
+1. **Cognitive & Semantic Guardrail (ป้องกัน AI Agent เข้าใจผิดและตีความคลาดเคลื่อน):**
+   - เป็นตัวกลางแยกแยะเจตนา (Intent Disambiguation) ไม่ให้ Agent ทึกทักคำกำกวมเป็น Action ที่ตนถนัดฝ่ายเดียว (เช่น คำว่า *"ทดสอบ"* แยกแยะระหว่าง Unit Test โค้ด กับ Dogfooding/การใช้งานจริง; คำว่า *"ข้อผิดพลาด"* แยกแยะระหว่าง System Bug กับ Agent Hallucination/ทำงานไม่ตรงบรีฟ)
+   - ป้องกันพฤติกรรมสูญเปล่า (Behavioral Accountability): ยับยั้งการสแกน/อ่านข้อมูลเข้ามาสะสมในหัวโดยไม่เคยบันทึกเป็นผลลัพธ์ (Unproductive Acquisition) และยับยั้งการอ่านไฟล์ซ้ำซ้อนทั้งที่ข้อมูลยังอยู่ใน Prompt Context (In-Context Amnesia)
+2. **Intelligent Context & Knowledge Vault Management:**
+   - ค้นหา จัดทำดัชนี แปลง ตรวจสอบ เปรียบเทียบ และคัดกรอง Context สู่ AI Agent ด้วย FFF Acquisition Core และ SQZ-derived Judge Engine เพื่อให้ได้เนื้อหาที่แม่นยำ ปลอดภัย และลดโทเค็นซ้ำซ้อนสูงสุด
 
 | Crate | ความรับผิดชอบ |
 |---|---|

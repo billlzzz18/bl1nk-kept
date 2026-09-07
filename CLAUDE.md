@@ -30,11 +30,17 @@ cargo test -p kept-mcp
 
 # รัน static analysis
 cargo clippy --workspace
+
+# รันตรวจสอบแบบเร็วระหว่างพัฒนา (fmt + test เท่านั้น)
+just quick
+
+# รันตรวจสอบเอกสาร (links, version-drift, eol)
+just docs
 ```
 
 ### Full Validation Suite
 ```bash
-# รัน validation ทั้งหมดของโปรเจกต์ (format, clippy, tests, schema)
+# รัน validation เต็มรูปแบบก่อน push/release (format, clippy, tests, schema, docs)
 just check
 ```
 

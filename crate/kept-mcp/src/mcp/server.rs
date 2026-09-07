@@ -53,6 +53,12 @@ pub fn build() -> Result<Server, Box<dyn std::error::Error>> {
                 manager: fff_manager.clone(),
             },
         )
+        .tool(
+            "filesystem_acquire",
+            tools::filesystem::FilesystemAcquireTool {
+                manager: fff_manager.clone(),
+            },
+        )
         // Unified Document & Table Pipelines
         .tool("search_documents", tools::unified::SearchDocumentsTool)
         .tool("convert_document", tools::unified::ConvertDocumentTool)

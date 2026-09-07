@@ -100,4 +100,36 @@ async fn test_fff_manager_lifecycle_and_tools() {
     // 5. filesystem_rescan
     let rescan_res = manager.rescan(root_str).await.expect("rescan query");
     assert!(rescan_res.indexed_file_count >= 2);
+
+    // 6. filesystem_acquire with Context Admission Judge
+    use kept_core::context::AdmissionDecision;
+    use kept_core::scanner::fff::FffAcquisitionMode;
+
+    // First acquire -> Pass full observation
+    let decision1 = manager
+        .acquire(root_str, "src/lib.rs", FffAcquisitionMode::View)
+        .await
+        .expect("acquire 1");
+    assert!(matches!(decision1, AdmissionDecision::Pass(_)));
+
+    // Second acquire of same unchanged file -> Reference
+    let decision2 = manager
+        .acquire(root_str, "src/lib.rs", FffAcquisitionMode::View)
+        .await
+        .expect("acquire 2");
+    assert!(matches!(decision2, AdmissionDecision::Reference { .. }));
+
+    // Third acquire -> Reference
+    let decision3 = manager
+        .acquire(root_str, "src/lib.rs", FffAcquisitionMode::View)
+        .await
+        .expect("acquire 3");
+    assert!(matches!(decision3, AdmissionDecision::Reference { .. }));
+
+    // Fourth acquire -> Loop warning
+    let decision4 = manager
+        .acquire(root_str, "src/lib.rs", FffAcquisitionMode::View)
+        .await
+        .expect("acquire 4");
+    assert!(matches!(decision4, AdmissionDecision::Warn { .. }));
 }

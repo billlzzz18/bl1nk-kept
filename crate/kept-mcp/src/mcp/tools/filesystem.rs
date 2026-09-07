@@ -19,6 +19,7 @@ use serde_json::Value;
 use crate::mcp::core::{
     invalid_args, McpError, McpResult, RequestHandlerExtra, SchemaBuilder, ToolHandler, ToolInfo,
 };
+use kept_core::context::{AdmissionDecision, Judge};
 use kept_core::scanner::fff::{FffAcquisitionMode, FffScanner};
 use kept_core::scanner::types::FileRecord;
 
@@ -82,6 +83,7 @@ struct RootState {
 /// Long-running FFF Manager caching FFF instances per canonical root.
 pub struct FffManager {
     instances: Arc<RwLock<HashMap<PathBuf, Arc<RwLock<RootState>>>>>,
+    judge: Arc<Judge>,
 }
 
 impl Default for FffManager {
@@ -94,7 +96,12 @@ impl FffManager {
     pub fn new() -> Self {
         Self {
             instances: Arc::new(RwLock::new(HashMap::new())),
+            judge: Arc::new(Judge::new()),
         }
+    }
+
+    pub fn judge(&self) -> &Judge {
+        &self.judge
     }
 
     /// Canonicalize and validate a root path.
@@ -300,6 +307,25 @@ impl FffManager {
             last_error: None,
         })
     }
+
+    /// Acquire file observation and evaluate through Context Admission Judge.
+    pub async fn acquire(
+        &self,
+        root: &str,
+        path: &str,
+        mode: FffAcquisitionMode,
+    ) -> Result<AdmissionDecision, McpError> {
+        let canonical = Self::canonicalize_root(root)?;
+        let state_arc = self.get_or_create(&canonical).await?;
+        let mut state = state_arc.write().await;
+
+        let observation = state
+            .scanner
+            .acquire(path, mode)
+            .map_err(|e| McpError::internal(format!("Acquisition failed for '{path}': {e}")))?;
+
+        Ok(self.judge.evaluate(observation))
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -327,6 +353,46 @@ struct RootMultiPatternInput {
 #[derive(Deserialize)]
 struct RootOnlyInput {
     root: String,
+}
+
+#[derive(Deserialize)]
+struct RootPathInput {
+    root: String,
+    path: String,
+    mode: Option<String>,
+}
+
+/// Tool: `filesystem_acquire`
+pub struct FilesystemAcquireTool {
+    pub manager: Arc<FffManager>,
+}
+
+#[async_trait]
+impl ToolHandler for FilesystemAcquireTool {
+    async fn handle(&self, args: Value, _extra: RequestHandlerExtra) -> McpResult<Value> {
+        let input: RootPathInput =
+            serde_json::from_value(args).map_err(|e| invalid_args("Invalid args", e))?;
+        let mode = match input.mode.as_deref() {
+            Some("look") => FffAcquisitionMode::Look,
+            _ => FffAcquisitionMode::View,
+        };
+        let decision = self.manager.acquire(&input.root, &input.path, mode).await?;
+        serde_json::to_value(decision).map_err(|e| McpError::internal(e.to_string()))
+    }
+
+    fn metadata(&self) -> Option<ToolInfo> {
+        Some(ToolInfo::new(
+            "filesystem_acquire",
+            Some(
+                "Acquire file observation and evaluate through Context Admission Judge".to_string(),
+            ),
+            SchemaBuilder::new()
+                .param("root", "Absolute root directory path")
+                .param("path", "Relative file path within root")
+                .optional_param("mode", "Acquisition mode ('view' or 'look')")
+                .build(),
+        ))
+    }
 }
 
 /// Tool: `filesystem_find`

@@ -3,13 +3,13 @@
 ## 🔴 [P0] — Core Stability & Quality Baseline (ฐานรากต้องแน่นก่อน)
 
 ### 1. Handoff, สัญญา และ Governance ที่ใช้งานจริง
-- [ ] ปรับ `AGENTS.md` เมื่อเริ่ม implementation ให้มี repository map ของ FFF filesystem engine, `kept-vault`, package manifest, lockfile, package store, script runtime และ MCP tool modules ที่สร้างจริง
-- [ ] ระบุ ownership ตามโค้ดจริง: `kept-core` เป็น filesystem/vault domain, `kept-cli` เป็น command surface, `kept-mcp` เป็น long-running MCP service, `kept-doc` เป็น document conversion library
-- [ ] เพิ่มงานที่เริ่มจริงลง `TODO.md` เป็น checkbox ระดับ behavior ไม่รวม report หรือ ticket ซ้ำซ้อน
-- [ ] อัปเดต `SPEC.md` เฉพาะ public CLI/MCP/package contract ที่ implementation และ smoke proof ผ่านแล้ว
-- [ ] อัปเดต `CHANGELOG.md` เฉพาะ behavior สาธารณะที่เปลี่ยนจริงใน session นั้น
-- [ ] reconcile `.agents/MEMORY.md` ทุก requirement ที่แตะ พร้อม red test, focused test, command proof และเอกสารที่เปลี่ยน
-- [ ] รักษา flow ทุก slice เป็น TDD red → minimal implementation → focused green → command-level proof → `just check`
+- [x] ปรับ `AGENTS.md` เมื่อเริ่ม implementation ให้มี repository map ของ FFF filesystem engine, `kept-vault`, package manifest, lockfile, package store, script runtime และ MCP tool modules ที่สร้างจริง
+- [x] ระบุ ownership ตามโค้ดจริง: `kept-core` เป็น filesystem/vault domain, `kept-cli` เป็น command surface, `kept-mcp` เป็น long-running MCP service, `kept-doc` เป็น document conversion library
+- [x] เพิ่มงานที่เริ่มจริงลง `TODO.md` เป็น checkbox ระดับ behavior ไม่รวม report หรือ ticket ซ้ำซ้อน
+- [x] อัปเดต `SPEC.md` เฉพาะ public CLI/MCP/package contract ที่ implementation และ smoke proof ผ่านแล้ว
+- [x] อัปเดต `CHANGELOG.md` เฉพาะ behavior สาธารณะที่เปลี่ยนจริงใน session นั้น
+- [x] reconcile `.agents/MEMORY.md` ทุก requirement ที่แตะ พร้อม red test, focused test, command proof และเอกสารที่เปลี่ยน
+- [x] รักษา flow ทุก slice เป็น TDD red → minimal implementation → focused green → command-level proof → `just check`
 
 ### 2. Observation Contract, Evidence Model, AST และ Judge Engine ใน kept-core
 

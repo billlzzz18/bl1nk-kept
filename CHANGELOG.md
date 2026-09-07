@@ -2,35 +2,22 @@
 
 เอกสารนี้ยึดแนวคิดของ [Keep a Changelog](https://keepachangelog.com/) และใช้ semantic versioning. Public API, schema, corpus revision และค่า default ที่เปลี่ยนต้องมี release entry และหลักฐานทดสอบเสมอ.
 
-## Unreleased
+## [Unreleased]
+
+## [0.3.0] - 2026-09-07
 
 ### Added
 
-- เพิ่มคำสั่ง read-only evidence/corpus foundation: `kept evidence run|rescore|correct append|self-test` และ `kept corpus validate|snapshot save|replay`; raw evidence และ hypothesis ไม่ถูก promote อัตโนมัติ.
-- เพิ่ม optional `searchPolicy` ใน public registry contract ให้เจ้าของ registry กำหนด `fuzzyMinSimilarity` (`0.0..=1.0`), candidate limit, n-gram size และ posting cap ได้ โดย registry ที่ไม่มี policy ใช้ default เดิม.
-- เพิ่ม task-first commands `kept scan`, `find`, `review`, `duplicates`, `search` และ `convert`; `scan` สร้างหรือ refresh persistent index, `review` อ่าน index เดียวกัน และ `find`/`duplicates` ไม่ scan ซ้ำ.
-- เพิ่ม persisted `ScanIssue` เพื่อให้ index บันทึก read/metadata diagnostics และ scan ข้ามจุดที่อ่านไม่ได้แทนการยกเลิกทั้งรอบ.
-- เพิ่ม `--index <path>` สำหรับ `find`, `review` และ `duplicates` เพื่อใช้ portable snapshot ที่สร้างจาก `scan --output`.
-- เพิ่ม `kept setup`, `kept config`, `kept config edit`, `kept doctor` และ `kept doctor --fix` สำหรับ lifecycle ของ user-owned `config.yaml`: setup สร้างครั้งเดียว, config แสดงหรือเปิด editor, doctor ตรวจ config/editor และ fix เก็บ backup ก่อน restore เมื่อ config เสีย.
-- เพิ่ม naming analysis แบบ read-only ใน `kept review` จาก `config.yaml` และ ScanIndex เดิม โดยรายงาน violations, proposed target และ collision แต่ไม่มี rename/apply/rollback command.
-- เพิ่ม task-level configuration management: `kept config fields`, `config defaults`, `config profile`, `config scope`, scope exceptions และ scope overrides; ทุก mutation validate ก่อนเขียน user-owned YAML และ scope รับเฉพาะ absolute path ที่ผู้ใช้ระบุ.
-- เพิ่ม filename-token `shortcuts` ใน naming model เป็น keymap แยกจาก keyboard shortcut; merge และ read-only analysis ใช้ shortcut ก่อน aliases ตาม deterministic transform order.
-- เพิ่ม public `kept group` สำหรับดู supported field types, สร้าง/แก้/ลบ/เรียง registry groups และจัดการ group field schemas ที่ validator รองรับ.
-- เพิ่ม `.agents/REQUIREMENTS.md` และ repository contract สำหรับ agent handoff: ต้อง reconcile requirement, evidence และสถานะก่อนเริ่มหรือปิดงาน โดยคง `.learnings/` เป็น agent memory แยกจาก product documentation.
+- เพิ่ม Layer 0 Observation Contract (`Target` URI: `file://`, `symbol://`, `search://`, `context://`, `Revision`, `ContentIdentity`, `Source`, `Observation`) ใน `kept-core`.
+- เพิ่ม FFF Acquisition Adapter (`look` outline vs `view` content) ใน `kept-core::scanner::fff` แทนที่ recursive `read_dir` traversal เดิม.
+- เพิ่ม Context Admission & Judge Engine (`ContextRegistry`, `Judge`, `AdmissionDecision`: `Pass`, `Reference`, `Delta`, `Compress`, `Warn`, `Block`) ป้องกัน duplicate context dumps และตรวจจับ tool-call loops.
+- เพิ่ม unified MCP tools ใน `bl1nk-kept-mcp`: `filesystem_find`, `filesystem_grep`, `filesystem_multi_grep`, `filesystem_rescan`, `filesystem_status`, `filesystem_acquire` ที่ผูกกับ `Judge` engine.
+- เพิ่มคำสั่ง `just quick` (fmt + test) และ `just docs` (eol + links + version-check) เพื่อลดรอบเวลาการพัฒนาและรักษา `just check` เป็น pre-release gate.
 
 ### Changed
 
-- Generated Draft-07 schema และ runtime validator ปฏิเสธ `fuzzyMinSimilarity` นอกช่วง; `kept registry search` ตรวจ registry policy ก่อนสร้าง search index.
-- ซ่อน `registry`, `fs`, `doc`, `tui` และ `mcp` จาก root help; command compatibility เดิมยังรับได้สำหรับ script เดิม แต่เอกสารผู้ใช้และ help หลักใช้ task-first surface.
-- ไม่เพิ่ม `policy` command เพราะ policy เป็นโครงสร้าง configuration ภายใน; user-facing flow ใช้ `setup`, `config`, `doctor` และ `review` ตามงานที่ผู้ใช้ต้องการทำ.
-- เพิ่ม `just cli-smoke` เข้า `just check` เพื่อสร้าง binary และตรวจ root help, subcommand help, setup/config/doctor, config defaults/profile/scope, group lifecycle/schema, scan/find/review/duplicates, search และ convert บน temporary fixtures ทุกครั้ง.
-- เปลี่ยน `kept config` จาก raw YAML dump เป็น summary ของ profiles, scopes และ task-level next steps; `config edit` เหลือเป็น advanced escape hatch.
-
-### Fixed
-
-- แยก `NOTE-001` ออกจาก text ของ Clap help เพื่อไม่ให้ marker ภายในหลุดสู่ CLI.
-- คำสั่ง interactive จะเปิด dialog เฉพาะเมื่อทั้ง stdin และ stdout เป็น terminal; การใช้ pipe หรือ script จบแบบ non-interactive.
-- CSV registry import สร้าง entry object ที่มี `id` และ `aliases` array ตาม schema จึงใช้กับ `kept search` ได้หลัง import.
+- อัปเกรด Workspace version เป็น `0.3.0`.
+- ปรับโครงสร้าง `kept-cli/src/main.rs` แยกคำสั่งย่อยเข้า `src/commands/` เพื่อความกระชับและ maintainability.
 
 ## [0.2.0] — 2026-08-19
 

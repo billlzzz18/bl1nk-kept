@@ -52,6 +52,13 @@ fix-eol:
 check-eol:
     {{python}} tools/fix_line_endings.py --check
 
+# Fast developer feedback (code formatting + tests only)
+quick: fmt test
+
+# Document verification (links, version drift, eol)
+docs: check-eol links version-check
+
+# Full CI / Pre-Release validation gate
 check: fix-eol fmt test clippy repo-contract cli-smoke schema-check links version-check
 
 package:

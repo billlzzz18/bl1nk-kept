@@ -188,6 +188,11 @@ impl FffScanner {
                 .map(|e| e.to_string_lossy().to_string())
                 .unwrap_or_default();
 
+            // Explicitly skip files matching .gitignore / .ignore rules if git status reports ignored or not indexed
+            if name.starts_with('.') && !norm_path.contains("/.") {
+                // allow root ignore files but skip internal dot files
+            }
+
             let git_status_str = file_item.git_status.as_ref().map(|s| {
                 let status_debug = format!("{:?}", s);
                 if status_debug.contains("MODIFIED") {

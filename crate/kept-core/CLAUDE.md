@@ -9,9 +9,13 @@
 - `scanner/`: Filesystem traversal และ FFF wrapper
 - `foundation.rs`: Evidence classification และ verification ledger
 - `search.rs` / `semantic.rs`: Retrieval engine (BM25, Bigram, Vector)
+- `context/`: ContextRegistry, Judge และ admission decisions
+- Guardrail ต้องตัดสินก่อน acquisition callback หรือ tool dispatch
 
 ## คำสั่งทดสอบ
+
 ```bash
 cargo test -p kept-core
 cargo test -p kept-core --test <test_name>
+cargo test -p kept-core --test context_contract
 ```

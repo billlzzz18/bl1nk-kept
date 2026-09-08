@@ -40,6 +40,12 @@ just check
 
 ---
 
+## Cognitive Guardrail
+
+- อ่าน `docs/specs/cognitive_guardrail_architecture.md` ก่อนแตะ P0.1–P0.3
+- Router ต้องตัดสินก่อน acquisition หรือ tool dispatch
+- SQLite Correction Ledger เป็น enforcement authority; Vault/Markdown เป็น audit projection
+
 ## กฎการโค้ดดิ้ง (Coding Guidelines)
 - พัฒนาแบบ TDD (Red -> Green -> Refactor)
 - โค้ด Rust ต้องจัดรูปแบบตาม `rustfmt` และผ่าน `clippy` 0 warnings

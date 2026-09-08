@@ -9,6 +9,7 @@
 - **Structure:** Tree-sitter วิเคราะห์ Code AST และ `kept-doc` วิเคราะห์ Document IR
 - **Model:** แปลงข้อมูลเป็น `Observation` พร้อม `Target` URI (`file://`, `symbol://`, `document://`)
 - **Judge & Admission:** เปรียบเทียบกับ Context Registry แล้วส่ง treatment (`PASS`, `REFERENCE`, `DELTA`, `COMPRESS`) ผ่าน `kept-mcp`
+- **Tooling:** ใช้ FFF MCP (`C:\Users\Admin\AppData\Local\fff-mcp\bin\fff-mcp.exe`) สำหรับการค้นหาไฟล์และสำรวจโครงสร้างอย่างรวดเร็ว (High-performance file finder)
 
 ---
 

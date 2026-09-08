@@ -4,6 +4,11 @@
       "type": "stdio",
       "command": "./target/release/kept-mcp",
       "args": []
+    },
+    "fff": {
+      "type": "stdio",
+      "command": "C:\\Users\\Admin\\AppData\\Local\\fff-mcp\\bin\\fff-mcp.exe",
+      "args": []
     }
   }
 }

@@ -217,11 +217,14 @@ mod tests {
     }
 
     #[test]
-    fn lru_eviction() {
-        let mut registry = ContextRegistry::with_capacity(2);
+    fn lru_eviction() -> Result<(), Box<dyn std::error::Error>> {
+        let registry = ContextRegistry::with_capacity(2);
         // Manually insert entries
         {
-            let mut guard = registry.entries.write().unwrap();
+            let mut guard = registry
+                .entries
+                .write()
+                .map_err(|error| std::io::Error::other(error.to_string()))?;
             guard.insert(
                 "a".into(),
                 SeenEntry {
@@ -253,7 +256,10 @@ mod tests {
 
         // Add one more to exceed capacity
         {
-            let mut guard = registry.entries.write().unwrap();
+            let mut guard = registry
+                .entries
+                .write()
+                .map_err(|error| std::io::Error::other(error.to_string()))?;
             guard.insert(
                 "c".into(),
                 SeenEntry {
@@ -274,5 +280,6 @@ mod tests {
         assert!(registry.lookup("a").is_none()); // oldest evicted
         assert!(registry.lookup("b").is_some());
         assert!(registry.lookup("c").is_some());
+        Ok(())
     }
 }

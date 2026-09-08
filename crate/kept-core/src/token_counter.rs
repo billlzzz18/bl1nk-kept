@@ -1,9 +1,9 @@
-/// LLM token counter — ported from SQZ token_counter.rs
-/// Source: D:\01work\Active\references\campbellr\sqz\sqz_engine\src\token_counter.rs
-///
-/// Uses tiktoken BPE singletons for exact counting.
-/// Supports cl100k_base (GPT-4/Claude) and o200k_base (GPT-4o/o1/o3).
-/// Fast fallback: ceil(chars / 4) for unknown models.
+//! LLM token counter — ported from SQZ token_counter.rs
+//! Source: D:\01work\Active\references\campbellr\sqz\sqz_engine\src\token_counter.rs
+//!
+//! Uses tiktoken BPE singletons for exact counting.
+//! Supports cl100k_base (GPT-4/Claude) and o200k_base (GPT-4o/o1/o3).
+//! Fast fallback: ceil(chars / 4) for unknown models.
 
 /// Encoding model family — determines which BPE vocabulary to use.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

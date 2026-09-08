@@ -110,7 +110,7 @@ impl RegretTracker {
     /// Top N most regretted content IDs.
     pub fn most_regretted(&self, top_n: usize) -> Vec<(&str, &ContentProfile)> {
         let mut sorted: Vec<_> = self.profiles.iter().map(|(k, v)| (k.as_str(), v)).collect();
-        sorted.sort_by(|a, b| b.1.regret_count.cmp(&a.1.regret_count));
+        sorted.sort_by_key(|entry| std::cmp::Reverse(entry.1.regret_count));
         sorted.truncate(top_n);
         sorted
     }

@@ -1,10 +1,10 @@
-/// Content-aware compression mode router — ported from SQZ confidence_router.rs
-/// Source: D:\01work\Active\references\campbellr\sqz\sqz_engine\src\confidence_router.rs
-///
-/// Analyzes input content and selects compression aggressiveness:
-/// - High-risk (stack traces, configs, secrets, legal) → Safe
-/// - Low-entropy repetitive content → Aggressive
-/// - Normal content → Default
+//! Content-aware compression mode router — ported from SQZ confidence_router.rs
+//! Source: D:\01work\Active\references\campbellr\sqz\sqz_engine\src\confidence_router.rs
+//!
+//! Analyzes input content and selects compression aggressiveness:
+//! - High-risk (stack traces, configs, secrets, legal) → Safe
+//! - Low-entropy repetitive content → Aggressive
+//! - Normal content → Default
 
 /// Compression mode selected by the router.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -138,9 +138,10 @@ impl ContentRouter {
 
 /// Heuristic: does this content look like a git commit log?
 fn looks_like_commit_log(lower: &str) -> bool {
-    let lines: Vec<&str> = lower.lines().take(10).collect();
+    let mut line_count = 0;
     let mut commit_lines = 0;
-    for line in &lines {
+    for line in lower.lines().take(10) {
+        line_count += 1;
         let trimmed = line.trim();
         if trimmed.len() > 8 && trimmed[..7].chars().all(|c| c.is_ascii_hexdigit()) {
             commit_lines += 1;
@@ -158,7 +159,7 @@ fn looks_like_commit_log(lower: &str) -> bool {
             commit_lines += 1;
         }
     }
-    commit_lines > 0 && commit_lines >= lines.len() / 3
+    commit_lines > 0 && commit_lines >= line_count / 3
 }
 
 /// Shannon entropy in bits per character.

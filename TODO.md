@@ -122,14 +122,35 @@
 
 #### 2.3.3 P0.3 Semantic & Scope Disambiguation
 
-* [ ] ออกแบบ test cases สำหรับคำที่มีความหมายกำกวม (เช่น "ทดสอบ", "ปัญหา", "ลบ") Assert ว่าต้องคืน `Resolve` พร้อมช้อยส์ และไม่ dispatch tool ไปเอง (Red)
-* [ ] พัฒนาระบบ Intent Disambiguation: Two-tier check (Tier 1 literal rule -> Tier 2 intent congruence เทียบกับเป้าหมายเซสชัน) (Green)
-* [ ] พัฒนาระบบ Scope Resolution: บังคับ canonical explicit scope, สกัดกั้น implicit/wider scope ก่อนเข้าถึง filesystem (Green)
-* [ ] ติดตั้ง `override_rate` metric เพื่อวัดสถิติการ override กฎ ป้องกันการร้องเตือนพร่ำเพรื่อ (Refactor)
-* [ ] Dogfooding ครอบคลุม taxonomy ทั้ง 4 หมวด และยืนยันว่า agent ไม่เดาคำกำกวมเป็น action โปรดของตัวเอง (Verified)
-* [ ] Reconcile บันทึกหลักฐานใน `.agents/MEMORY.md` และรัน `just check` (Reconcile)
+* [x] ออกแบบ test cases สำหรับคำที่มีความหมายกำกวม (เช่น "ทดสอบ", "ปัญหา", "ลบ") Assert ว่าต้องคืน `Resolve` พร้อมช้อยส์ และไม่ dispatch tool ไปเอง (Red)
+* [x] พัฒนาระบบ Intent Disambiguation: Two-tier check (Tier 1 literal rule -> Tier 2 intent congruence เทียบกับเป้าหมายเซสชัน) (Green)
+* [x] พัฒนาระบบ Scope Resolution: บังคับ canonical explicit scope, สกัดกั้น implicit/wider scope ก่อนเข้าถึง filesystem (Green)
+* [x] ติดตั้ง `override_rate` metric เพื่อวัดสถิติการ override กฎ ป้องกันการร้องเตือนพร่ำเพรื่อ (Refactor)
+* [x] Dogfooding ครอบคลุม taxonomy ทั้ง 4 หมวด และยืนยันว่า agent ไม่เดาคำกำกวมเป็น action โปรดของตัวเอง (Verified)
+* [x] Reconcile บันทึกหลักฐานใน `.agents/MEMORY.md` และรัน `just check` (Reconcile)
 
----
+#### 2.4 SQZ Integration: Port Core Functions into kept-core
+
+* [x] port `token_counter.rs` (BPE counting ผ่าน tiktoken-rs) เข้า kept-core (Ported)
+* [x] port `content_router.rs` (Safe/Default/Aggressive routing ตาม risk + entropy) เข้า kept-core (Ported)
+* [x] port `regret_tracker.rs` (learn from re-reads, per-content aggressiveness) เข้า kept-core (Ported)
+* [x] เพิ่ม SHA-256 hashing + LRU eviction ใน `ContextRegistry` (Ported)
+* [ ] port `session_store.rs` (SQLite persistence ข้าม session) เข้า kept-core
+* [ ] re-export kept-grammar types ผ่าน kept-core/lib.rs (incremental migration)
+
+#### 2.5 kept-grammar Crate Separation
+
+* [x] สร้าง `kept-grammar` crate: types, config I/O, validation rules (Created)
+* [ ] เพิ่ม tests ใน kept-grammar (config load/save, validation edge cases)
+* [ ] ย้าย validation functions จาก kept-core/policy.rs ไป kept-grammar (incremental)
+
+#### 2.6 CLI/MCP Architecture Separation
+
+* [ ] เพิ่ม `kept status` — show scan state, regret stats, token savings, active sessions
+* [ ] เพิ่ม `kept strip` — strip context ด้วย treatment (Pass/Reference/Delta/Compress)
+* [ ] แยก MCP tools: filesystem_* (agent runtime) vs convert/diff (agent runtime)
+* [ ] ย้าย Evidence/Corpus ให้ชัดเจนเป็น CLI-only (agent bootstrap)
+* [ ] เพิ่ม dashboard/strip สำหรับ show status---
 
 ## 🟠 [P1] — Filesystem & MCP Pipeline (ระบบรับส่งข้อมูลและ Agent Tools)
 

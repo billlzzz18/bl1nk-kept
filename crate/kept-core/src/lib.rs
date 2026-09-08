@@ -1,4 +1,5 @@
 pub mod analyzer;
+pub mod content_router;
 pub mod context;
 pub mod error;
 pub mod foundation;
@@ -6,11 +7,13 @@ pub mod keyboard;
 pub mod migration;
 pub mod observation;
 pub mod policy;
+pub mod regret_tracker;
 pub mod scanner;
 pub mod schema;
 pub mod search;
 pub mod semantic;
 pub mod source_graph;
+pub mod token_counter;
 pub mod validator;
 
 pub use analyzer::RegistryAnalyzer;

@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "crate/kept-grammar",
     "crate/kept-core",
     "crate/kept-doc",
     "crate/kept-cli",
@@ -57,6 +58,12 @@ similar = "3"
 lopdf = "0.44"
 docx-rs = "0.4"
 pmcp = "2.10"
+
+# SQZ Engine (reference only — functions ported into kept-core)
+# Source: D:\01work\Active\references\campbellr\sqz
+
+# Grammar types (keyword validation, naming profiles, config resolution)
+kept-grammar = { path = "crate/kept-grammar" }
 
 [profile.release]
 opt-level = 3

@@ -22,9 +22,11 @@ reqwest.workspace = true
 anyhow.workspace = true
 chrono.workspace = true
 sha2 = "0.10.9"
+kept-grammar.workspace = true
 fff-search.workspace = true
 rusqlite.workspace = true
 uuid.workspace = true
+tiktoken-rs = "0.6"
 
 [dev-dependencies]
 jsonschema = { version = "0.49.9", default-features = false }

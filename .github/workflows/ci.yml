@@ -36,9 +36,13 @@ permissions:
 
 jobs:
   verify:
-    name: Verify
-    runs-on: ubuntu-latest
+    name: Verify (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
 
@@ -48,27 +52,52 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
+      - uses: mozilla-actions/sccache-action@v0.0.6
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
+      - name: Set python command
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            echo "PY=python" >> "$GITHUB_ENV"
+          else
+            echo "PY=python3" >> "$GITHUB_ENV"
+          fi
+
+      - name: Set sccache env
+        shell: bash
+        run: |
+          echo "SCCACHE_GHA_ENABLED=true" >> "$GITHUB_ENV"
+          echo "RUSTC_WRAPPER=sccache" >> "$GITHUB_ENV"
+
       # Fast Fail: Format & Lint first (fails in seconds if styled wrong)
       - name: Format check
+        shell: bash
         run: cargo fmt --all -- --check
 
       - name: Rust lint (Clippy)
+        shell: bash
         run: cargo clippy --workspace --all-targets -- -D warnings
 
       # Test suite
       - name: Rust tests
+        shell: bash
         run: cargo test --workspace
 
       # Schema & Integrity contracts
       - name: Repository contracts
-        run: python3 -m unittest discover -s tests -p "test_*.py"
+        shell: bash
+        run: ${{ env.PY }} -m unittest discover -s tests -p "test_*.py"
 
       - name: Public schema drift
-        run: cargo run -q -p kept-core --example export_schema > /tmp/keyword-registry.schema.json && cmp -s /tmp/keyword-registry.schema.json schema/keyword-registry.schema.json
+        shell: bash
+        run: |
+          cargo run -q -p kept-core --example export_schema > /tmp/keyword-registry.schema.json
+          cmp -s /tmp/keyword-registry.schema.json schema/keyword-registry.schema.json
 
       - name: Version contract
-        run: python3 tools/check_version_contract.py
+        shell: bash
+        run: ${{ env.PY }} tools/check_version_contract.py

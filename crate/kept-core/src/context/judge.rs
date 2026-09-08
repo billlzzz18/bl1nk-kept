@@ -36,6 +36,17 @@ pub enum AdmissionDecision {
     Warn { target: String, warning: String },
     /// Dangerous operation or violation blocked.
     Block { target: String, reason: String },
+    /// Ambiguous term or intent detected; return structured choices to caller instead of
+    /// dispatching an action autonomously. Tier 1 (literal rule) — Tier 2 (intent congruence)
+    /// is delegated to the host-agent Skill/Hook layer per ADR 0004.
+    Resolve {
+        /// The ambiguous term that triggered resolution.
+        term: String,
+        /// Possible interpretations ranked by likelihood.
+        choices: Vec<String>,
+        /// Hint for the host agent to surface choices to user or LLM.
+        hint: String,
+    },
 }
 
 /// Evaluation result containing the decision, a calibrated confidence score, and rationale.
@@ -46,7 +57,56 @@ pub struct AdmissionEvaluation {
     pub rationale: String,
 }
 
-/// The Judge admission engine inspired by SQZ CacheManager and ConfidenceRouter.
+// NOTE-008: AMBIGUOUS_TERMS เป็น Tier 1 literal rule table — (term, [choices], hint)
+// Tier 2 (intent congruence กับ session goal) เป็น host-agent Skill/Hook ตาม ADR 0004
+// ห้ามเพิ่ม LLM call ใน kept-core เพื่อทำ Tier 2
+static AMBIGUOUS_TERMS: &[(&str, &[&str], &str)] = &[
+    (
+        "ทดสอบ",
+        &[
+            "dogfood — รันลองใช้ CLI จริงบน workspace",
+            "cargo test — รัน unit/integration tests",
+            "manual verification — ตรวจผลด้วยตาและเทียบกับ spec",
+        ],
+        "คำว่า 'ทดสอบ' มีหลายความหมาย กรุณาระบุว่าต้องการทำอะไร",
+    ),
+    (
+        "ปัญหา",
+        &[
+            "hallucination — agent คิดไปเองไม่มีหลักฐาน",
+            "syntax error / compile error — โค้ดไม่ compile",
+            "task mismatch — งานไม่ตรงบรีฟ",
+            "hang / timeout — คำสั่งค้างไม่สำเร็จ",
+        ],
+        "คำว่า 'ปัญหา' หมายถึงอะไร กรุณาระบุให้ชัดเจน",
+    ),
+    (
+        "ลบ",
+        &[
+            "delete file — ลบไฟล์ออกจาก filesystem",
+            "remove config entry — ลบค่าออกจาก config.yaml",
+            "discard plan — ยกเลิกแผนที่ร่างไว้",
+            "uninstall package — ถอน package ออกจาก vault",
+        ],
+        "คำว่า 'ลบ' มีหลายความหมายและบางอย่างเป็น mutation ถาวร กรุณาระบุให้ชัด",
+    ),
+    (
+        "ทั้งหมด",
+        &[
+            "current file — เฉพาะไฟล์ที่กำลังแก้ไข",
+            "current module — เฉพาะ module ปัจจุบัน",
+            "workspace — ทั้ง workspace ที่ระบุ",
+            "all crates — ทุก crate ใน Cargo workspace",
+        ],
+        "คำว่า 'ทั้งหมด' มี scope กว้างต่างกัน กรุณาระบุ scope ให้ชัดเจน",
+    ),
+];
+
+/// Implicit wider scopes ที่ต้องถูก Block เนื่องจากขัด CLI-004 (canonical explicit scope)
+static IMPLICIT_WIDER_SCOPES: &[&str] = &["/", "~", "$HOME", "", "."];
+
+/// Judge admission engine — ported from SQZ ConfidenceRouter + CacheManager.
+/// Source: D:\01work\Active\references\campbellr\sqz\sqz_engine\src\confidence_router.rs
 pub struct Judge {
     registry: ContextRegistry,
     // NOTE-006: ตัวกรอง correction ledger เป็น optional เพื่อไม่ให้ Judge::new() เดิม break
@@ -55,6 +115,9 @@ pub struct Judge {
     wasted_call_count: std::sync::atomic::AtomicUsize,
     consecutive_acquisitions: std::sync::atomic::AtomicUsize,
     consecutive_limit: usize,
+    // NOTE-008: metric สำหรับ override_rate — นับครั้งที่กฎถูก override และ evaluate ทั้งหมด
+    override_count: std::sync::atomic::AtomicUsize,
+    total_evaluated: std::sync::atomic::AtomicUsize,
 }
 
 impl Default for Judge {
@@ -72,6 +135,8 @@ impl Judge {
             wasted_call_count: std::sync::atomic::AtomicUsize::new(0),
             consecutive_acquisitions: std::sync::atomic::AtomicUsize::new(0),
             consecutive_limit: 3,
+            override_count: std::sync::atomic::AtomicUsize::new(0),
+            total_evaluated: std::sync::atomic::AtomicUsize::new(0),
         }
     }
 
@@ -89,6 +154,8 @@ impl Judge {
             wasted_call_count: std::sync::atomic::AtomicUsize::new(0),
             consecutive_acquisitions: std::sync::atomic::AtomicUsize::new(0),
             consecutive_limit: 3,
+            override_count: std::sync::atomic::AtomicUsize::new(0),
+            total_evaluated: std::sync::atomic::AtomicUsize::new(0),
         }
     }
 
@@ -333,5 +400,80 @@ impl Judge {
             confidence: 0.95,
             rationale: "Provenance verified".to_string(),
         }
+    }
+
+    // NOTE-009: Tier 1 literal disambiguation — ตรวจคำกำกวมจาก AMBIGUOUS_TERMS table
+    // คืน Resolve พร้อมช้อยส์ถ้าตรงกับคำในตาราง, คืน Allow ถ้าไม่กำกวม
+    // Tier 2 (intent congruence กับ session goal) เป็นของ host-agent Skill/Hook ตาม ADR 0004
+    /// Evaluate whether a term is ambiguous and must be clarified before dispatch.
+    ///
+    /// Returns `Resolve` with ranked choices when the term is in the Tier 1 ambiguous-word
+    /// table, or `Allow` when the term is unambiguous and safe to act on directly.
+    pub fn evaluate_intent(&self, term: &str, _action: &str) -> AdmissionDecision {
+        self.total_evaluated
+            .fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+
+        for (ambiguous_term, choices, hint) in AMBIGUOUS_TERMS {
+            if *ambiguous_term == term {
+                return AdmissionDecision::Resolve {
+                    term: term.to_string(),
+                    choices: choices.iter().map(|s| s.to_string()).collect(),
+                    hint: hint.to_string(),
+                };
+            }
+        }
+
+        AdmissionDecision::Allow
+    }
+
+    // NOTE-010: Scope Resolution — บังคับ canonical explicit scope ตาม CLI-004
+    // สกัดกั้น implicit/wider scope (/, ~, $HOME, .) ก่อนเข้าถึง filesystem
+    /// Evaluate whether a scope path is an explicit canonical scope.
+    ///
+    /// Returns `Block` for implicit or overly wide scopes (e.g. `/`, `~`, `.`).
+    /// Returns `Allow` for explicit absolute paths that are not root or home shortcuts.
+    pub fn evaluate_scope(&self, scope: &str, _tool: &str) -> AdmissionDecision {
+        self.total_evaluated
+            .fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+
+        let normalized = scope.trim();
+        if IMPLICIT_WIDER_SCOPES.contains(&normalized) {
+            return AdmissionDecision::Block {
+                target: normalized.to_string(),
+                reason: format!(
+                    "Implicit wider scope '{}' is not allowed. \
+                    Provide an explicit canonical absolute path chosen by the user (CLI-004).",
+                    normalized
+                ),
+            };
+        }
+
+        AdmissionDecision::Allow
+    }
+
+    // NOTE-011: override_rate metric — ป้องกัน rule ที่ trigger พร่ำเพรื่อ (2.3.3 Refactor)
+    // อัตราส่วน override ต่อ total evaluation — ควรอยู่ใกล้ 0.0 ในสภาวะปกติ
+    /// Returns the ratio of overridden evaluations to total evaluations.
+    ///
+    /// A high rate indicates rules are firing too aggressively and may need calibration.
+    pub fn override_rate(&self) -> f64 {
+        let total = self
+            .total_evaluated
+            .load(std::sync::atomic::Ordering::SeqCst);
+        if total == 0 {
+            return 0.0;
+        }
+        let overrides = self
+            .override_count
+            .load(std::sync::atomic::Ordering::SeqCst);
+        overrides as f64 / total as f64
+    }
+
+    /// Increment the override counter when a rule decision is explicitly overridden by the caller.
+    pub fn record_override(&self) {
+        self.override_count
+            .fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+        self.total_evaluated
+            .fetch_add(1, std::sync::atomic::Ordering::SeqCst);
     }
 }

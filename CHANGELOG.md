@@ -6,6 +6,32 @@
 
 ### Added
 
+- เพิ่ม `kept-grammar` crate: แยก types, config I/O, validation rules สำหรับ keyword grammar ออกจาก kept-core
+- เพิ่ม `token_counter.rs` ใน kept-core: BPE token counting จริงผ่าน tiktoken-rs (cl100k, o200k, fast fallback) — ported จาก SQZ
+- เพิ่ม `content_router.rs` ใน kept-core: content-aware admission routing (Safe/Default/Aggressive) ตาม risk patterns + Shannon entropy — ported จาก SQZ
+- เพิ่ม `regret_tracker.rs` ใน kept-core: learn from re-reads/verifier fallbacks/information loss, per-content aggressiveness profiles — ported จาก SQZ
+- เพิ่ม `sha256_hex()` และ `ref_prefix()` ใน `ContextRegistry`: SHA-256 content-hash dedup พร้อม inline `§ref:HASH§` references — ported จาก SQZ CacheManager
+- เพิ่ม LRU eviction ใน `ContextRegistry`: ลบ entries เก่าเมื่อเกิน capacity
+- เพิ่ม `lookup_by_hash()` ใน `ContextRegistry`: dedup by content hash ไม่ใช่ URI
+- เพิ่ม Windows matrix ใน CI: `ubuntu-latest` + `windows-latest` พร้อม `fail-fast: false`
+- เพิ่ม `sccache` ใน CI ผ่าน `mozilla-actions/sccache-action@v0.0.6`
+- เพิ่ม `* text=auto eol=lf` ใน `.gitattributes` สำหรับ cross-platform line ending normalization
+- เพิ่ม `MAVIS_ACP_COMMAND` ใน `.env` สำหรับ Mavis skill runtime
+
+### Changed
+
+- CI verify job ใช้ `shell: bash` ทุก step เพื่อข้าม platform (Windows/Linux)
+- CI auto-detect python command (`python` บน Windows, `python3` บน Linux)
+- ลบ dead Cargo.lock drift check (`cmp -s`) ออกจาก CI — lock ไม่ track จึงไม่มีผลจริง
+- ปรับ `.gitattributes` เพิ่ม `*.zip binary` สำหรับ codeql-db/src.zip
+- SQZ source เก็บเฉพาะ reference ที่ `D:\01work\Active\references\campbellr\sqz\` — ไม่ vendor
+
+### Fixed
+
+- แก้ Mavis CLI Windows compatibility: เพิ่ม Winsock init (WSAStartup) + threading-based readline แทน selectors (selectors ใช้ได้แค่ sockets บน Windows)
+- ลบ broken symlink `composio` ที่ทำให้ skill traverse crash
+- ติดตั้ง Claude Code v2.1.263 ผ่าน winget (Anthropic.ClaudeCode)
+
 - เพิ่มคำสั่ง read-only evidence/corpus foundation: `kept evidence run|rescore|correct append|self-test` และ `kept corpus validate|snapshot save|replay`; raw evidence และ hypothesis ไม่ถูก promote อัตโนมัติ.
 - เพิ่ม optional `searchPolicy` ใน public registry contract ให้เจ้าของ registry กำหนด `fuzzyMinSimilarity` (`0.0..=1.0`), candidate limit, n-gram size และ posting cap ได้ โดย registry ที่ไม่มี policy ใช้ default เดิม.
 - เพิ่ม task-first commands `kept scan`, `find`, `review`, `duplicates`, `search` และ `convert`; `scan` สร้างหรือ refresh persistent index, `review` อ่าน index เดียวกัน และ `find`/`duplicates` ไม่ scan ซ้ำ.

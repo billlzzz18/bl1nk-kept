@@ -344,3 +344,121 @@ fn test_judge_allows_observation_not_conflicting_with_ledger() {
         eval.decision
     );
 }
+
+// ---------------------------------------------------------------------------
+// 2.3.3 P0.3 Semantic & Scope Disambiguation — Red tests (TDD)
+// ---------------------------------------------------------------------------
+
+/// คำว่า "ทดสอบ" กำกวม — ต้องคืน Resolve พร้อมช้อยส์ ไม่ dispatch tool เอง
+#[test]
+fn test_resolve_returned_for_ambiguous_term_test() {
+    let judge = Judge::new();
+    let decision = judge.evaluate_intent("ทดสอบ", "run");
+    match decision {
+        AdmissionDecision::Resolve { term, choices, .. } => {
+            assert_eq!(term, "ทดสอบ");
+            assert!(
+                !choices.is_empty(),
+                "Resolve must carry at least one choice for the caller"
+            );
+        }
+        other => panic!(
+            "Expected Resolve for ambiguous term 'ทดสอบ', got {:?}",
+            other
+        ),
+    }
+}
+
+/// คำว่า "ปัญหา" กำกวม — ต้องคืน Resolve พร้อมช้อยส์ ไม่ dispatch tool เอง
+#[test]
+fn test_resolve_returned_for_ambiguous_term_problem() {
+    let judge = Judge::new();
+    let decision = judge.evaluate_intent("ปัญหา", "diagnose");
+    match decision {
+        AdmissionDecision::Resolve { term, choices, .. } => {
+            assert_eq!(term, "ปัญหา");
+            assert!(
+                !choices.is_empty(),
+                "Resolve must carry at least one choice for the caller"
+            );
+        }
+        other => panic!(
+            "Expected Resolve for ambiguous term 'ปัญหา', got {:?}",
+            other
+        ),
+    }
+}
+
+/// คำว่า "ลบ" กำกวม เพราะอาจหมายถึง delete file, remove config, discard plan
+/// ต้องคืน Resolve พร้อมช้อยส์ ห้าม dispatch mutation เอง
+#[test]
+fn test_resolve_returned_for_ambiguous_term_delete() {
+    let judge = Judge::new();
+    let decision = judge.evaluate_intent("ลบ", "delete");
+    match decision {
+        AdmissionDecision::Resolve { term, choices, .. } => {
+            assert_eq!(term, "ลบ");
+            assert!(
+                !choices.is_empty(),
+                "Resolve must carry at least one choice for the caller"
+            );
+        }
+        other => panic!("Expected Resolve for ambiguous term 'ลบ', got {:?}", other),
+    }
+}
+
+/// คำว่า "scan" ไม่กำกวม — ต้องคืน Allow ไม่ใช่ Resolve
+#[test]
+fn test_unambiguous_term_returns_allow() {
+    let judge = Judge::new();
+    let decision = judge.evaluate_intent("scan", "filesystem_find");
+    assert!(
+        matches!(decision, AdmissionDecision::Allow),
+        "Expected Allow for clear term 'scan', got {:?}",
+        decision
+    );
+}
+
+/// override_rate เริ่มต้นที่ 0.0 เมื่อยังไม่มีการ evaluate ใดๆ
+#[test]
+fn test_override_rate_starts_at_zero() {
+    let judge = Judge::new();
+    assert_eq!(
+        judge.override_rate(),
+        0.0,
+        "Fresh Judge must have override_rate = 0.0"
+    );
+}
+
+/// scope ที่เป็น implicit wider scope ต้องถูก Block
+/// เช่น action ที่อ้างถึง "/" หรือ home directory โดยไม่มี explicit canonical scope
+#[test]
+fn test_scope_resolution_blocks_implicit_wider_scope() {
+    let judge = Judge::new();
+    let decision = judge.evaluate_scope("/", "filesystem_find");
+    match decision {
+        AdmissionDecision::Block { reason, .. } => {
+            assert!(
+                !reason.is_empty(),
+                "Block for implicit wider scope must carry a reason"
+            );
+        }
+        other => panic!(
+            "Expected Block for implicit wider scope '/', got {:?}",
+            other
+        ),
+    }
+}
+
+/// scope ที่เป็น absolute canonical path ภายใน workspace ต้องได้ Allow
+#[test]
+fn test_scope_resolution_allows_explicit_canonical_scope() {
+    let judge = Judge::new();
+    // Canonical explicit scope: absolute path ที่ผู้ใช้กำหนดเอง ไม่ใช่ root/home
+    let decision = judge.evaluate_scope("/home/user/projects/bl1nk-kept/src", "filesystem_find");
+    assert!(
+        matches!(decision, AdmissionDecision::Allow),
+        "Expected Allow for explicit canonical scope, got {:?}",
+        decision
+    );
+}

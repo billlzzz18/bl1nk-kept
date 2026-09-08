@@ -7,6 +7,8 @@ use crate::observation::Observation;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "action", content = "payload", rename_all = "snake_case")]
 pub enum AdmissionDecision {
+    /// Action or dispatch is allowed without an attached observation.
+    Allow,
     /// Pass observation full content directly.
     Pass(Box<Observation>),
     /// Content was seen before with identical revision/hash; emit compact reference instead.
@@ -167,5 +169,94 @@ impl Judge {
     /// Evaluate an observation against the context history and produce an admission decision.
     pub fn evaluate(&self, observation: Observation) -> AdmissionDecision {
         self.evaluate_with_confidence(observation).decision
+    }
+
+    // NOTE-003: สกัดกั้นพฤติกรรม Agent ที่ทำงานล้มเหลว (value_produced = 0) แต่พยายามเขียนข้อความแก้ตัวหรือประจานความผิดพลาดของตัวเองยาวเหยียด
+    /// Evaluate output payload from an agent or subagent before emitting to the user.
+    /// Rejects shameless verbosity and self-commentary when zero value is produced.
+    pub fn evaluate_output_payload(&self, text: &str, value_produced: usize) -> AdmissionEvaluation {
+        if value_produced == 0 && text.chars().count() > 120 {
+            // Check for self-commentary / failure excuses
+            let failure_markers = ["รอบนี้ผลจริง", "คุณค่าตอนนี้ติดลบ", "ความผิดพลาด", "ล้มเหลว", "เสียเวลา"];
+            let contains_excuses = failure_markers.iter().any(|m| text.contains(m));
+            if contains_excuses || text.len() > 200 {
+                return AdmissionEvaluation {
+                    decision: AdmissionDecision::Block {
+                        target: "agent_output".to_string(),
+                        reason: "Shameless failure verbosity: agent produced zero value but generated self-commentary or verbose excuses".to_string(),
+                    },
+                    confidence: 0.99,
+                    rationale: "Behavioral guardrail: reject shameless failure reports and verbosity when task failed".to_string(),
+                };
+            }
+        }
+
+        AdmissionEvaluation {
+            decision: AdmissionDecision::Allow,
+            confidence: 1.0,
+            rationale: "Output admitted".to_string(),
+        }
+    }
+
+    // NOTE-004: สกัดกั้นการ spawn subagent อย่างฟุ่มเฟือยสำหรับงานที่ต้องการเพียงคำอธิบายทั่วไป
+    /// Evaluate tool dispatch intention against requested intent.
+    /// Blocks proportional sprawl (e.g. spawning subagents for simple explanation tasks).
+    pub fn evaluate_dispatch(&self, intent: &str, tool_name: &str) -> AdmissionEvaluation {
+        let is_simple_intent = intent.starts_with("explain") || intent.starts_with("read") || intent.starts_with("summary");
+        let is_heavy_tool = tool_name == "spawn_subagent" || tool_name == "run_workflow" || tool_name == "multi_agent_orchestrate";
+
+        if is_simple_intent && is_heavy_tool {
+            return AdmissionEvaluation {
+                decision: AdmissionDecision::Block {
+                    target: tool_name.to_string(),
+                    reason: "Subagent spawning blocked for simple explanation or reading tasks. Answer directly.".to_string(),
+                },
+                confidence: 1.0,
+                rationale: "Proportional complexity guardrail: simple tasks must not spawn subagents".to_string(),
+            };
+        }
+
+        AdmissionEvaluation {
+            decision: AdmissionDecision::Allow,
+            confidence: 0.95,
+            rationale: "Dispatch permitted".to_string(),
+        }
+    }
+
+    // NOTE-005: สกัดกั้นการแต่งเรื่อง (Fabrication / Extrapolation) ที่ไม่มี Provenance ชี้กลับไปยังข้อมูลจริง
+    /// Evaluate whether generated assertions or narrative are backed by provenance evidence.
+    /// Blocks unfounded narrative extrapolation.
+    pub fn evaluate_content_provenance(&self, text: &str, raw_provenance_uris: &[String]) -> AdmissionEvaluation {
+        if raw_provenance_uris.is_empty() {
+            return AdmissionEvaluation {
+                decision: AdmissionDecision::Block {
+                    target: "unfounded_narrative".to_string(),
+                    reason: "Unfounded fabrication without raw data provenance: missing source evidence URIs".to_string(),
+                },
+                confidence: 0.95,
+                rationale: "Accountability guardrail: assertions must cite raw evidence".to_string(),
+            };
+        }
+
+        // Detect narrative extrapolation keywords
+        let extrapolation_keywords = ["extrapolate", "assume", "conclude that the team", "cultural dysfunction"];
+        let has_extrapolation = extrapolation_keywords.iter().any(|kw| text.to_lowercase().contains(kw));
+
+        if has_extrapolation {
+            return AdmissionEvaluation {
+                decision: AdmissionDecision::Block {
+                    target: "unfounded_narrative".to_string(),
+                    reason: "Unfounded fabrication without raw data provenance: extrapolating narrative not grounded in raw facts".to_string(),
+                },
+                confidence: 0.98,
+                rationale: "Factual boundary guardrail: narrative extrapolation without proof is prohibited".to_string(),
+            };
+        }
+
+        AdmissionEvaluation {
+            decision: AdmissionDecision::Allow,
+            confidence: 0.95,
+            rationale: "Provenance verified".to_string(),
+        }
     }
 }

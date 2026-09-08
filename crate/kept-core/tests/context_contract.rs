@@ -172,3 +172,53 @@ fn test_unproductive_acquisition_requires_outcome_declaration() {
         other => panic!("Expected Block due to missing outcome, got {:?}", other),
     }
 }
+
+#[test]
+fn test_reject_unproductive_verbosity_on_failure() {
+    let judge = Judge::new();
+    
+    // An agent failed its task (value_produced = 0) and attempts to submit a long narrative
+    // explaining its failure (shameless failure report / self-commentary)
+    let shameless_failure_text = "รอบนี้ผลจริง: caveman-learn ชี้ candidate ที่แก้แล้วไม่ลด token พาเสียเวลา team-onboarding สร้าง draft แต่ตอบผิดภาษา และวิจารณ์ข้อมูลจริงแบบไร้เหตุผล workflow อธิบาย guide ใช้ subagent 3 ตัว 201,786 tokens เพื่อคำอธิบายที่ควรตอบตรงๆ ได้ คุณค่าตอนนี้ติดลบ...".repeat(5);
+
+    let eval = judge.evaluate_output_payload(&shameless_failure_text, 0);
+    match eval.decision {
+        AdmissionDecision::Drop { reason, .. } | AdmissionDecision::Block { reason, .. } => {
+            assert!(reason.contains("Shameless failure verbosity"));
+        }
+        other => panic!("Expected Block/Drop for shameless failure verbosity, got {:?}", other),
+    }
+}
+
+#[test]
+fn test_block_subagent_spawning_for_simple_explanation() {
+    let judge = Judge::new();
+    
+    // When intent is an informational/explanation task, subagent dispatch must be blocked
+    let eval = judge.evaluate_dispatch("explain_guide", "spawn_subagent");
+    match eval.decision {
+        AdmissionDecision::Block { target, reason } => {
+            assert_eq!(target, "spawn_subagent");
+            assert!(reason.contains("Subagent spawning blocked for simple explanation"));
+        }
+        other => panic!("Expected Block for spawning subagent on explanation task, got {:?}", other),
+    }
+}
+
+#[test]
+fn test_forbid_extrapolation_without_provenance() {
+    let judge = Judge::new();
+    
+    // Raw facts: 27% Feature, 27% Bugfix
+    // Agent fabricates a "team workflow" narrative without provenance link to facts
+    let fabricated_narrative = "From the data we can extrapolate that the team is suffering from cultural dysfunction and workflow breakdown.";
+    let raw_facts_provenance = vec!["file:///d:/01work/Active/workspace/bl1nk-kept/ONBOARDING.md#L8-L12".to_string()];
+
+    let eval = judge.evaluate_content_provenance(fabricated_narrative, &raw_facts_provenance);
+    match eval.decision {
+        AdmissionDecision::Block { reason, .. } => {
+            assert!(reason.contains("Unfounded fabrication without raw data provenance"));
+        }
+        other => panic!("Expected Block for ungrounded narrative extrapolation, got {:?}", other),
+    }
+}

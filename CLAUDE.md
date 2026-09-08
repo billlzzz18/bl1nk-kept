@@ -9,7 +9,10 @@
 - **Structure:** Tree-sitter วิเคราะห์ Code AST และ `kept-doc` วิเคราะห์ Document IR
 - **Model:** แปลงข้อมูลเป็น `Observation` พร้อม `Target` URI (`file://`, `symbol://`, `document://`)
 - **Judge & Admission:** เปรียบเทียบกับ Context Registry แล้วส่ง treatment (`PASS`, `REFERENCE`, `DELTA`, `COMPRESS`) ผ่าน `kept-mcp`
-- **Tooling:** ใช้ FFF MCP (`C:\Users\Admin\AppData\Local\fff-mcp\bin\fff-mcp.exe`) สำหรับการค้นหาไฟล์และสำรวจโครงสร้างอย่างรวดเร็ว (High-performance file finder)
+- **Tooling:**
+  - **FFF MCP:** (`C:\Users\Admin\AppData\Local\fff-mcp\bin\fff-mcp.exe`) ค้นหาไฟล์และสำรวจโครงสร้างความเร็วสูง
+  - **Serena MCP:** (`C:\Users\Admin\.local\bin\serena.exe start-mcp-server`) ตรวจจับ Language Server/LSP (Rust, Python), Code AST symbols, diagnostics และ targeted edits
+  - **SQZ MCP:** (`C:\Users\Admin\.cargo\bin\sqz-mcp.exe`) จัดการ Token Compression, Shannon Entropy, Context Dedup (`sqz_read_file`, `sqz_grep`, `compress`)
 
 ---
 

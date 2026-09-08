@@ -111,13 +111,13 @@
 
 #### 2.3.2 P0.2 Zero-Regression Memory Store
 
-* [ ] ออกแบบ schema และ test cases สำหรับ SQLite Correction Ledger แบบ immutable (correction ID, subject, assertions, evidence URI, supersession) (Red)
-* [ ] พัฒนา SQLite Correction Ledger model แบบ immutable พร้อม migration (Green)
-* [ ] พัฒนาตัวตรวจจับความขัดแย้ง: เมื่อมี active correction `A ≠ a` ต้องบล็อกคำสั่งที่ขัดแย้ง (`Block`) ก่อนส่งไปทำงานจริง พร้อมแนบหลักฐาน (Green)
-* [ ] พัฒนากลไก Supersede: แทนที่ข้อเท็จจริงเดิมด้วยหลักฐานใหม่ โดยเก็บประวัติเดิมครบถ้วนและไม่แก้ทับ in-place (Green)
+* [x] ออกแบบ schema และ test cases สำหรับ SQLite Correction Ledger แบบ immutable (correction ID, subject, assertions, evidence URI, supersession) (Red)
+* [x] พัฒนา SQLite Correction Ledger model แบบ immutable พร้อม migration (Green)
+* [x] พัฒนาตัวตรวจจับความขัดแย้ง: เมื่อมี active correction `A ≠ a` ต้องบล็อกคำสั่งที่ขัดแย้ง (`Block`) ก่อนส่งไปทำงานจริง พร้อมแนบหลักฐาน (Green)
+* [x] พัฒนากลไก Supersede: แทนที่ข้อเท็จจริงเดิมด้วยหลักฐานใหม่ โดยเก็บประวัติเดิมครบถ้วนและไม่แก้ทับ in-place (Green)
 * [ ] พัฒนาระบบ Projection บันทึก Audit Log ลง Vault/Markdown โดยอ่านจาก SQLite แบบ append-only (Green)
 * [ ] Refactor ปรับปรุง connection pooling และ safe query execution ใน SQLite wrapper (Refactor)
-* [ ] Dogfooding ทดสอบกับคำสั่งที่เคยได้รับการแก้ไขจริงในเซสชัน ยืนยันการสกัดกั้นไม่ให้ agent ทำผิดพลาดซ้ำ (Verified)
+* [x] Dogfooding ทดสอบกับคำสั่งที่เคยได้รับการแก้ไขจริงในเซสชัน ยืนยันการสกัดกั้นไม่ให้ agent ทำผิดพลาดซ้ำ (Verified)
 * [ ] อัปเดต `docs/specs/cognitive_guardrail_architecture.md` และ `.agents/MEMORY.md` บันทึกสถานะการทำงาน (Reconcile)
 
 #### 2.3.3 P0.3 Semantic & Scope Disambiguation

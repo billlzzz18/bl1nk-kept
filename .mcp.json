@@ -9,6 +9,24 @@
       "type": "stdio",
       "command": "C:\\Users\\Admin\\AppData\\Local\\fff-mcp\\bin\\fff-mcp.exe",
       "args": []
+    },
+    "serena": {
+      "type": "stdio",
+      "command": "C:\\Users\\Admin\\.local\\bin\\serena.exe",
+      "args": [
+        "start-mcp-server",
+        "--context",
+        "antigravity",
+        "--project-from-cwd"
+      ]
+    },
+    "sqz": {
+      "type": "stdio",
+      "command": "C:\\Users\\Admin\\.cargo\\bin\\sqz-mcp.exe",
+      "args": [
+        "--transport",
+        "stdio"
+      ]
     }
   }
 }

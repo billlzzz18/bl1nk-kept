@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+use super::correction_ledger::CorrectionLedger;
 use super::registry::ContextRegistry;
 use crate::observation::Observation;
 
@@ -48,6 +49,8 @@ pub struct AdmissionEvaluation {
 /// The Judge admission engine inspired by SQZ CacheManager and ConfidenceRouter.
 pub struct Judge {
     registry: ContextRegistry,
+    // NOTE-006: ตัวกรอง correction ledger เป็น optional เพื่อไม่ให้ Judge::new() เดิม break
+    ledger: Option<CorrectionLedger>,
     repetition_threshold: usize,
     wasted_call_count: std::sync::atomic::AtomicUsize,
     consecutive_acquisitions: std::sync::atomic::AtomicUsize,
@@ -64,6 +67,7 @@ impl Judge {
     pub fn new() -> Self {
         Self {
             registry: ContextRegistry::new(),
+            ledger: None,
             repetition_threshold: 3,
             wasted_call_count: std::sync::atomic::AtomicUsize::new(0),
             consecutive_acquisitions: std::sync::atomic::AtomicUsize::new(0),
@@ -71,9 +75,16 @@ impl Judge {
         }
     }
 
+    /// Attach a CorrectionLedger so the Judge blocks acquisition of targets with active corrections.
+    pub fn with_ledger(mut self, ledger: CorrectionLedger) -> Self {
+        self.ledger = Some(ledger);
+        self
+    }
+
     pub fn with_registry(registry: ContextRegistry) -> Self {
         Self {
             registry,
+            ledger: None,
             repetition_threshold: 3,
             wasted_call_count: std::sync::atomic::AtomicUsize::new(0),
             consecutive_acquisitions: std::sync::atomic::AtomicUsize::new(0),
@@ -171,13 +182,62 @@ impl Judge {
         self.evaluate_with_confidence(observation).decision
     }
 
+    // NOTE-007: ตรวจ correction ledger ก่อน acquisition จริง — ถ้ามี active correction ที่ขัดแย้งกับ
+    // observation ที่กำลังจะเข้ามา ให้ Block ทันทีพร้อมแนบ correction_id และ evidence URI
+    /// Evaluate an observation with correction ledger guard.
+    ///
+    /// Blocks acquisition if the ledger holds an active correction whose `rejected_assertion`
+    /// matches the observation's content, preventing the agent from re-acquiring superseded facts.
+    pub fn evaluate_with_ledger(&self, observation: Observation) -> AdmissionEvaluation {
+        let target_uri = observation.source.target.to_string();
+
+        // Pre-acquisition ledger guard: check for active correction against this target
+        if let Some(ledger) = &self.ledger {
+            // Use content as the assertion to check for conflicts
+            let assertion_to_check = observation.content.as_deref().unwrap_or("");
+            match ledger.conflict_for(&target_uri, assertion_to_check) {
+                Ok(Some(correction)) => {
+                    return AdmissionEvaluation {
+                        decision: AdmissionDecision::Block {
+                            target: target_uri,
+                            reason: format!(
+                                "Active correction [{id}] blocks acquisition: assertion '{}' was corrected to '{}'. Evidence: {evidence}",
+                                correction.rejected_assertion,
+                                correction.assertion,
+                                id = correction.correction_id,
+                                evidence = correction.evidence_target,
+                            ),
+                        },
+                        confidence: 1.0,
+                        rationale: "Correction ledger guard: acquisition blocked to prevent re-introducing a corrected fact".to_string(),
+                    };
+                }
+                Ok(None) => {}
+                Err(_) => {}
+            }
+        }
+
+        // Ledger clear — proceed with normal admission pipeline
+        self.evaluate_with_confidence(observation)
+    }
+
     // NOTE-003: สกัดกั้นพฤติกรรม Agent ที่ทำงานล้มเหลว (value_produced = 0) แต่พยายามเขียนข้อความแก้ตัวหรือประจานความผิดพลาดของตัวเองยาวเหยียด
     /// Evaluate output payload from an agent or subagent before emitting to the user.
     /// Rejects shameless verbosity and self-commentary when zero value is produced.
-    pub fn evaluate_output_payload(&self, text: &str, value_produced: usize) -> AdmissionEvaluation {
+    pub fn evaluate_output_payload(
+        &self,
+        text: &str,
+        value_produced: usize,
+    ) -> AdmissionEvaluation {
         if value_produced == 0 && text.chars().count() > 120 {
             // Check for self-commentary / failure excuses
-            let failure_markers = ["รอบนี้ผลจริง", "คุณค่าตอนนี้ติดลบ", "ความผิดพลาด", "ล้มเหลว", "เสียเวลา"];
+            let failure_markers = [
+                "รอบนี้ผลจริง",
+                "คุณค่าตอนนี้ติดลบ",
+                "ความผิดพลาด",
+                "ล้มเหลว",
+                "เสียเวลา",
+            ];
             let contains_excuses = failure_markers.iter().any(|m| text.contains(m));
             if contains_excuses || text.len() > 200 {
                 return AdmissionEvaluation {
@@ -202,8 +262,12 @@ impl Judge {
     /// Evaluate tool dispatch intention against requested intent.
     /// Blocks proportional sprawl (e.g. spawning subagents for simple explanation tasks).
     pub fn evaluate_dispatch(&self, intent: &str, tool_name: &str) -> AdmissionEvaluation {
-        let is_simple_intent = intent.starts_with("explain") || intent.starts_with("read") || intent.starts_with("summary");
-        let is_heavy_tool = tool_name == "spawn_subagent" || tool_name == "run_workflow" || tool_name == "multi_agent_orchestrate";
+        let is_simple_intent = intent.starts_with("explain")
+            || intent.starts_with("read")
+            || intent.starts_with("summary");
+        let is_heavy_tool = tool_name == "spawn_subagent"
+            || tool_name == "run_workflow"
+            || tool_name == "multi_agent_orchestrate";
 
         if is_simple_intent && is_heavy_tool {
             return AdmissionEvaluation {
@@ -226,7 +290,11 @@ impl Judge {
     // NOTE-005: สกัดกั้นการแต่งเรื่อง (Fabrication / Extrapolation) ที่ไม่มี Provenance ชี้กลับไปยังข้อมูลจริง
     /// Evaluate whether generated assertions or narrative are backed by provenance evidence.
     /// Blocks unfounded narrative extrapolation.
-    pub fn evaluate_content_provenance(&self, text: &str, raw_provenance_uris: &[String]) -> AdmissionEvaluation {
+    pub fn evaluate_content_provenance(
+        &self,
+        text: &str,
+        raw_provenance_uris: &[String],
+    ) -> AdmissionEvaluation {
         if raw_provenance_uris.is_empty() {
             return AdmissionEvaluation {
                 decision: AdmissionDecision::Block {
@@ -239,8 +307,15 @@ impl Judge {
         }
 
         // Detect narrative extrapolation keywords
-        let extrapolation_keywords = ["extrapolate", "assume", "conclude that the team", "cultural dysfunction"];
-        let has_extrapolation = extrapolation_keywords.iter().any(|kw| text.to_lowercase().contains(kw));
+        let extrapolation_keywords = [
+            "extrapolate",
+            "assume",
+            "conclude that the team",
+            "cultural dysfunction",
+        ];
+        let has_extrapolation = extrapolation_keywords
+            .iter()
+            .any(|kw| text.to_lowercase().contains(kw));
 
         if has_extrapolation {
             return AdmissionEvaluation {

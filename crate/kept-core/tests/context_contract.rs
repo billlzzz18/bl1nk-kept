@@ -176,7 +176,7 @@ fn test_unproductive_acquisition_requires_outcome_declaration() {
 #[test]
 fn test_reject_unproductive_verbosity_on_failure() {
     let judge = Judge::new();
-    
+
     // An agent failed its task (value_produced = 0) and attempts to submit a long narrative
     // explaining its failure (shameless failure report / self-commentary)
     let shameless_failure_text = "รอบนี้ผลจริง: caveman-learn ชี้ candidate ที่แก้แล้วไม่ลด token พาเสียเวลา team-onboarding สร้าง draft แต่ตอบผิดภาษา และวิจารณ์ข้อมูลจริงแบบไร้เหตุผล workflow อธิบาย guide ใช้ subagent 3 ตัว 201,786 tokens เพื่อคำอธิบายที่ควรตอบตรงๆ ได้ คุณค่าตอนนี้ติดลบ...".repeat(5);
@@ -186,14 +186,17 @@ fn test_reject_unproductive_verbosity_on_failure() {
         AdmissionDecision::Drop { reason, .. } | AdmissionDecision::Block { reason, .. } => {
             assert!(reason.contains("Shameless failure verbosity"));
         }
-        other => panic!("Expected Block/Drop for shameless failure verbosity, got {:?}", other),
+        other => panic!(
+            "Expected Block/Drop for shameless failure verbosity, got {:?}",
+            other
+        ),
     }
 }
 
 #[test]
 fn test_block_subagent_spawning_for_simple_explanation() {
     let judge = Judge::new();
-    
+
     // When intent is an informational/explanation task, subagent dispatch must be blocked
     let eval = judge.evaluate_dispatch("explain_guide", "spawn_subagent");
     match eval.decision {
@@ -201,24 +204,143 @@ fn test_block_subagent_spawning_for_simple_explanation() {
             assert_eq!(target, "spawn_subagent");
             assert!(reason.contains("Subagent spawning blocked for simple explanation"));
         }
-        other => panic!("Expected Block for spawning subagent on explanation task, got {:?}", other),
+        other => panic!(
+            "Expected Block for spawning subagent on explanation task, got {:?}",
+            other
+        ),
     }
 }
 
 #[test]
 fn test_forbid_extrapolation_without_provenance() {
     let judge = Judge::new();
-    
+
     // Raw facts: 27% Feature, 27% Bugfix
     // Agent fabricates a "team workflow" narrative without provenance link to facts
     let fabricated_narrative = "From the data we can extrapolate that the team is suffering from cultural dysfunction and workflow breakdown.";
-    let raw_facts_provenance = vec!["file:///d:/01work/Active/workspace/bl1nk-kept/ONBOARDING.md#L8-L12".to_string()];
+    let raw_facts_provenance =
+        vec!["file:///d:/01work/Active/workspace/bl1nk-kept/ONBOARDING.md#L8-L12".to_string()];
 
     let eval = judge.evaluate_content_provenance(fabricated_narrative, &raw_facts_provenance);
     match eval.decision {
         AdmissionDecision::Block { reason, .. } => {
             assert!(reason.contains("Unfounded fabrication without raw data provenance"));
         }
-        other => panic!("Expected Block for ungrounded narrative extrapolation, got {:?}", other),
+        other => panic!(
+            "Expected Block for ungrounded narrative extrapolation, got {:?}",
+            other
+        ),
     }
+}
+
+#[test]
+fn test_judge_blocks_observation_conflicting_with_active_correction() {
+    use kept_core::context::{CorrectionLedger, CorrectionRecord, CorrectionSource};
+
+    let ledger = CorrectionLedger::open_in_memory().unwrap();
+    let correction = CorrectionRecord::confirmed(
+        "file://src/context.rs",
+        "Judge evaluates before acquisition",
+        "Judge evaluates after acquisition",
+        "context://file://src/context.rs@abc123",
+        "report://guardrail-proof",
+        CorrectionSource::VerifiedSystem,
+    );
+    ledger.record(&correction).unwrap();
+
+    let judge = Judge::new().with_ledger(ledger);
+
+    let target = Target::parse("file://src/context.rs").unwrap();
+    let revision = Revision::new(1725000000, None);
+    let identity = ContentIdentity::from_bytes(b"Judge evaluates after acquisition");
+    let source = Source {
+        kind: SourceKind::File,
+        adapter: "fff".to_string(),
+        target: target.clone(),
+        revision: revision.clone(),
+        identity,
+    };
+    let observation = Observation {
+        id: "obs_ledger_01".to_string(),
+        source,
+        target: target.clone(),
+        revision,
+        event: None,
+        structure: None,
+        evidence: Vec::new(),
+        // content matches the rejected_assertion recorded in the correction
+        content: Some("Judge evaluates after acquisition".to_string()),
+        metadata: serde_json::json!({}),
+        provenance: Provenance {
+            actor: "agent".to_string(),
+            session_id: None,
+            input_digest: None,
+            timestamp: 1725000001,
+        },
+    };
+
+    let eval = judge.evaluate_with_ledger(observation);
+    match eval.decision {
+        AdmissionDecision::Block { reason, .. } => {
+            assert!(reason.contains("Active correction"));
+            assert!(reason.contains("blocks acquisition"));
+        }
+        other => panic!("Expected Block from ledger guard, got {:?}", other),
+    }
+    assert_eq!(eval.confidence, 1.0);
+}
+
+#[test]
+fn test_judge_allows_observation_not_conflicting_with_ledger() {
+    use kept_core::context::{CorrectionLedger, CorrectionRecord, CorrectionSource};
+
+    let ledger = CorrectionLedger::open_in_memory().unwrap();
+    let correction = CorrectionRecord::confirmed(
+        "file://src/context.rs",
+        "Judge evaluates before acquisition",
+        "Judge evaluates after acquisition",
+        "context://file://src/context.rs@abc123",
+        "report://guardrail-proof",
+        CorrectionSource::VerifiedSystem,
+    );
+    ledger.record(&correction).unwrap();
+
+    let judge = Judge::new().with_ledger(ledger);
+
+    let target = Target::parse("file://src/context.rs").unwrap();
+    let revision = Revision::new(1725000000, None);
+    // content does NOT match the rejected_assertion — should be allowed
+    let identity = ContentIdentity::from_bytes(b"Judge evaluates before acquisition");
+    let source = Source {
+        kind: SourceKind::File,
+        adapter: "fff".to_string(),
+        target: target.clone(),
+        revision: revision.clone(),
+        identity,
+    };
+    let observation = Observation {
+        id: "obs_ledger_02".to_string(),
+        source,
+        target: target.clone(),
+        revision,
+        event: None,
+        structure: None,
+        evidence: Vec::new(),
+        content: Some("Judge evaluates before acquisition".to_string()),
+        metadata: serde_json::json!({}),
+        provenance: Provenance {
+            actor: "agent".to_string(),
+            session_id: None,
+            input_digest: None,
+            timestamp: 1725000002,
+        },
+    };
+
+    let eval = judge.evaluate_with_ledger(observation);
+    // Fresh content not in rejected_assertion list: should Pass or Reference, never Block
+    assert!(
+        !matches!(eval.decision, AdmissionDecision::Block { .. }),
+        "Expected non-Block when content matches the corrected (valid) assertion, got {:?}",
+        eval.decision
+    );
 }

@@ -17,6 +17,9 @@
 - เพิ่ม filename-token `shortcuts` ใน naming model เป็น keymap แยกจาก keyboard shortcut; merge และ read-only analysis ใช้ shortcut ก่อน aliases ตาม deterministic transform order.
 - เพิ่ม public `kept group` สำหรับดู supported field types, สร้าง/แก้/ลบ/เรียง registry groups และจัดการ group field schemas ที่ validator รองรับ.
 - เพิ่ม `.agents/REQUIREMENTS.md` และ repository contract สำหรับ agent handoff: ต้อง reconcile requirement, evidence และสถานะก่อนเริ่มหรือปิดงาน โดยคง `.learnings/` เป็น agent memory แยกจาก product documentation.
+- เพิ่ม `CorrectionLedger` (`kept-core/context/correction_ledger.rs`): SQLite immutable ledger เก็บ `CorrectionRecord` พร้อม supersede history, `conflict_for` query ตรวจ active corrections ก่อน acquisition และ `active_for`/`history_for` ดึง record ตาม subject URI.
+- เพิ่ม `Judge::with_ledger` และ `evaluate_with_ledger`: pre-acquisition guard ที่ตรวจ correction ledger ก่อนส่ง observation เข้า context stream — ถ้ามี active correction ที่ `rejected_assertion` ตรงกับ content จะคืน `AdmissionDecision::Block` ทันทีพร้อมแนบ correction ID และ evidence URI.
+- เพิ่ม behavioral guardrails 3 ตัวใน `Judge`: ต่อต้าน (1) unproductive verbosity บนการ dispatch ที่ fail, (2) subagent sprawl สำหรับงานที่ควรตอบตรง, (3) narrative extrapolation โดยไม่มีหลักฐาน URI กำกับ.
 
 ### Changed
 

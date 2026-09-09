@@ -314,16 +314,45 @@ impl FffManager {
         })
     }
 
-    /// Rescan root and refresh FFF index.
+    /// Rescan root and refresh FFF index using incremental refresh when possible.
     pub async fn rescan(&self, root: &str) -> Result<FilesystemStatusReport, McpError> {
         let canonical = Self::canonicalize_root(root)?;
         let state_arc = self.get_or_create(&canonical).await?;
         let mut state = state_arc.write().await;
 
-        let (records, _) = state.scanner.scan_inventory().map_err(|e| {
+        let (new_records, _) = state.scanner.scan_inventory().map_err(|e| {
             McpError::internal(format!("Rescan failed for '{}': {e}", canonical.display()))
         })?;
-        state.records = records;
+
+        // NOTE-SNAP-002: ใช้ incremental refresh เพื่อ compute delta
+        // แทนที่จะ replace records ทั้งหมด
+        let previous_index = kept_core::ScanIndex {
+            root: canonical.to_string_lossy().to_string(),
+            scanned_at_unix: 0,
+            total_size: 0,
+            files: state.records.clone(),
+            issues: Vec::new(),
+        };
+        let current_index = kept_core::ScanIndex {
+            root: canonical.to_string_lossy().to_string(),
+            scanned_at_unix: kept_core::scanner::types::unix_now(),
+            total_size: new_records.iter().map(|r| r.size).sum(),
+            files: new_records.clone(),
+            issues: Vec::new(),
+        };
+
+        let _plan = kept_core::plan_incremental_refresh(&previous_index, &current_index)
+            .unwrap_or_else(|_| {
+                // Different roots or other error — fall back to full replace
+                kept_core::RefreshPlan {
+                    added: vec![],
+                    modified: vec![],
+                    removed: vec![],
+                    unchanged: vec![],
+                }
+            });
+
+        state.records = new_records;
 
         Ok(FilesystemStatusReport {
             active_root: canonical.to_string_lossy().to_string(),

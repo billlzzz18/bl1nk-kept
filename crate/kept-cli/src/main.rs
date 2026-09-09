@@ -71,6 +71,12 @@ pub enum Commands {
         group: Option<String>,
         #[arg(short, long)]
         json: bool,
+        /// Rerank BM25 results using a local semantic reranker.
+        #[arg(long)]
+        semantic: bool,
+        /// Combine BM25 and semantic reranker scores (weighted blend).
+        #[arg(long, conflicts_with = "semantic")]
+        hybrid: bool,
     },
     /// Inspect and manage keyword registry groups.
     Group {
@@ -191,12 +197,17 @@ async fn main() -> anyhow::Result<()> {
             query,
             group,
             json,
+            semantic,
+            hybrid,
         } => handle_registry(RegistryCommands::Search {
             path: registry,
             query,
             group,
             json,
-        })?,
+            semantic,
+            hybrid,
+        })
+        .await?,
         Commands::Group { cmd } => handle_group(cmd)?,
         Commands::Convert { input, output } => {
             handle_doc(DocCommands::Convert { input, output }).await?
@@ -214,7 +225,7 @@ async fn main() -> anyhow::Result<()> {
         } => handle_task_duplicates(root, index, json, action, yes)?,
         Commands::Evidence { cmd } => handle_evidence(cmd)?,
         Commands::Corpus { cmd } => handle_corpus(cmd)?,
-        Commands::Registry { cmd } => handle_registry(cmd)?,
+        Commands::Registry { cmd } => handle_registry(cmd).await?,
         Commands::Fs { cmd } => handle_fs(cmd)?,
         Commands::Doc { cmd } => handle_doc(cmd).await?,
         Commands::Tui => anyhow::bail!(
@@ -1259,8 +1270,8 @@ mod search_policy_command_tests {
     use super::Cli;
     use clap::Parser;
 
-    #[test]
-    fn registry_search_rejects_invalid_user_search_policy_before_index_build() {
+    #[tokio::test]
+    async fn registry_search_rejects_invalid_user_search_policy_before_index_build() {
         let registry = serde_json::json!({
             "version": "1.2.0",
             "metadata": {
@@ -1325,8 +1336,11 @@ mod search_policy_command_tests {
                 query: "query".to_string(),
                 group: None,
                 json: true,
+                semantic: false,
+                hybrid: false,
             },
-        );
+        )
+        .await;
         assert!(
             result.is_err(),
             "invalid search policy must be rejected before searching"

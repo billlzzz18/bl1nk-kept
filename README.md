@@ -59,21 +59,25 @@
 ## Key Capabilities
 
 ### 1. Progressive Duplicate Detection
+
 - Pipeline ตรวจสอบ 4 ขั้นตอนแบบ read-only ปลอดภัยต่อไฟล์ต้นทาง: `size bucket` → `partial SHA-256` → `full SHA-256` → `group evidence`
 - จัดหมวดหมู่ชัดเจน: `same_name`, `near_name`, `same_content` และ `hard_link`
 - รับประกันความปลอดภัย: ไม่มีการแก้ไขหรือลบไฟล์ต้นทางของผู้ใช้โดยอัตโนมัติ
 
 ### 2. Thai-Aware & Hybrid Semantic Search
+
 - ผสาน BM25 inverted index เข้ากับ Thai bigram tokenization, synonym expansion และ n-gram fuzzy candidate filtering
 - คะแนนและผลลัพธ์โปร่งใส: near match ยังคงเป็น candidate ที่ตรวจสอบได้ ไม่ถูกแปลงเป็นข้อมูลจริงโดยพลการ
 - รองรับ Dense Vector Search และ Reranking ผ่าน Ollama และ Jina พร้อมแยกแจกแจงคะแนนชัดเจน
 
 ### 3. Filesystem Analytics & Naming Rules
+
 - บันทึกสถานะโฟลเดอร์ลงใน `ScanIndex` snapshots พร้อมเก็บ structured `ScanIssue` diagnostics
 - ตรวจสอบกฎการตั้งชื่อตาม profile แบบ read-only รองรับ absolute path scoping, priority resolution และ conflict detection
 - เมนู Interactive TUI ใน terminal สำหรับตรวจดูการใช้พื้นที่, กลุ่มไฟล์ซ้ำ และข้อผิดพลาดในการตั้งชื่อ
 
 ### 4. Universal Document IR (Offline Conversion)
+
 - แปลงโครงสร้างระหว่าง GitHub Flavored Markdown (GFM), Notion Markdown (NFM), DOCX และ PDF โดยไม่ต้องพึ่งพา network
 
 ---

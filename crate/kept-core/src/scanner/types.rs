@@ -222,3 +222,166 @@ pub fn to_unix(time: SystemTime) -> u64 {
         .map(|duration| duration.as_secs())
         .unwrap_or(0)
 }
+
+/// Migrate a snapshot from an older schema version to the current version.
+///
+/// Currently only version "1.1.0" → "1.2.0" is supported (added `root_fingerprint`).
+/// Returns `None` if the snapshot is already at the current version or has an unknown version.
+pub fn migrate_snapshot(
+    snapshot: PersistentScanSnapshot,
+) -> Result<PersistentScanSnapshot, String> {
+    match snapshot.schema_version.as_str() {
+        v if v == CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION => Ok(snapshot),
+        "1.1.0" => {
+            // NOTE-SNAP-001: v1.1.0 → v1.2.0 — เพิ่ม root_fingerprint field
+            let root_fingerprint =
+                scan_context_fingerprint(&snapshot.root, &ScanOptions {
+                    include_hidden: snapshot.include_hidden,
+                    max_depth: snapshot.max_depth,
+                });
+            Ok(PersistentScanSnapshot {
+                schema_version: CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION.to_string(),
+                root_fingerprint,
+                ..snapshot
+            })
+        }
+        other => Err(format!(
+            "unsupported snapshot schema version: {other} (expected {CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION})"
+        )),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn make_record(path: &str, size: u64, modified: u64) -> FileRecord {
+        FileRecord {
+            path: path.to_string(),
+            name: path.rsplit('/').next().unwrap_or(path).to_string(),
+            extension: path.rsplit('.').next().unwrap_or("").to_string(),
+            size,
+            modified_unix: modified,
+            kind: "file".to_string(),
+            is_binary: None,
+            git_status: None,
+        }
+    }
+
+    fn make_index(root: &str, files: Vec<FileRecord>) -> ScanIndex {
+        let total_size = files.iter().map(|f| f.size).sum();
+        ScanIndex {
+            root: root.to_string(),
+            scanned_at_unix: 1000,
+            total_size,
+            files,
+            issues: Vec::new(),
+        }
+    }
+
+    #[test]
+    fn incremental_refresh_detects_added_files() {
+        let previous = make_index("/root", vec![make_record("a.txt", 10, 100)]);
+        let current = make_index(
+            "/root",
+            vec![make_record("a.txt", 10, 100), make_record("b.txt", 20, 200)],
+        );
+        let plan = plan_incremental_refresh(&previous, &current).unwrap();
+        assert_eq!(plan.added, vec!["b.txt"]);
+        assert!(plan.modified.is_empty());
+        assert!(plan.removed.is_empty());
+    }
+
+    #[test]
+    fn incremental_refresh_detects_modified_files() {
+        let previous = make_index("/root", vec![make_record("a.txt", 10, 100)]);
+        let current = make_index("/root", vec![make_record("a.txt", 99, 200)]);
+        let plan = plan_incremental_refresh(&previous, &current).unwrap();
+        assert!(plan.added.is_empty());
+        assert_eq!(plan.modified, vec!["a.txt"]);
+        assert!(plan.removed.is_empty());
+    }
+
+    #[test]
+    fn incremental_refresh_detects_removed_files() {
+        let previous = make_index(
+            "/root",
+            vec![make_record("a.txt", 10, 100), make_record("b.txt", 20, 200)],
+        );
+        let current = make_index("/root", vec![make_record("a.txt", 10, 100)]);
+        let plan = plan_incremental_refresh(&previous, &current).unwrap();
+        assert!(plan.added.is_empty());
+        assert!(plan.modified.is_empty());
+        assert_eq!(plan.removed, vec!["b.txt"]);
+    }
+
+    #[test]
+    fn incremental_refresh_tracks_unchanged_files() {
+        let previous = make_index("/root", vec![make_record("a.txt", 10, 100)]);
+        let current = make_index("/root", vec![make_record("a.txt", 10, 100)]);
+        let plan = plan_incremental_refresh(&previous, &current).unwrap();
+        assert!(plan.added.is_empty());
+        assert!(plan.modified.is_empty());
+        assert!(plan.removed.is_empty());
+        assert_eq!(plan.unchanged, vec!["a.txt"]);
+    }
+
+    #[test]
+    fn incremental_refresh_rejects_different_roots() {
+        let previous = make_index("/root-a", vec![make_record("a.txt", 10, 100)]);
+        let current = make_index("/root-b", vec![make_record("a.txt", 10, 100)]);
+        assert!(plan_incremental_refresh(&previous, &current).is_err());
+    }
+
+    #[test]
+    fn snapshot_migration_current_version_passthrough() {
+        let snapshot = PersistentScanSnapshot {
+            schema_version: CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION.to_string(),
+            root: "/root".to_string(),
+            root_fingerprint: "abc".to_string(),
+            include_hidden: false,
+            max_depth: None,
+            index: make_index("/root", vec![]),
+        };
+        let migrated = migrate_snapshot(snapshot.clone()).unwrap();
+        assert_eq!(
+            migrated.schema_version,
+            CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION
+        );
+        assert_eq!(migrated.root_fingerprint, "abc");
+    }
+
+    #[test]
+    fn snapshot_migration_1_1_to_1_2_adds_fingerprint() {
+        let snapshot = PersistentScanSnapshot {
+            schema_version: "1.1.0".to_string(),
+            root: "/root".to_string(),
+            root_fingerprint: String::new(), // empty in v1.1.0
+            include_hidden: false,
+            max_depth: None,
+            index: make_index("/root", vec![]),
+        };
+        let migrated = migrate_snapshot(snapshot).unwrap();
+        assert_eq!(
+            migrated.schema_version,
+            CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION
+        );
+        assert!(
+            !migrated.root_fingerprint.is_empty(),
+            "fingerprint must be computed"
+        );
+    }
+
+    #[test]
+    fn snapshot_migration_unknown_version_rejected() {
+        let snapshot = PersistentScanSnapshot {
+            schema_version: "99.0.0".to_string(),
+            root: "/root".to_string(),
+            root_fingerprint: String::new(),
+            include_hidden: false,
+            max_depth: None,
+            index: make_index("/root", vec![]),
+        };
+        assert!(migrate_snapshot(snapshot).is_err());
+    }
+}

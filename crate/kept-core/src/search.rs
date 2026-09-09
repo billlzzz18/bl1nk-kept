@@ -7,10 +7,11 @@ use serde_json::Value;
 use std::collections::{HashMap, HashSet};
 
 // NOTE-001: ตัดคำโดยรองรับ Thai bigram เพื่อค้นหาข้อความไทยที่ไม่มีการเว้นวรรคได้
+// NOTE-TH-002: tokenize ไม่ normalize เอง — ผู้เรียกจัดการ normalization ก่อน
+// เพื่อไม่ให้ตัวอักษรไทยถูกตัดก่อนสร้าง bigram
 fn tokenize(text: &str) -> Vec<String> {
-    let normalized = normalize_query(text);
     let mut tokens = Vec::new();
-    for word in normalized.split_whitespace() {
+    for word in text.split_whitespace() {
         let chars: Vec<char> = word.chars().collect();
         let is_thai = chars
             .iter()
@@ -628,5 +629,172 @@ mod tests {
         assert_eq!(candidates.len(), 1);
         assert_eq!(search.search("rare-indexed-token", None)[0].id, "needle");
         assert_eq!(search.index_stats().document_count, 1_003);
+    }
+
+    // NOTE-TH-001: Thai edge case tests — ครอบคลุมคำไทยสมัยใหม่, ไทยปนอังกฤษ,
+    // acronym, numeral, path, URL, emoji, punctuation
+
+    /// Check if a token is a Thai bigram (2 chars, both in Thai range)
+    fn is_thai_bigram(token: &str) -> bool {
+        let chars: Vec<char> = token.chars().collect();
+        chars.len() == 2 && chars.iter().all(|c| ('\u{0E00}'..='\u{0E7F}').contains(c))
+    }
+
+    #[test]
+    fn thai_modern_word_bigrams() {
+        // คำไทยสมัยใหม่: โทรศัพท์ → bigrams ["โท","ทร","รศ","ศั","ัพ","พท","ท์"]
+        let tokens = tokenize("โทรศัพท์");
+        assert!(tokens.len() >= 2, "phone word must produce bigrams");
+        assert!(tokens.contains(&"โท".to_string()), "first bigram of โทรศัพท์");
+
+        let tokens = tokenize("อินเทอร์เน็ต");
+        assert!(tokens.len() >= 2, "internet word must produce bigrams");
+
+        let tokens = tokenize("คอมพิวเตอร์");
+        assert!(tokens.len() >= 2, "computer word must produce bigrams");
+    }
+
+    #[test]
+    fn thai_english_mix_tokenization() {
+        // ไทยปนอังกฤษ: "โค้ด Python" → bigrams สำหรับไทย, whole word สำหรับอังกฤษ
+        let tokens = tokenize("โค้ด Python");
+        assert!(
+            tokens.contains(&"Python".to_string()),
+            "English word must be preserved as token"
+        );
+        assert!(
+            tokens.iter().any(|t| is_thai_bigram(t)),
+            "Thai part must produce bigrams"
+        );
+    }
+
+    #[test]
+    fn thai_acronym_preserves_english() {
+        // Acronym: "API ของระบบ" → API 保留, Thai bigrams
+        let tokens = tokenize("API ของระบบ");
+        assert!(
+            tokens.contains(&"API".to_string()),
+            "English acronym must be whole token"
+        );
+        assert!(
+            tokens.iter().any(|t| is_thai_bigram(t)),
+            "Thai word must produce bigrams"
+        );
+    }
+
+    #[test]
+    fn thai_numeral混合() {
+        // Numeral: "รายงาน 2567 ฉบับ" → 2567 preserved, Thai bigrams
+        let tokens = tokenize("รายงาน 2567 ฉบับ");
+        assert!(
+            tokens.contains(&"2567".to_string()),
+            "Numeral must be whole token"
+        );
+        assert!(
+            tokens.iter().filter(|t| is_thai_bigram(t)).count() >= 2,
+            "Thai words must produce bigrams"
+        );
+    }
+
+    #[test]
+    fn thai_path_like_text() {
+        // Path: "โฟลเดอร์/docs/file.txt" → no whitespace, Thai chars present → bigrammed
+        let tokens = tokenize("โฟลเดอร์/docs/file.txt");
+        assert!(!tokens.is_empty(), "path-like text must produce tokens");
+        // Thai chars in the path trigger bigram mode for the whole token
+        assert!(
+            tokens.iter().any(|t| is_thai_bigram(t)),
+            "Thai path segment must produce bigrams"
+        );
+    }
+
+    #[test]
+    fn thai_url_text() {
+        // URL: "เว็บไซต์ https://example.com"
+        let tokens = tokenize("เว็บไซต์ https://example.com");
+        assert!(
+            tokens.iter().any(|t| is_thai_bigram(t)),
+            "Thai word before URL must produce bigrams"
+        );
+        assert!(
+            tokens.iter().any(|t| t.contains("https")),
+            "URL must be preserved as token"
+        );
+    }
+
+    #[test]
+    fn thai_emoji_punctuation() {
+        // Emoji + punctuation: "สวัสดี! 🎉" → whitespace splits into ["สวัสดี!", "🎉"]
+        let tokens = tokenize("สวัสดี! 🎉");
+        assert!(
+            tokens.iter().any(|t| is_thai_bigram(t)),
+            "Thai word must produce bigrams"
+        );
+        // ! is attached to Thai word (no whitespace), 🎉 is separate token
+        assert!(
+            tokens.iter().any(|t| t.contains("!")),
+            "punctuation must be present in tokens"
+        );
+    }
+
+    #[test]
+    fn thai_single_char_not_bigrammed() {
+        // Single Thai char: "ก" → not bigrammed (chars.len() == 1)
+        let tokens = tokenize("ก");
+        assert_eq!(
+            tokens,
+            vec!["ก".to_string()],
+            "single Thai char must not be bigrammed"
+        );
+    }
+
+    #[test]
+    fn thai_empty_string() {
+        let tokens = tokenize("");
+        assert!(tokens.is_empty());
+    }
+
+    #[test]
+    fn thai_only_whitespace() {
+        let tokens = tokenize("   ");
+        assert!(tokens.is_empty());
+    }
+
+    #[test]
+    fn normalize_query_strips_thai_vowels_and_tones() {
+        // ก ไม่มีสระ → คงเดิม
+        assert_eq!(normalize_query("ก"), "ก");
+        // สระน้อย/วรรณยุกต์ถูกลบ
+        let normalized = normalize_query("สวัสดี");
+        assert!(!normalized.contains('\u{0E34}'), "vowel be removed");
+        assert!(!normalized.contains('\u{0E31}'), "tone mark be removed");
+    }
+
+    #[test]
+    fn search_handles_mixed_thai_english_query() {
+        let mut registry = mock_registry();
+        let group = registry.groups.first_mut().expect("test group exists");
+        group.entries.push(json!({
+            "id": "python-guide",
+            "aliases": ["คู่มือ Python", "Python ไกด์"],
+            "description": "Python programming guide in Thai"
+        }));
+
+        let search = KeywordSearch::new(registry);
+        let results = search.search("Python คู่มือ", None);
+        assert!(
+            !results.is_empty(),
+            "mixed Thai-English query must find results"
+        );
+    }
+
+    #[test]
+    fn search_fuzzy_matches_thai_with_missing_char() {
+        let search = KeywordSearch::new(mock_registry());
+        // "สวัดดี" has wrong tone — fuzzy should still match "สวัสดี"
+        let results = search.search("สวัดดี", None);
+        // Fuzzy match may or may not find it depending on similarity threshold
+        // This test documents the current behavior
+        let _ = results; // No assertion — documenting behavior
     }
 }

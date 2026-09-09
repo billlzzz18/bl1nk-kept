@@ -61,15 +61,15 @@
 
 ### 1.2 Wire Semantic Search into CLI (SEM-001 partial)
 
-- [ ] เชื่อม re-rank pipeline เข้ากับ `kept search` command (Green)
-- [ ] เพิ่ม `kept search --semantic` และ `kept search --hybrid` CLI surfaces (Green)
+- [x] เชื่อม re-rank pipeline เข้ากับ `kept search` command (Green) — `rerank_with_semantic()` ใน `registry.rs`
+- [x] เพิ่ม `kept search --semantic` และ `kept search --hybrid` CLI surfaces (Green) — `--semantic` rerank-only, `--hybrid` BM25 40% + reranker 60%
 - [ ] เพิ่ม MCP semantic search tools สำหรับ registry/vault query (Green)
 - [ ] อัปเดต `get-start.md` และ `SPEC.md` (Reconcile)
 
 ### 1.3 Thai Bigram Tokenizer & Seed Corpus (TODO Section 5)
 
-- [ ] ออกแบบ corpus tests: คำไทยสมัยใหม่, ไทยปนอังกฤษ, acronym, numeral, path, URL, emoji, punctuation (Red)
-- [ ] พัฒนา Thai Bigram / Maximal Matching tokenizer (Green)
+- [x] ออกแบบ corpus tests: คำไทยสมัยใหม่, ไทยปนอังกฤษ, acronym, numeral, path, URL, emoji, punctuation (Red) — 12 tests ใน `search.rs`
+- [x] พัฒนา Thai Bigram / Maximal Matching tokenizer (Green) — `tokenize()` แก้ไขไม่ normalize ก่อน bigram, mixed Thai-English ทำงานถูกต้อง
 - [ ] Seed Thai corpus จาก PyThaiNLP: ตรวจ license ราย corpus, เก็บ content SHA-256 + retrieval timestamp ใน `CorpusManifest`,  import words/synonyms/stopwords/Wikipedia titles (ตาม `docs/research/THAI_CORPUS_AND_TOKENIZATION_SOURCES.md`)
 - [ ] เปรียบเทียบผล BM25/Thai Bigram ก่อน/หลัง FFF migration (Refactor)
 
@@ -79,8 +79,9 @@
 - [ ] เชื่อม watcher events เข้า index query pipeline (Green)
 - [ ] ออกแบบ tests: `.gitignore` เปลี่ยน → FFF rescan state ถูกส่งต่อ (Red)
 - [ ] จัดการ propagation ของ ignore changes (Green)
-- [ ] ออกแบบ tests: snapshot migration ใช้ schema ข้ามเวอร์ชัน (Red)
-- [ ] รักษา migration logic (Green)
+- [x] ออกแบบ tests: snapshot migration ใช้ schema ข้ามเวอร์ชัน (Red) — 3 tests ใน `types.rs`
+- [x] รักษา migration logic (Green) — `migrate_snapshot()` v1.1.0 → v1.2.0
+- [x] Wire `plan_incremental_refresh()` เข้า `FffManager::rescan()` (Green) — MCP filesystem rescan ใช้ incremental refresh
 
 ---
 

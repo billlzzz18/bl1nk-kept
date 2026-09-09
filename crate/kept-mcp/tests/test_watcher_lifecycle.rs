@@ -41,3 +41,46 @@ async fn root_watcher_starts_and_stops_without_panic() -> anyhow::Result<()> {
     let _ = std::fs::remove_dir_all(dir);
     Ok(())
 }
+
+#[tokio::test]
+async fn ffmanager_auto_refreshes_index_after_file_change() {
+    use kept_mcp::mcp::tools::filesystem::FffManager;
+
+    let dir = std::env::temp_dir().join(format!("ffm-auto-{}", std::process::id()));
+    if let Err(e) = std::fs::create_dir_all(&dir) {
+        panic!("Failed to create temp dir: {e}");
+    }
+    if let Err(e) = std::fs::write(dir.join("a.txt"), b"hello") {
+        panic!("Failed to write initial file: {e}");
+    }
+
+    let manager = FffManager::new();
+    let status = manager
+        .status(dir.to_str().unwrap_or_default())
+        .await
+        .expect("status call should succeed");
+    assert_eq!(status.indexed_file_count, 1);
+
+    manager
+        .start_watcher(dir.to_str().unwrap_or_default())
+        .await
+        .expect("start_watcher should succeed");
+
+    if let Err(e) = std::fs::write(dir.join("b.txt"), b"world") {
+        panic!("Failed to write second file: {e}");
+    }
+    tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+
+    let status = manager
+        .status(dir.to_str().unwrap_or_default())
+        .await
+        .expect("status call should succeed after change");
+    assert!(
+        status.indexed_file_count >= 2,
+        "index should auto-refresh to >= 2 files, got {}",
+        status.indexed_file_count
+    );
+
+    manager.stop_all_watchers().await;
+    let _ = std::fs::remove_dir_all(dir);
+}

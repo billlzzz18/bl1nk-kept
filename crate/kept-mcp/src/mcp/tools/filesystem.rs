@@ -19,9 +19,11 @@ use serde_json::Value;
 use crate::mcp::core::{
     invalid_args, McpError, McpResult, RequestHandlerExtra, SchemaBuilder, ToolHandler, ToolInfo,
 };
+use crate::mcp::tools::watcher::RootWatcher;
 use kept_core::context::Judge;
 use kept_core::scanner::fff::{FffAcquisitionMode, FffScanner};
 use kept_core::scanner::types::FileRecord;
+use kept_core::{apply_refresh_plan, plan_incremental_refresh, ScanIndex};
 
 /// Status report for an active filesystem root.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -84,6 +86,7 @@ struct RootState {
 /// Long-running FFF Manager caching FFF instances per canonical root.
 pub struct FffManager {
     instances: Arc<RwLock<HashMap<PathBuf, Arc<RwLock<RootState>>>>>,
+    watchers: Arc<RwLock<HashMap<PathBuf, RootWatcher>>>,
 }
 
 impl Default for FffManager {
@@ -96,6 +99,7 @@ impl FffManager {
     pub fn new() -> Self {
         Self {
             instances: Arc::new(RwLock::new(HashMap::new())),
+            watchers: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 
@@ -312,6 +316,73 @@ impl FffManager {
             total_matches: total,
             cursor: None,
         })
+    }
+
+    /// Start a file watcher for the given root. Auto-refreshes index on changes.
+    pub async fn start_watcher(&self, root: &str) -> Result<(), McpError> {
+        let canonical = Self::canonicalize_root(root)?;
+        let state_arc = self.get_or_create(&canonical).await?;
+
+        // NOTE-001: สร้าง channel สำหรับ debounced change events จาก watcher
+        let (tx, mut rx) = tokio::sync::mpsc::channel(64);
+        let mut watcher = RootWatcher::new(canonical.clone(), tx);
+        watcher.start().map_err(|e| {
+            McpError::internal(format!(
+                "Failed to start watcher for '{}': {e}",
+                canonical.display()
+            ))
+        })?;
+
+        // NOTE-002: spawn refresh task — รับ debounced events แล้ว apply incremental refresh
+        let instances = self.instances.clone();
+        let root_clone = canonical.clone();
+        drop(state_arc);
+        tokio::spawn(async move {
+            while let Some(_event) = rx.recv().await {
+                let map = instances.read().await;
+                if let Some(inner) = map.get(&root_clone) {
+                    let mut state = inner.write().await;
+                    if let Ok((new_records, _stats)) = state.scanner.scan_inventory() {
+                        let old_records = state.records.clone();
+                        let previous_index = ScanIndex {
+                            root: root_clone.display().to_string(),
+                            scanned_at_unix: 0,
+                            total_size: 0,
+                            files: old_records,
+                            issues: Vec::new(),
+                        };
+                        let current_index = ScanIndex {
+                            root: root_clone.display().to_string(),
+                            scanned_at_unix: 0,
+                            total_size: 0,
+                            files: new_records.clone(),
+                            issues: Vec::new(),
+                        };
+                        let plan = plan_incremental_refresh(&previous_index, &current_index);
+                        match plan {
+                            Ok(ref p) => {
+                                apply_refresh_plan(&mut state.records, p, &new_records);
+                            }
+                            Err(_) => {
+                                // NOTE-003: fallback — replace ทั้งหมดถ้า plan ล้มเหลว
+                                state.records = new_records;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        self.watchers.write().await.insert(canonical, watcher);
+        Ok(())
+    }
+
+    /// Stop all watchers (for shutdown).
+    pub async fn stop_all_watchers(&self) {
+        let mut watchers = self.watchers.write().await;
+        for (_, mut w) in watchers.drain() {
+            w.stop().await;
+        }
     }
 
     /// Rescan root and refresh FFF index using incremental refresh when possible.

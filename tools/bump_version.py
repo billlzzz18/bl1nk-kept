@@ -72,9 +72,9 @@ def update_version(root: Path, version: str | None = None) -> str:
             "Unreleased changelog heading",
         )
 
-    manifest_path.write_text(manifest, encoding="utf-8")
-    spec_path.write_text(spec, encoding="utf-8")
-    changelog_path.write_text(changelog, encoding="utf-8")
+    manifest_path.write_text(manifest, encoding="utf-8", newline="\n")
+    spec_path.write_text(spec, encoding="utf-8", newline="\n")
+    changelog_path.write_text(changelog, encoding="utf-8", newline="\n")
     return version
 
 

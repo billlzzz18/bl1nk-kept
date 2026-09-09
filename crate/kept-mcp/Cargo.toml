@@ -21,5 +21,6 @@ async-trait = "0.1"
 pmcp.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+notify.workspace = true
 # NOTE-001: ใช้เฉพาะ library renderer; ปิด CLI/PNG defaults เพื่อไม่ชนกับ clap ที่ CLI หลัก pin ไว้
 mermaid-rs-renderer = { version = "0.2.0", default-features = false }

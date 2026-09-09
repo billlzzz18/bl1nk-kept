@@ -12,6 +12,7 @@ pub mod mermaid;
 pub mod notion;
 pub mod notion_live;
 pub mod unified;
+pub mod watcher;
 
 use serde_json::{json, Value};
 

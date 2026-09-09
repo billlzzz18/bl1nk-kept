@@ -84,3 +84,27 @@ async fn ffmanager_auto_refreshes_index_after_file_change() {
     manager.stop_all_watchers().await;
     let _ = std::fs::remove_dir_all(dir);
 }
+
+#[tokio::test]
+async fn rescan_applies_incremental_delta() {
+    use kept_mcp::mcp::tools::filesystem::FffManager;
+
+    let dir = std::env::temp_dir().join(format!("rescan-delta-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(dir.join("a.txt"), b"hello").unwrap();
+
+    let manager = FffManager::new();
+    let status1 = manager.status(dir.to_str().unwrap()).await.unwrap();
+    assert_eq!(status1.indexed_file_count, 1);
+
+    std::fs::write(dir.join("b.txt"), b"world").unwrap();
+    let status2 = manager.rescan(dir.to_str().unwrap()).await.unwrap();
+    assert_eq!(status2.indexed_file_count, 2);
+
+    std::fs::remove_file(dir.join("b.txt")).unwrap();
+    let status3 = manager.rescan(dir.to_str().unwrap()).await.unwrap();
+    assert_eq!(status3.indexed_file_count, 1);
+
+    manager.stop_all_watchers().await;
+    let _ = std::fs::remove_dir_all(dir);
+}

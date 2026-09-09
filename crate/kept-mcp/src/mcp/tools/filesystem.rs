@@ -165,7 +165,7 @@ impl FffManager {
             active_root: canonical.to_string_lossy().to_string(),
             indexed_file_count: state.records.len(),
             scanning_state: "ready".to_string(),
-            watcher_readiness: true,
+            watcher_readiness: self.watchers.read().await.contains_key(&canonical),
             warmup_state: "warm".to_string(),
             last_error: None,
         })
@@ -412,24 +412,22 @@ impl FffManager {
             issues: Vec::new(),
         };
 
-        let _plan = kept_core::plan_incremental_refresh(&previous_index, &current_index)
-            .unwrap_or_else(|_| {
-                // Different roots or other error — fall back to full replace
-                kept_core::RefreshPlan {
-                    added: vec![],
-                    modified: vec![],
-                    removed: vec![],
-                    unchanged: vec![],
-                }
+        // NOTE-008: ใช้ incremental refresh จริงแทน full replace
+        let plan = kept_core::plan_incremental_refresh(&previous_index, &current_index)
+            .unwrap_or_else(|_| kept_core::RefreshPlan {
+                added: vec![],
+                modified: vec![],
+                removed: vec![],
+                unchanged: vec![],
             });
 
-        state.records = new_records;
+        kept_core::apply_refresh_plan(&mut state.records, &plan, &new_records);
 
         Ok(FilesystemStatusReport {
             active_root: canonical.to_string_lossy().to_string(),
             indexed_file_count: state.records.len(),
             scanning_state: "ready".to_string(),
-            watcher_readiness: true,
+            watcher_readiness: self.watchers.read().await.contains_key(&canonical),
             warmup_state: "warmed".to_string(),
             last_error: None,
         })

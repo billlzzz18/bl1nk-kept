@@ -7,20 +7,14 @@
 use std::path::Path;
 
 use kept_core::{
-    analyze_naming, resolve_naming_rule, NamingIssueKind, NamingSettings, PolicyError,
-    ResolvedNamingRule, UserConfig,
+    analyze_naming, resolve_naming_rule, NamingIssueKind, NamingSettings, ResolvedNamingRule,
+    UserConfig,
 };
 
 // ─── validate_naming_settings edge cases ────────────────────────────────────
 
 fn starter_config() -> UserConfig {
     UserConfig::starter()
-}
-
-fn config_with_naming(naming: NamingSettings) -> UserConfig {
-    let mut config = starter_config();
-    config.defaults.naming = naming;
-    config
 }
 
 #[test]

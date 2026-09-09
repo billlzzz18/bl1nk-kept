@@ -19,43 +19,41 @@ license = "MIT"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "=1.0.151"
 serde_yaml = "0.9"
-# NOTE-001: 0.8.23 แก้ compatibility กับ serde 1.0.229 ที่ทำให้ 0.8.19 compile ไม่ผ่านบน stable ปัจจุบัน
-toml = "1.1.5+spec-1.1.0"
+# NOTE-001: toml 1.1.5 ตาม TOML spec 1.1.0 — ห้ามใส่ semver build metadata ใน version requirement (cargo จะ ignore และ warning)
+toml = "1.1.5"
 regex = "1.10"
 unicode-normalization = "0.1.25"
 thiserror = "2.0.20"
 anyhow = "1.0.104"
-cpufeatures = "=0.2.16"
-sha2 = "=0.10.8"
-digest = "=0.10.7"
-block-buffer = "=0.10.4"
-crypto-common = "=0.1.6"
-index = "2.14.2"
-hashbrown = "0.14.3"
+# NOTE-002: sha2 ถูก inherit โดย kept-core/kept-doc ผ่าน workspace; ส่วน digest/block-buffer/crypto-common/
+# cpufeatures เป็น transitive deps ของ sha2/hmac ที่ไม่มี crate ไหนเรียกใช้ตรง ๆ จึงลบออกจาก workspace.dependencies
+sha2 = "0.11.0"
+hex = "0.4"
 chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1.23", features = ["serde", "v4"] }
 tokio = { version = "1.52.4", features = ["full"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-clap = { version = "=4.4.18", features = ["derive"] }
+clap = { version = "4.6", features = ["derive"] }
 csv = "1.3"
 rusqlite = { version = "0.39", features = ["bundled"] }
 
 # Keyword / Search
 fuzzy-matcher = "0.3"
+# NOTE-005: โค้ด schema export ใน kept-core ใช้ API ของ schemars 0.8 (RootSchema, definitions, Draft-07) — ห้าม bump เป็น 1.x โดย migrate โค้ดก่อน
 schemars = "0.8"
+# NOTE-003: strsim ใช้คำนวณ levenshtein similarity ใน kept-core/src/scanner/duplicate.rs
 strsim = "0.11"
 walkdir = "2.5"
 dashmap = "6.1"
 fff-search = "0.10.6"
-# hashbrown = "0.15" (already pinned above)
 
 # Document / Markdown
 reqwest = { version = "0.13", features = ["json", "multipart"] }
 pulldown-cmark = "0.13"
 notify = "8"
 similar = "3"
-lopdf = "0.44"
+lopdf = "0.45"
 docx-rs = "0.4"
 pmcp = "2.10"
 
@@ -66,7 +64,8 @@ pmcp = "2.10"
 kept-grammar = { path = "crate/kept-grammar" }
 
 # AST parsing (Phase 1.1: tree-sitter symbol extraction)
-tree-sitter = "0.25"
+# NOTE-004: 0.25.10 คือเวอร์ชันที่ verified กับ tree-sitter-rust 0.24 (TODO Phase 1.1) — ห้าม bump runtime แยกจาก grammar crates เพราะ Language type จะไม่ตรงกัน
+tree-sitter = "0.25.10"
 tree-sitter-rust = "0.24"
 tree-sitter-python = "0.23"
 tree-sitter-javascript = "0.23"

@@ -72,7 +72,7 @@ impl ContextRegistry {
     pub fn sha256_hex(content: &[u8]) -> String {
         let mut hasher = Sha256::new();
         hasher.update(content);
-        format!("{:x}", hasher.finalize())
+        hex::encode(hasher.finalize())
     }
 
     /// Truncated SHA-256 prefix for inline references (first 8 hex chars).

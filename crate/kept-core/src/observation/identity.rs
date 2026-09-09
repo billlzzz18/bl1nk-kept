@@ -26,7 +26,7 @@ impl ContentIdentity {
     pub fn from_bytes(bytes: &[u8]) -> Self {
         let mut hasher = Sha256::new();
         hasher.update(bytes);
-        let hash = format!("{:x}", hasher.finalize());
+        let hash = hex::encode(hasher.finalize());
         Self {
             hash_algorithm: "sha256".to_string(),
             digest: hash,

@@ -6,11 +6,9 @@
 use kept_core::scanner::DuplicateMutationPlan;
 use kept_core::{
     create_duplicate_mutation_plan, simulate_duplicate_mutation, DuplicateActionKind,
-    DuplicateAllowRule, DuplicateEvidence, DuplicateGroup, DuplicateMutationPolicy,
-    DuplicatePlanAction, FileRecord, ScanIndex,
+    DuplicateEvidence, DuplicateGroup, DuplicateMutationPolicy, DuplicatePlanAction, FileRecord,
+    ScanIndex,
 };
-use std::fs;
-use std::path::PathBuf;
 
 fn make_file(path: &str, name: &str, size: u64) -> FileRecord {
     FileRecord {

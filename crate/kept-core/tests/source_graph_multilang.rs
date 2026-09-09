@@ -117,11 +117,11 @@ fn dogfood_parse_real_workspace_rust_file() {
         .unwrap_or_else(|e| panic!("must read real workspace file {syntax_path:?}: {e}"));
     let index = IndexBuilder::parse_file(&syntax_path, &content);
     assert!(
-        index.find_definitions("parse_rust_ast").len() >= 1,
+        !index.find_definitions("parse_rust_ast").is_empty(),
         "parse_rust_ast must be extracted from real syntax.rs"
     );
     assert!(
-        index.find_definitions("parse_rust_outline").len() >= 1,
+        !index.find_definitions("parse_rust_outline").is_empty(),
         "parse_rust_outline must be extracted from real syntax.rs"
     );
 }

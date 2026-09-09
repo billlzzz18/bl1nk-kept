@@ -21,7 +21,8 @@ tokio.workspace = true
 reqwest.workspace = true
 anyhow.workspace = true
 chrono.workspace = true
-sha2 = "0.10.9"
+sha2.workspace = true
+hex.workspace = true
 kept-grammar.workspace = true
 fff-search.workspace = true
 rusqlite.workspace = true
@@ -32,7 +33,7 @@ tree-sitter-python.workspace = true
 tree-sitter-javascript.workspace = true
 tree-sitter-typescript.workspace = true
 tree-sitter-go.workspace = true
-tiktoken-rs = "0.6"
+tiktoken-rs = "0.12.0"
 
 [dev-dependencies]
 jsonschema = { version = "0.49.9", default-features = false }

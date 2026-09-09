@@ -42,16 +42,15 @@ impl TokenCounter {
         ((text.len() as f64) / 4.0).ceil() as u32
     }
 
+    // NOTE-001: tiktoken-rs 0.12 singleton คืน &CoreBPE ที่ sync ภายในแล้ว จึงเรียกใช้ตรง ๆ ได้โดยไม่ต้อง lock
     fn count_cl100k(&self, text: &str) -> u32 {
         let bpe = tiktoken_rs::cl100k_base_singleton();
-        let lock = bpe.lock();
-        lock.encode_with_special_tokens(text).len() as u32
+        bpe.encode_with_special_tokens(text).len() as u32
     }
 
     fn count_o200k(&self, text: &str) -> u32 {
         let bpe = tiktoken_rs::o200k_base_singleton();
-        let lock = bpe.lock();
-        lock.encode_with_special_tokens(text).len() as u32
+        bpe.encode_with_special_tokens(text).len() as u32
     }
 }
 

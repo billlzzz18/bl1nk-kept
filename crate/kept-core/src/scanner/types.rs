@@ -164,7 +164,7 @@ fn scan_context_fingerprint(root: &str, options: &ScanOptions) -> String {
     digest.update([u8::from(options.include_hidden)]);
     digest.update([0]);
     digest.update(options.max_depth.unwrap_or(usize::MAX).to_le_bytes());
-    format!("{:x}", digest.finalize())
+    hex::encode(digest.finalize())
 }
 
 pub fn plan_incremental_refresh(

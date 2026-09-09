@@ -33,6 +33,11 @@
 
 ### Fixed
 
+- แก้ `Cargo.toml` เสียหายจากการแปะทับ: quote ครบถ้วน (`digest`, `block-buffer`/`crypto-common`, `schemars`/`strsim`, `tree-sitter`), แยกบรรทัดที่ติดกันและเติม `strsim = "0.11"` ที่ kept-core ใช้จริงใน duplicate detection
+- ลบ workspace dependencies ที่ไม่มี crate ใด inherit (`digest`, `block-buffer`, `crypto-common`, `cpufeatures`, `index`, `hashbrown`) — เป็น transitive deps ของ sha2/hmac อยู่แล้ว
+- unify `sha2` เป็น 0.11.0 ผ่าน workspace inheritance (kept-core เดิม 0.10.9, kept-doc เดิม 0.11.0) และเปลี่ยน hex encoding เป็น `hex::encode` (digest 0.11 ไม่มี `LowerHex` บน Output)
+- downgrade `schemars` เป็น 0.8 ตาม API ที่โค้ดใช้จริง (`RootSchema`, `definitions`, Draft-07) และลด `.lock()` ใน `token_counter.rs` ตาม tiktoken-rs 0.12 ที่ singleton sync ภายใน
+- คืน `tree-sitter` เป็น 0.25.10 (เวอร์ชันที่ verified กับ grammar crates 0.23/0.24 ตาม TODO Phase 1.1) และลบ semver build metadata ออกจาก `toml` requirement เพื่อจบ cargo warning
 - แก้ Mavis CLI Windows compatibility: เพิ่ม Winsock init (WSAStartup) + threading-based readline แทน selectors (selectors ใช้ได้แค่ sockets บน Windows)
 - ลบ broken symlink `composio` ที่ทำให้ skill traverse crash
 - ติดตั้ง Claude Code v2.1.263 ผ่าน winget (Anthropic.ClaudeCode)

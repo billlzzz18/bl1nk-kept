@@ -429,7 +429,7 @@ pub fn validate_corpus_manifest(manifest: &CorpusManifest) -> Result<(), Foundat
 
 /// NOTE-001: corpus จะผ่าน experiment ได้ก็ต่อเมื่อ bytes ตรงกับ checksum ที่ manifest ระบุ
 pub fn verify_corpus_bytes(entry: &CorpusManifestEntry, bytes: &[u8]) -> bool {
-    let actual = format!("{:x}", Sha256::digest(bytes));
+    let actual = hex::encode(Sha256::digest(bytes));
     actual.eq_ignore_ascii_case(&entry.content_sha256)
 }
 

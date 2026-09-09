@@ -66,10 +66,11 @@
 - [ ] เพิ่ม MCP semantic search tools สำหรับ registry/vault query (Green)
 - [ ] อัปเดต `get-start.md` และ `SPEC.md` (Reconcile)
 
-### 1.3 Thai Bigram Tokenizer (TODO Section 5)
+### 1.3 Thai Bigram Tokenizer & Seed Corpus (TODO Section 5)
 
 - [ ] ออกแบบ corpus tests: คำไทยสมัยใหม่, ไทยปนอังกฤษ, acronym, numeral, path, URL, emoji, punctuation (Red)
 - [ ] พัฒนา Thai Bigram / Maximal Matching tokenizer (Green)
+- [ ] Seed Thai corpus จาก PyThaiNLP: ตรวจ license ราย corpus, เก็บ content SHA-256 + retrieval timestamp ใน `CorpusManifest`,  import words/synonyms/stopwords/Wikipedia titles (ตาม `docs/research/THAI_CORPUS_AND_TOKENIZATION_SOURCES.md`)
 - [ ] เปรียบเทียบผล BM25/Thai Bigram ก่อน/หลัง FFF migration (Refactor)
 
 ### 1.4 Watcher Lifecycle & Snapshot Migration (TODO Section 5)

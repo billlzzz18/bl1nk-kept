@@ -23,12 +23,19 @@
 
 ## Phase 0: Test Debt & Code Quality (ต้องทำก่อนขยายฟีเจอร์)
 
-> **Exit Gate:** `cargo clippy --workspace -- -D warnings` ผ่าน 0 warning, unwrap/expect ใน kept-core/src ลดลง
+> **Exit Gate:** `cargo clippy --workspace -- -D warnings` ผ่าน 0 warning, production unwrap/expect = 0
 
 ### 0.1 Clippy Restriction Lints
 
 - [x] ตั้งค่า restriction lints ใน workspace `Cargo.toml` ให้เตือน `clippy::unwrap_used` และ `clippy::expect_used`
-- [ ] ทยอยลบ unwrap/expect 130 จุดใน `crate/kept-core/src/` ให้เหลือ 0
+- [x] ลบ unwrap/expect ใน production code ทั้งหมด (kept-core, kept-doc, kept-mcp) เหลือ 0 จุด
+  - `foundation.rs`: `compile_regex()` helper, `unreachable!()` สำหรับ static patterns
+  - `semantic.rs`: `embeddings_request_body` / `rerank_request_body` → `Result<SemanticError>`
+  - `source_graph.rs`: RwLock poison recovery ด้วย `unwrap_or_else(|e| e.into_inner())`
+  - `client.rs`: `NotionClient::new()` → `Result<Self>` + `NotionError::Client`
+  - `frontmatter.rs`: `let Some(...) else { continue }` แทน `.expect()`
+  - `doc_to_diagram.rs`: `if let` pattern matching แทน `.unwrap()`
+  - `schema.rs`: `SchemaError` enum, `export_keyword_registry_schema()` → `Result<RootSchema, SchemaError>`
 
 ### 0.2 Test Coverage Gaps
 

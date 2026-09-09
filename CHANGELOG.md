@@ -17,6 +17,11 @@
 - เพิ่ม `sccache` ใน CI ผ่าน `mozilla-actions/sccache-action@v0.0.6`
 - เพิ่ม `* text=auto eol=lf` ใน `.gitattributes` สำหรับ cross-platform line ending normalization
 - เพิ่ม `MAVIS_ACP_COMMAND` ใน `.env` สำหรับ Mavis skill runtime
+- เพิ่ม Tree-sitter AST symbol extraction (Phase 1.1): `kept-core/source_graph/syntax.rs` ใช้ `tree-sitter` + `tree-sitter-rust` parse definitions (fn/struct/enum/trait/type/mod/macro), imports, impl relationships และ call/type references แทน regex string matching; regex scanner คงไว้เป็น fallback
+- เพิ่ม `syntax::parse_rust_outline()` คืน structural outline (`StructureOutlineItem` พร้อม children และ 1-based range) สำหรับผูกเข้า `StructurePayload` ของ Observation
+- เพิ่ม contract tests `tests/source_graph_ast.rs` (7 cases): string literal/comment ไม่กลายเป็น definition, multi-line signature, generics, impl trait for type, macro_rules, call references
+- เพิ่ม multi-language symbol extraction (Phase 1.1): `source_graph/multilang.rs` รองรับ Python (`def`/`class`/`import`), JavaScript/TypeScript (`function`/`class`/`method`/`interface`/`type`/`enum`/`import`) และ Go (`func`/`method`/`type_spec` struct/interface/alias/`import_spec`) ผ่าน `IndexBuilder::parse_file()` dispatch ตาม extension; `scan_recursive` และ `apply_events` index ทุกภาษาที่รองรับ
+- เพิ่ม dogfooding tests: parse ไฟล์จริงใน workspace (`src/source_graph/syntax.rs`, `tools/extract_obsidian_corpus.py`) ยืนยัน extraction ทำงานกับโค้ดจริง
 
 ### Changed
 

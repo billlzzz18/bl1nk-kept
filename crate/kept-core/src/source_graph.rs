@@ -192,6 +192,12 @@ impl Default for IndexBuilderConfig {
     }
 }
 
+/// Tree-sitter AST-based symbol extraction (Phase 1.1)
+pub mod syntax;
+
+/// Multi-language (Python, JS/TS, Go) tree-sitter extraction (Phase 1.1)
+pub mod multilang;
+
 /// Builder for constructing a `ScopeGraphIndex` from files or directories.
 #[derive(Debug, Clone, Default)]
 pub struct IndexBuilder {
@@ -224,6 +230,28 @@ impl IndexBuilder {
         self
     }
 
+    /// Parses any supported source file (Rust, Python, JS/TS, Go) into symbols.
+    /// Returns an empty index for unsupported extensions.
+    pub fn parse_file(path: &Path, content: &str) -> ScopeGraphIndex {
+        let file_path_str = path.to_string_lossy().replace('\\', "/");
+        // NOTE-012: เลือกภาษาจาก extension — ไม่รองรับ = คืน index ว่าง
+        let extension = path
+            .extension()
+            .and_then(|e| e.to_str())
+            .unwrap_or_default();
+        let Some(language) = multilang::language_from_extension(extension) else {
+            return ScopeGraphIndex::new();
+        };
+        if language == multilang::Language::Rust {
+            return Self::parse_rust_file(path, content);
+        }
+        // NOTE-015: ใช้ match แทน unwrap_or_else เพื่อเลี่ยง clippy::unwrap_or_default
+        match multilang::parse_source(language, &file_path_str, content) {
+            Some(index) => index,
+            None => ScopeGraphIndex::new(),
+        }
+    }
+
     /// Checks if a file is binary by inspecting bounded initial bytes.
     pub fn is_binary_file(path: &Path, max_bytes: usize) -> bool {
         if let Ok(mut file) = fs::File::open(path) {
@@ -236,8 +264,19 @@ impl IndexBuilder {
         false
     }
 
-    /// Parses a single Rust source file into symbols.
+    /// Parses a single Rust source file into symbols using tree-sitter AST.
+    /// Falls back to the legacy regex scanner if the AST parser is unavailable.
     pub fn parse_rust_file(path: &Path, content: &str) -> ScopeGraphIndex {
+        let file_path_str = path.to_string_lossy().replace('\\', "/");
+        // NOTE-008: AST parsing ตรงตาม grammar — regex scanner เก็บไว้เป็น fallback เท่านั้น
+        if let Some(index) = syntax::parse_rust_ast(&file_path_str, content) {
+            return index;
+        }
+        Self::parse_rust_file_regex(path, content)
+    }
+
+    /// Legacy regex-based scanner (fallback เมื่อ AST parser ใช้ไม่ได้)
+    pub fn parse_rust_file_regex(path: &Path, content: &str) -> ScopeGraphIndex {
         let mut index = ScopeGraphIndex::new();
         let file_path_str = path.to_string_lossy().replace('\\', "/");
         index.indexed_files.insert(file_path_str.clone());
@@ -439,26 +478,29 @@ impl IndexBuilder {
             if path.is_dir() {
                 self.scan_recursive(&path, index);
             } else if path.is_file() {
-                if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
-                    if ext == "rs" {
-                        if let Ok(meta) = entry.metadata() {
-                            if meta.len() > self.config.max_file_size_bytes {
-                                continue;
-                            }
-                        }
-
-                        if Self::is_binary_file(&path, self.config.max_prefix_check_bytes) {
+                // NOTE-014: index ทุกภาษาที่ parse_file รองรับ (Rust/Python/JS/TS/Go)
+                let supported = path
+                    .extension()
+                    .and_then(|e| e.to_str())
+                    .is_some_and(|ext| multilang::language_from_extension(ext).is_some());
+                if supported {
+                    if let Ok(meta) = entry.metadata() {
+                        if meta.len() > self.config.max_file_size_bytes {
                             continue;
                         }
+                    }
 
-                        if let Ok(content) = fs::read_to_string(&path) {
-                            let file_idx = Self::parse_rust_file(&path, &content);
-                            index.definitions.extend(file_idx.definitions);
-                            index.references.extend(file_idx.references);
-                            index.imports.extend(file_idx.imports);
-                            index.implementations.extend(file_idx.implementations);
-                            index.indexed_files.extend(file_idx.indexed_files);
-                        }
+                    if Self::is_binary_file(&path, self.config.max_prefix_check_bytes) {
+                        continue;
+                    }
+
+                    if let Ok(content) = fs::read_to_string(&path) {
+                        let file_idx = Self::parse_file(&path, &content);
+                        index.definitions.extend(file_idx.definitions);
+                        index.references.extend(file_idx.references);
+                        index.imports.extend(file_idx.imports);
+                        index.implementations.extend(file_idx.implementations);
+                        index.indexed_files.extend(file_idx.indexed_files);
                     }
                 }
             }
@@ -604,7 +646,7 @@ impl IndexManager {
                             }
                         }
                         if let Ok(content) = fs::read_to_string(&event.path) {
-                            let file_idx = IndexBuilder::parse_rust_file(&event.path, &content);
+                            let file_idx = IndexBuilder::parse_file(&event.path, &content);
                             guard.definitions.extend(file_idx.definitions);
                             guard.references.extend(file_idx.references);
                             guard.imports.extend(file_idx.imports);

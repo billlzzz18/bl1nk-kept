@@ -65,6 +65,14 @@ pmcp = "2.10"
 # Grammar types (keyword validation, naming profiles, config resolution)
 kept-grammar = { path = "crate/kept-grammar" }
 
+# AST parsing (Phase 1.1: tree-sitter symbol extraction)
+tree-sitter = "0.25"
+tree-sitter-rust = "0.24"
+tree-sitter-python = "0.23"
+tree-sitter-javascript = "0.23"
+tree-sitter-typescript = "0.23"
+tree-sitter-go = "0.23"
+
 [profile.release]
 opt-level = 3
 lto = true

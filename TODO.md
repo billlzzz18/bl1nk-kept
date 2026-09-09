@@ -52,12 +52,12 @@
 
 ### 1.1 Tree-sitter Symbol Extraction (TODO 2.2.1)
 
-- [ ] นำ `tree-sitter` และ `tree-sitter-rust` เข้า `Cargo.toml`
-- [ ] ออกแบบ fixtures ทดสอบ symbol parsing ใน `source_graph.rs`: multi-line signatures, string literals, comments, generics, traits, enums, macros (Red)
-- [ ] Implement AST parsing แทน regex string matching ใน `source_graph.rs` (Green)
-- [ ] ผูกผลลัพธ์ AST เข้ากับ `StructurePayload` และ `StructureOutlineItem` ของ `Observation` (Green)
-- [ ] ออกแบบ fallback/multi-language parser สำหรับ Python, JS/TS, Go (Green)
-- [ ] Dogfooding ทดสอบกับโค้ดจริงใน workspace (Verified)
+- [x] นำ `tree-sitter` และ `tree-sitter-rust` เข้า `Cargo.toml` (tree-sitter 0.25.10, tree-sitter-rust 0.24.2)
+- [x] ออกแบบ fixtures ทดสอบ symbol parsing ใน `source_graph.rs`: multi-line signatures, string literals, comments, generics, traits, enums, macros (Red) — `tests/source_graph_ast.rs` 7 cases
+- [x] Implement AST parsing แทน regex string matching ใน `source_graph.rs` (Green) — `source_graph/syntax.rs`, regex เหลือเป็น fallback
+- [x] ผูกผลลัพธ์ AST เข้ากับ `StructurePayload` และ `StructureOutlineItem` ของ `Observation` (Green) — `syntax::parse_rust_outline()` คืน outline พร้อม children/range
+- [x] ออกแบบ fallback/multi-language parser สำหรับ Python, JS/TS, Go (Green) — `source_graph/multilang.rs` + `IndexBuilder::parse_file()` dispatch ตาม extension (py/js/jsx/ts/tsx/go); scan_recursive และ apply_events index ทุกภาษาที่รองรับ
+- [x] Dogfooding ทดสอบกับโค้ดจริงใน workspace (Verified) — parse `src/source_graph/syntax.rs` จริงได้ `parse_rust_ast`/`parse_rust_outline` และ parse `tools/extract_obsidian_corpus.py` จริงได้ definitions
 
 ### 1.2 Wire Semantic Search into CLI (SEM-001 partial)
 

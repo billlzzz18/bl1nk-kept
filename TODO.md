@@ -75,8 +75,15 @@
 
 ### 1.4 Watcher Lifecycle & Snapshot Migration (TODO Section 5)
 
-- [ ] ออกแบบ tests: watcher events `created/modified/removed` → index query เห็นล่าสุดโดยไม่สร้าง instance ใหม่ (Red)
-- [ ] เชื่อม watcher events เข้า index query pipeline (Green)
+- [x] Auto-rescan watcher: `RootWatcher` + `FffManager::start_watcher()` — plan ที่ `docs/superpowers/plans/2026-09-10-auto-rescan-watcher.md`
+  - [x] `apply_refresh_plan()` — apply delta from `plan_incremental_refresh` in-place
+  - [x] `RootWatcher` — notify loop + debounce 500ms per root (ใช้ `notify` v8 OS-native watcher)
+  - [x] `FffManager` integrate watcher — auto-start on first access, auto-refresh on events
+  - [x] Fix `rescan()` ให้ใช้ incremental refresh จริง (ปัจจุบัน discard plan ทิ้ง)
+  - [x] Graceful shutdown + real `watcher_readiness` status
+  - [ ] ทดสอบกับ editor หลายตัว: nano, vim, code — ต้อง handle atomic save (write-to-temp + rename) ได้ถูกต้อง
+- [ ] `kept state` — wire index state เข้า CLI แสดง breakdown (index file count, watcher status, last rescan, scan delta)
+  - **ตารางต้องอ่านง่าย** — ใช้ aligned columns, ห้ามเบี้ยว like sqz stats
 - [ ] ออกแบบ tests: `.gitignore` เปลี่ยน → FFF rescan state ถูกส่งต่อ (Red)
 - [ ] จัดการ propagation ของ ignore changes (Green)
 - [x] ออกแบบ tests: snapshot migration ใช้ schema ข้ามเวอร์ชัน (Red) — 3 tests ใน `types.rs`

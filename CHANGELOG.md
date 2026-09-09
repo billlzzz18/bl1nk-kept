@@ -2,8 +2,9 @@
 
 เอกสารนี้ยึดแนวคิดของ [Keep a Changelog](https://keepachangelog.com/) และใช้ semantic versioning. Public API, schema, corpus revision และค่า default ที่เปลี่ยนต้องมี release entry และหลักฐานทดสอบเสมอ.
 
-## Unreleased
+## [Unreleased]
 
+## [0.3.0] - 2026-09-10
 ### Added
 
 - เพิ่ม `kept-grammar` crate: แยก types, config I/O, validation rules สำหรับ keyword grammar ออกจาก kept-core

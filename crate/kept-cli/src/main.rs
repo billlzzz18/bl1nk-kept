@@ -1185,7 +1185,7 @@ mod release_metadata_tests {
     fn cli_metadata_uses_foundation_release_version() {
         assert_eq!(
             super::Cli::command().get_version().unwrap_or_default(),
-            "0.2.0"
+            "0.3.0"
         );
     }
 }

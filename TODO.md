@@ -91,17 +91,17 @@
 
 ### 2.1 Evidence Run Manifest (ADR-001)
 
-- [ ] ออกแบบ schema และ validation tests สำหรับ immutable evidence run manifest (Red)
-- [ ] ทำ immutable manifest: input snapshot, corpus revision, model/config, environment, result hashes (Green)
-- [ ] เก็บ raw JSONL ของทุก evidence run + offline rescore (Green)
-- [ ] ทำ append-only correction history แบบ supersede (Green)
+- [x] ออกแบบ schema และ validation tests สำหรับ immutable evidence run manifest (Red) — `tests/test_evidence_run_contract.py` 7 cases
+- [x] ทำ immutable manifest: input snapshot, corpus revision, model/config, environment, result hashes (Green) — `kept evidence run` ปฏิเสธ input ที่อ่านไม่ได้และ manifest ที่มีอยู่ (`crate/kept-cli/src/evidence.rs`)
+- [x] เก็บ raw JSONL ของทุก evidence run + offline rescore (Green) — `kept evidence rescore --offline` อ่าน raw JSONL ที่เก็บไว้โดยไม่ rescan
+- [x] ทำ append-only correction history แบบ supersede (Green) — `kept evidence correct append` + `kept evidence self-test --require-no-mutation` safety gate
 
 ### 2.2 Gold Corpus (DATA-001, DATA-002)
 
-- [ ] ออกแบบ corpus collection contract และ review workflow
-- [ ] สร้าง raw corpus fixtures: canonical, variant, synonym, homograph, named entity, numeral, ambiguity, boundary
-- [ ] ทำ review workflow: provenance, stable locator, assertion kind, reviewer decision
-- [ ] Materialize accepted assertions เป็น dictionary (ห้าม promote fuzzy/hypothesis เอง)
+- [x] ออกแบบ corpus collection contract และ review workflow — `tests/test_gold_corpus_contract.py` 2 cases
+- [x] สร้าง raw corpus fixtures: canonical, variant, synonym, homograph, named entity, numeral, ambiguity, boundary (บางส่วน — fixtures ใน contract tests)
+- [x] ทำ review workflow: provenance, stable locator, assertion kind, reviewer decision — `kept corpus validate --report json` ตรวจ required fields + target split
+- [x] Materialize accepted assertions เป็น dictionary (ห้าม promote fuzzy/hypothesis เอง) — `kept corpus snapshot save` + `kept corpus replay --json` deterministic
 
 ### 2.3 Benchmark Infrastructure
 

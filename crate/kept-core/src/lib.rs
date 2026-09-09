@@ -407,7 +407,7 @@ mod foundation_normalization_tests {
 #[cfg(test)]
 mod foundation_release_version_tests {
     #[test]
-    fn foundation_release_uses_workspace_version_0_3_0() {
-        assert_eq!(env!("CARGO_PKG_VERSION"), "0.3.0");
+    fn foundation_release_uses_workspace_version_0_3_1() {
+        assert_eq!(env!("CARGO_PKG_VERSION"), "0.3.1");
     }
 }

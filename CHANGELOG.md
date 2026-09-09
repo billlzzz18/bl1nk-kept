@@ -3,8 +3,10 @@
 เอกสารนี้ยึดแนวคิดของ [Keep a Changelog](https://keepachangelog.com/) และใช้ semantic versioning. Public API, schema, corpus revision และค่า default ที่เปลี่ยนต้องมี release entry และหลักฐานทดสอบเสมอ.
 
 ## [Unreleased]
+
+## [0.3.1] - 2026-09-10
 ### Fixed
-- แก้ stale release-version tests ใน kept-cli (`main.rs`) และ kept-core (`lib.rs`) ให้ตรง workspace version 0.3.0; ยืนยัน evidence run manifest (TODO 2.1) และ gold corpus workflow (TODO 2.2) ผ่าน contract tests ครบ 9/9 (`tests/test_evidence_run_contract.py`, `tests/test_gold_corpus_contract.py`)
+- แก้ stale release-version tests ใน kept-cli (`main.rs`) และ kept-core (`lib.rs`) ให้ตรง workspace version 0.3.1; ยืนยัน evidence run manifest (TODO 2.1) และ gold corpus workflow (TODO 2.2) ผ่าน contract tests ครบ 9/9 (`tests/test_evidence_run_contract.py`, `tests/test_gold_corpus_contract.py`)
 
 ## [0.3.0] - 2026-09-10
 ### Added

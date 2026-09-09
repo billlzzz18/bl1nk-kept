@@ -24,7 +24,9 @@ pub fn choose_duplicate_action() -> anyhow::Result<Option<DuplicateAction>> {
         "2. export duplicate plan",
         "3. simulate duplicate mutation (dry-run)",
         "4. trash duplicates to backup directory",
-        "5. rollback recent duplicate mutation",
+        "5. ⚠️  delete duplicates (ไม่สามารถ undo ได้)",
+        "6. ⚠️  hardlink duplicates (แทนที่ด้วย hardlink)",
+        "7. rollback recent duplicate mutation",
         "0. จบโดยไม่เปลี่ยนไฟล์",
     ];
     let selected = Select::new()
@@ -39,6 +41,8 @@ pub fn choose_duplicate_action() -> anyhow::Result<Option<DuplicateAction>> {
             2 => "3",
             3 => "4",
             4 => "5",
+            5 => "6",
+            6 => "7",
             _ => "0",
         })
     }))
@@ -50,7 +54,9 @@ pub fn duplicate_action_from_selection(selection: &str) -> Option<DuplicateActio
         "2" | "export" | "export-plan" => Some(DuplicateAction::ExportPlan),
         "3" | "simulate" => Some(DuplicateAction::Simulate),
         "4" | "trash" => Some(DuplicateAction::Trash),
-        "5" | "rollback" => Some(DuplicateAction::Rollback),
+        "5" | "delete" => Some(DuplicateAction::Delete),
+        "6" | "hardlink" => Some(DuplicateAction::HardLink),
+        "7" | "rollback" => Some(DuplicateAction::Rollback),
         "0" | "q" | "" => None,
         _ => None,
     }
@@ -61,6 +67,7 @@ pub fn run_duplicate_action(
     root: &Path,
     report: &serde_json::Value,
     yes: bool,
+    scan_index: Option<&kept_core::ScanIndex>,
 ) -> anyhow::Result<()> {
     use kept_core::{
         create_duplicate_mutation_plan, execute_duplicate_mutation, rollback_duplicate_mutation,
@@ -92,12 +99,19 @@ pub fn run_duplicate_action(
         | DuplicateAction::HardLink => {
             let groups: Vec<DuplicateGroup> =
                 serde_json::from_value(report["groups"].clone()).unwrap_or_default();
-            let index: ScanIndex = ScanIndex {
-                root: root.display().to_string(),
-                scanned_at_unix: 0,
-                total_size: 0,
-                files: Vec::new(),
-                issues: Vec::new(),
+            // NOTE-002: ใช้ real scan index จาก snapshot ถ้ามี ป้องกัน stale-index safety gate ถูก bypass
+            let owned_index;
+            let index: &ScanIndex = if let Some(idx) = scan_index {
+                idx
+            } else {
+                owned_index = ScanIndex {
+                    root: root.display().to_string(),
+                    scanned_at_unix: 0,
+                    total_size: 0,
+                    files: Vec::new(),
+                    issues: Vec::new(),
+                };
+                &owned_index
             };
 
             let kind = match action {
@@ -106,7 +120,7 @@ pub fn run_duplicate_action(
                 _ => DuplicateActionKind::Trash,
             };
 
-            let plan = create_duplicate_mutation_plan(&index, &groups, kind);
+            let plan = create_duplicate_mutation_plan(index, &groups, kind);
             let policy = DuplicateMutationPolicy {
                 allowed_roots: vec![root.display().to_string()],
                 protected_patterns: vec![".git".to_string(), "node_modules".to_string()],
@@ -116,7 +130,7 @@ pub fn run_duplicate_action(
                 verify_checksum_before_action: true,
             };
 
-            let simulation = simulate_duplicate_mutation(&plan, &index, &policy);
+            let simulation = simulate_duplicate_mutation(&plan, index, &policy);
             println!(
                 "Simulation: {} action(s) valid, {} blocked. Total reclaimable: {} bytes.",
                 simulation.valid_actions.len(),
@@ -157,7 +171,7 @@ pub fn run_duplicate_action(
                 total_reclaimable_bytes: simulation.total_reclaimable_bytes,
             };
 
-            let journal = execute_duplicate_mutation(&safe_plan, &index, &policy)?;
+            let journal = execute_duplicate_mutation(&safe_plan, index, &policy)?;
             std::fs::write(&journal_file, serde_json::to_string_pretty(&journal)?)?;
             println!(
                 "Applied duplicate mutation. Rollback journal saved to: {}",
@@ -235,7 +249,7 @@ pub fn handle_task_duplicates(
         if json {
             println!("{}", serde_json::to_string_pretty(&report)?);
         }
-        return run_duplicate_action(action, &canonical_root, &report, yes);
+        return run_duplicate_action(action, &canonical_root, &report, yes, Some(&snapshot.index));
     }
 
     if json {
@@ -265,7 +279,13 @@ pub fn handle_task_duplicates(
 
     if is_interactive_terminal() {
         if let Some(action) = choose_duplicate_action()? {
-            run_duplicate_action(action, &canonical_root, &report, false)?;
+            run_duplicate_action(
+                action,
+                &canonical_root,
+                &report,
+                false,
+                Some(&snapshot.index),
+            )?;
         }
     }
     Ok(())

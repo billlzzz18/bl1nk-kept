@@ -174,6 +174,37 @@ pub fn simulate_duplicate_mutation(
     let root_path = Path::new(&plan.root);
 
     for action in &plan.actions {
+        // NOTE-003: เช็ค allow_list ก่อน — ถ้า target_path ตรง rule ใด ruleหนึ่ง ให้ข้าม action นี้
+        if !policy.allow_list.is_empty() {
+            let target_allowed = policy.allow_list.iter().any(|rule| {
+                // เช็ค sha256
+                if let Some(rule_hash) = &rule.sha256 {
+                    if rule_hash.eq_ignore_ascii_case(&action.expected_sha256) {
+                        return true;
+                    }
+                }
+                // เช็ค path_a/path_b
+                if let (Some(a), Some(b)) = (&rule.path_a, &rule.path_b) {
+                    if (a == &action.canonical_path && b == &action.target_path)
+                        || (a == &action.target_path && b == &action.canonical_path)
+                    {
+                        return true;
+                    }
+                }
+                // เช็ค glob_pattern — ตรงกับ canonical หรือ target
+                if let Some(pattern) = &rule.glob_pattern {
+                    if action.canonical_path.contains(pattern.as_str())
+                        || action.target_path.contains(pattern.as_str())
+                    {
+                        return true;
+                    }
+                }
+                false
+            });
+            if target_allowed {
+                continue;
+            }
+        }
         let target_full = if Path::new(&action.target_path).is_absolute() {
             PathBuf::from(&action.target_path)
         } else {
@@ -360,14 +391,44 @@ pub fn execute_duplicate_mutation(
                 });
             }
             DuplicateActionKind::HardLink => {
+                // NOTE-004: S4 — ตรวจสอบ checksum ของ canonical ก่อน hardlink
+                if policy.verify_checksum_before_action && !action.expected_sha256.is_empty() {
+                    let canonical_hash = full_hash(&canonical_full)?;
+                    if hash_hex(&canonical_hash) != action.expected_sha256 {
+                        return Err(std::io::Error::new(
+                            std::io::ErrorKind::InvalidData,
+                            format!(
+                                "Canonical file '{}' modified since duplicate index creation; aborting HardLink",
+                                action.canonical_path
+                            ),
+                        ));
+                    }
+                }
+
+                // NOTE-005: S3 — backup ไฟล์ต้นทางก่อนแทนที่ สำหรับ rollback
+                fs::create_dir_all(&backup_dir)?;
+                let relative_target = target_full.strip_prefix(root_path).unwrap_or(&target_full);
+                let backup_file =
+                    backup_dir.join(format!("{}.pre-hardlink", relative_target.display()));
+                if let Some(parent) = backup_file.parent() {
+                    fs::create_dir_all(parent)?;
+                }
+                fs::copy(&target_full, &backup_file)?;
+
                 let temp_link =
                     target_full.with_extension(format!("kept-tmp-{}", unix_now() % 1_000_000));
-                fs::hard_link(&canonical_full, &temp_link)?;
-                fs::rename(&temp_link, &target_full)?;
+                let link_result = fs::hard_link(&canonical_full, &temp_link)
+                    .and_then(|()| fs::rename(&temp_link, &target_full));
+                if let Err(e) = link_result {
+                    // NOTE-006: S3 — cleanup orphaned temp link แล้ว restore backup
+                    let _ = fs::remove_file(&temp_link);
+                    let _ = fs::copy(&backup_file, &target_full);
+                    return Err(e);
+                }
                 journal_entries.push(RollbackEntry {
                     target_path: action.target_path.clone(),
                     action_performed: DuplicateActionKind::HardLink,
-                    backup_path: None,
+                    backup_path: Some(backup_file.display().to_string()),
                     restored: false,
                 });
             }

@@ -8,12 +8,26 @@
 
 ```
 crate/
-├── kept-core/      # Core logic: keyword validation, search, filesystem, observation model
+├── kept-core/      # Core: observation, scanner, duplicate/mutation, policy, search, source_graph, validator, schema
 ├── kept-cli/       # CLI binary (`kept`) — command surface for users
 ├── kept-mcp/       # MCP server binary (`bl1nk-kept-mcp`) — long-running MCP service
 ├── kept-doc/       # Document sync/conversion library (Notion, Markdown, PDF, DOCX)
 └── kept-grammar/   # Grammar types, keyword validation, naming profiles, config
 ```
+
+### Module Relationships
+
+```
+kept-grammar ──→ kept-core ←── kept-cli
+                     ↑
+                 kept-doc
+                     ↑
+                 kept-mcp
+```
+
+- kept-core เป็น central hub — ทุก crate อ้างอิงถึง
+- kept-cli delegate domain logic ไป kept-core เท่านั้น
+- kept-mcp เป็น stdio transport; logic อยู่ kept-core
 
 ---
 
@@ -90,3 +104,12 @@ cargo fmt --all -- --check
 ## Agent Handoff
 
 ดูที่ `AGENTS.md` สำหรับคู่มือการส่งต่องานระหว่าง Agent
+
+---
+
+## Gotchas
+
+- **stale-index safety gate:** `simulate_duplicate_mutation` ต้องใช้ real `ScanIndex` จาก snapshot — ห้ามใช้ empty index
+- **mutation confirmation:** CLI mutation commands ต้อง `--action <name> --yes` ในโหมด non-interactive
+- **clippy restriction lints:** `unwrap_used` และ `expect_used` = warn ทั้ง workspace
+- **NOTE numbering:** `// NOTE-001:` เรียงเลขตามประเด็น ห้ามข้าม

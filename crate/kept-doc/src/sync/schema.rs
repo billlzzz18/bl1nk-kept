@@ -1,6 +1,7 @@
 //! Notion Database Schema definitions with property validation.
 
 use crate::models::common::{ObjectId, Parent};
+use crate::sync::error::{Result, SyncError};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::collections::HashMap;
@@ -19,18 +20,25 @@ impl DatabaseSchema {
         }
     }
 
-    pub fn title(mut self, name: &str) -> Self {
-        // Notion databases MUST have exactly one title property.
+    /// Adds the title property to the schema.
+    ///
+    /// Notion databases must have exactly one title property, so this
+    /// returns a validation error when a title property already exists.
+    pub fn title(mut self, name: &str) -> Result<Self> {
+        // NOTE-001: panic! เดิมถูกแทนด้วยการ propagate error ผ่าน Result
+        // ตามมาตรฐาน Safety & Error Handling (ห้าม panic ใน production code)
         if self
             .properties
             .values()
             .any(|p| matches!(p, PropertySchema::Title))
         {
-            panic!("Only one title property allowed per database");
+            return Err(SyncError::ValidationError(
+                "Only one title property allowed per database".to_string(),
+            ));
         }
         self.properties
             .insert(name.to_string(), PropertySchema::Title);
-        self
+        Ok(self)
     }
 
     pub fn rich_text(mut self, name: &str) -> Self {
@@ -161,4 +169,35 @@ pub enum PropertySchema {
         linked_db_id: ObjectId,
         two_way: bool,
     },
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn title_accepts_first_title_property() {
+        let schema = DatabaseSchema::new("Tasks")
+            .title("Name")
+            .expect("first title property must be accepted");
+        assert!(matches!(
+            schema.properties.get("Name"),
+            Some(PropertySchema::Title)
+        ));
+    }
+
+    #[test]
+    fn title_rejects_duplicate_title_property() {
+        let result = DatabaseSchema::new("Tasks")
+            .title("Name")
+            .and_then(|schema| schema.title("Duplicate"));
+        assert!(
+            matches!(
+                &result,
+                Err(SyncError::ValidationError(message))
+                    if message.contains("Only one title property allowed per database")
+            ),
+            "expected SyncError::ValidationError for duplicate title, got {result:?}"
+        );
+    }
 }

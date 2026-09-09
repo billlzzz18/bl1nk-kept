@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+### Changed
+- ลบ `panic!` ออกจาก production path ของ kept-doc: `DatabaseSchema::title()` เปลี่ยน signature จาก `Self` เป็น `Result<Self, SyncError>` (คืน `SyncError::ValidationError("Only one title property allowed per database")` เมื่อ schema มี title property อยู่แล้ว) พร้อม public rustdoc ภาษาอังกฤษ; builder นี้ไม่มี call site ภายนอก จึงไม่กระทบ contract อื่น — evidence: unit tests ใหม่ `sync::schema::tests::title_accepts_first_title_property` และ `sync::schema::tests::title_rejects_duplicate_title_property` (2/2 ผ่าน) พร้อม `cargo fmt --all -- --check` และ `cargo clippy --workspace -- -D warnings` ผ่าน
+
+### Fixed
+- แก้ CI ล้มทั้ง job เมื่อบริการ GitHub Actions Cache (`ghac`) ล่มชั่วคราว: step "Set sccache env" ใน `.github/workflows/ci.yml` ตรวจ `sccache --start-server` ก่อนเปิด `RUSTC_WRAPPER`; หาก GHAC backend ไม่พร้อมให้ emit `::warning::` และรันต่อโดยไม่มี compiler cache (fail-open) แทนการพังทุก cargo step ตั้งแต่ daemon startup
+
 ## [0.3.1] - 2026-09-10
 ### Fixed
 - แก้ stale release-version tests ใน kept-cli (`main.rs`) และ kept-core (`lib.rs`) ให้ตรง workspace version 0.3.1; ยืนยัน evidence run manifest (TODO 2.1) และ gold corpus workflow (TODO 2.2) ผ่าน contract tests ครบ 9/9 (`tests/test_evidence_run_contract.py`, `tests/test_gold_corpus_contract.py`)

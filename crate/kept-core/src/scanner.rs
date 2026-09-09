@@ -452,6 +452,337 @@ mod content_duplicate_tests {
         assert_eq!(filtered.len(), 1);
         assert_eq!(filtered[0].items[0], "c/doc.pdf");
     }
+
+    // --- Mutation safety tests (DUP-001) ---
+
+    #[test]
+    fn mutation_blocks_delete_for_protected_path() {
+        let directory = temporary_directory("mutation-delete-protected");
+        let primary = directory.join("keep-this.txt");
+        let dup = directory.join("repo").join(".git").join("dup.txt");
+
+        std::fs::create_dir_all(dup.parent().unwrap()).expect("git dir must be created");
+        std::fs::write(&primary, b"protected data").expect("primary must be written");
+        std::fs::write(&dup, b"protected data").expect("dup must be written");
+
+        let index = scan_directory(
+            &directory,
+            &ScanOptions {
+                include_hidden: true,
+                max_depth: None,
+            },
+        )
+        .expect("index must be created");
+        let (groups, _) = find_content_duplicates(&index, &ContentDuplicateOptions::default())
+            .expect("content duplicates must complete");
+
+        let plan = create_duplicate_mutation_plan(&index, &groups, DuplicateActionKind::Delete);
+        let policy = DuplicateMutationPolicy {
+            allowed_roots: vec![directory.display().to_string()],
+            protected_patterns: vec![".git".to_string()],
+            ..Default::default()
+        };
+
+        let simulation = simulate_duplicate_mutation(&plan, &index, &policy);
+        assert!(simulation
+            .blocked_actions
+            .iter()
+            .any(|b| b.action.target_path.contains(".git")
+                && b.rejection_reason
+                    .as_deref()
+                    .is_some_and(|r| r.contains("protected"))));
+
+        std::fs::remove_dir_all(directory).expect("cleanup must succeed");
+    }
+
+    #[test]
+    fn mutation_blocks_out_of_root_boundary() {
+        let directory = temporary_directory("mutation-out-of-root");
+        let primary = directory.join("canonical.txt");
+        let outside_dir =
+            std::env::temp_dir().join(format!("bl1nk-kept-oob-{}", std::process::id()));
+        std::fs::create_dir_all(&outside_dir).expect("outside dir must be created");
+        let dup = outside_dir.join("duplicate.txt");
+
+        std::fs::write(&primary, b"root data").expect("primary must be written");
+        std::fs::write(&dup, b"root data").expect("dup must be written");
+
+        let index =
+            scan_directory(&directory, &ScanOptions::default()).expect("index must be created");
+        // Manually add the outside file to simulate cross-root duplicate
+        let mut index_with_oob = index.clone();
+        index_with_oob.files.push(FileRecord {
+            path: dup.display().to_string(),
+            name: "duplicate.txt".to_string(),
+            extension: "txt".to_string(),
+            size: 9,
+            modified_unix: 0,
+            kind: "file".to_string(),
+            is_binary: None,
+            git_status: None,
+        });
+        let groups = vec![DuplicateGroup {
+            kind: "same_content".to_string(),
+            similarity: 1.0,
+            items: vec![
+                primary
+                    .strip_prefix(&directory)
+                    .unwrap()
+                    .display()
+                    .to_string(),
+                dup.display().to_string(),
+            ],
+            evidence: Some(DuplicateEvidence {
+                size_bytes: 9,
+                partial_sha256: "abc".to_string(),
+                full_sha256: "def".to_string(),
+            }),
+        }];
+
+        let plan =
+            create_duplicate_mutation_plan(&index_with_oob, &groups, DuplicateActionKind::Trash);
+        let policy = DuplicateMutationPolicy {
+            allowed_roots: vec![directory.display().to_string()],
+            protected_patterns: vec![".git".to_string()],
+            ..Default::default()
+        };
+
+        let simulation = simulate_duplicate_mutation(&plan, &index_with_oob, &policy);
+        assert!(simulation.blocked_actions.iter().any(|b| b
+            .rejection_reason
+            .as_deref()
+            .is_some_and(|r| r.contains("outside"))));
+
+        let _ = std::fs::remove_dir_all(&outside_dir);
+        std::fs::remove_dir_all(directory).expect("cleanup must succeed");
+    }
+
+    #[test]
+    fn mutation_blocks_on_disk_size_mismatch() {
+        let directory = temporary_directory("mutation-size-mismatch");
+        let primary = directory.join("a.txt");
+        let dup = directory.join("b.txt");
+
+        std::fs::write(&primary, b"original").expect("primary must be written");
+        std::fs::write(&dup, b"original").expect("dup must be written");
+
+        let index =
+            scan_directory(&directory, &ScanOptions::default()).expect("index must be created");
+        let (groups, _) = find_content_duplicates(&index, &ContentDuplicateOptions::default())
+            .expect("content duplicates must complete");
+
+        let plan = create_duplicate_mutation_plan(&index, &groups, DuplicateActionKind::Trash);
+
+        // Mutate the file on disk after plan creation
+        std::fs::write(&dup, b"modified-after-plan").expect("dup must be modified");
+
+        let policy = DuplicateMutationPolicy {
+            allowed_roots: vec![directory.display().to_string()],
+            ..Default::default()
+        };
+
+        let simulation = simulate_duplicate_mutation(&plan, &index, &policy);
+        assert!(!simulation.blocked_actions.is_empty());
+        assert!(simulation.blocked_actions.iter().any(|b| b
+            .rejection_reason
+            .as_deref()
+            .is_some_and(|r| r.contains("size"))));
+
+        std::fs::remove_dir_all(directory).expect("cleanup must succeed");
+    }
+
+    #[test]
+    fn mutation_blocks_stale_index_size_mismatch() {
+        let directory = temporary_directory("mutation-stale-index");
+        let primary = directory.join("a.txt");
+        let dup = directory.join("b.txt");
+
+        std::fs::write(&primary, b"data123").expect("primary must be written");
+        std::fs::write(&dup, b"data123").expect("dup must be written");
+
+        let mut index =
+            scan_directory(&directory, &ScanOptions::default()).expect("index must be created");
+
+        // Tamper index: change recorded size of dup to wrong value
+        for file in &mut index.files {
+            if file.path == "b.txt" {
+                file.size = 999;
+            }
+        }
+
+        let groups_input = [DuplicateGroup {
+            kind: "same_content".to_string(),
+            similarity: 1.0,
+            items: vec!["a.txt".to_string(), "b.txt".to_string()],
+            evidence: None,
+        }];
+        let plan =
+            create_duplicate_mutation_plan(&index, &groups_input, DuplicateActionKind::Trash);
+
+        let policy = DuplicateMutationPolicy {
+            allowed_roots: vec![directory.display().to_string()],
+            ..Default::default()
+        };
+
+        let simulation = simulate_duplicate_mutation(&plan, &index, &policy);
+        assert!(!simulation.blocked_actions.is_empty());
+        assert!(simulation.blocked_actions.iter().any(|b| b
+            .rejection_reason
+            .as_deref()
+            .is_some_and(|r| r.contains("size mismatch"))));
+
+        std::fs::remove_dir_all(directory).expect("cleanup must succeed");
+    }
+
+    #[test]
+    fn mutation_blocks_on_checksum_fail_when_file_modified() {
+        let directory = temporary_directory("mutation-checksum-fail");
+        let primary = directory.join("a.txt");
+        let dup = directory.join("b.txt");
+
+        std::fs::write(&primary, b"checksum data").expect("primary must be written");
+        std::fs::write(&dup, b"checksum data").expect("dup must be written");
+
+        let index =
+            scan_directory(&directory, &ScanOptions::default()).expect("index must be created");
+        let (groups, _) = find_content_duplicates(&index, &ContentDuplicateOptions::default())
+            .expect("content duplicates must complete");
+
+        let plan = create_duplicate_mutation_plan(&index, &groups, DuplicateActionKind::Trash);
+
+        // Modify file after plan — on-disk size check should catch this
+        std::fs::write(&dup, b"CHANGED").expect("dup must be modified");
+
+        let policy = DuplicateMutationPolicy {
+            allowed_roots: vec![directory.display().to_string()],
+            verify_checksum_before_action: true,
+            ..Default::default()
+        };
+
+        let result = execute_duplicate_mutation(&plan, &index, &policy);
+        assert!(result.is_err());
+
+        std::fs::remove_dir_all(directory).expect("cleanup must succeed");
+    }
+
+    #[test]
+    fn mutation_hardlink_creates_rollback_entry_with_backup() {
+        let directory = temporary_directory("mutation-hardlink-rollback");
+        let primary = directory.join("canonical.txt");
+        let dup = directory.join("duplicate.txt");
+
+        std::fs::write(&primary, b"hardlink content").expect("primary must be written");
+        std::fs::write(&dup, b"hardlink content").expect("dup must be written");
+
+        let index =
+            scan_directory(&directory, &ScanOptions::default()).expect("index must be created");
+        let (groups, _) = find_content_duplicates(&index, &ContentDuplicateOptions::default())
+            .expect("content duplicates must complete");
+
+        let plan = create_duplicate_mutation_plan(&index, &groups, DuplicateActionKind::HardLink);
+        let policy = DuplicateMutationPolicy {
+            allowed_roots: vec![directory.display().to_string()],
+            backup_directory: Some(directory.join("backups").display().to_string()),
+            ..Default::default()
+        };
+
+        let mut journal =
+            execute_duplicate_mutation(&plan, &index, &policy).expect("hardlink must execute");
+
+        assert_eq!(journal.entries.len(), 1);
+        assert!(journal.entries[0].backup_path.is_some());
+        assert!(primary.exists());
+        assert!(dup.exists());
+        // After hardlink, both should point to same inode
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::MetadataExt;
+            let meta_a = std::fs::metadata(&primary).unwrap();
+            let meta_b = std::fs::metadata(&dup).unwrap();
+            assert_eq!(meta_a.ino(), meta_b.ino());
+        }
+
+        // Rollback should restore original file content
+        let restored = rollback_duplicate_mutation(&mut journal).expect("rollback must succeed");
+        assert_eq!(restored, 1);
+        assert!(primary.exists());
+        assert!(dup.exists());
+
+        std::fs::remove_dir_all(directory).expect("cleanup must succeed");
+    }
+
+    #[test]
+    fn mutation_delete_execution_and_rollback() {
+        let directory = temporary_directory("mutation-delete-exec");
+        let primary = directory.join("a.txt");
+        let dup = directory.join("b.txt");
+
+        std::fs::write(&primary, b"delete me").expect("primary must be written");
+        std::fs::write(&dup, b"delete me").expect("dup must be written");
+
+        let index =
+            scan_directory(&directory, &ScanOptions::default()).expect("index must be created");
+        let (groups, _) = find_content_duplicates(&index, &ContentDuplicateOptions::default())
+            .expect("content duplicates must complete");
+
+        let plan = create_duplicate_mutation_plan(&index, &groups, DuplicateActionKind::Delete);
+        let policy = DuplicateMutationPolicy {
+            allowed_roots: vec![directory.display().to_string()],
+            backup_directory: Some(directory.join("backup").display().to_string()),
+            ..Default::default()
+        };
+
+        let mut journal =
+            execute_duplicate_mutation(&plan, &index, &policy).expect("delete must execute");
+
+        assert!(primary.exists());
+        assert!(!dup.exists());
+        assert_eq!(journal.entries.len(), 1);
+        assert!(journal.entries[0].backup_path.is_some());
+
+        // Rollback restores the deleted file
+        let restored = rollback_duplicate_mutation(&mut journal).expect("rollback must succeed");
+        assert_eq!(restored, 1);
+        assert!(dup.exists());
+        assert_eq!(std::fs::read(&dup).unwrap(), b"delete me");
+
+        std::fs::remove_dir_all(directory).expect("cleanup must succeed");
+    }
+
+    #[test]
+    fn mutation_allow_list_skips_allowed_groups() {
+        let directory = temporary_directory("mutation-allow-list");
+        let primary = directory.join("a.txt");
+        let dup = directory.join("b.txt");
+
+        std::fs::write(&primary, b"allowed data").expect("primary must be written");
+        std::fs::write(&dup, b"allowed data").expect("dup must be written");
+
+        let index =
+            scan_directory(&directory, &ScanOptions::default()).expect("index must be created");
+        let (groups, _) = find_content_duplicates(&index, &ContentDuplicateOptions::default())
+            .expect("content duplicates must complete");
+
+        let plan = create_duplicate_mutation_plan(&index, &groups, DuplicateActionKind::Trash);
+        let policy = DuplicateMutationPolicy {
+            allowed_roots: vec![directory.display().to_string()],
+            allow_list: vec![DuplicateAllowRule {
+                path_a: None,
+                path_b: None,
+                glob_pattern: Some("a.txt".to_string()),
+                sha256: None,
+                reason: Some("approved".to_string()),
+            }],
+            ..Default::default()
+        };
+
+        let simulation = simulate_duplicate_mutation(&plan, &index, &policy);
+        // All actions should be skipped by allow_list
+        assert!(simulation.valid_actions.is_empty());
+        assert!(simulation.blocked_actions.is_empty());
+
+        std::fs::remove_dir_all(directory).expect("cleanup must succeed");
+    }
 }
 
 #[cfg(all(test, unix))]

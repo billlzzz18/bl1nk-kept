@@ -466,3 +466,41 @@ Director ย้าย requirement ledger จาก `.agents/REQUIREMENTS.md` ไ
 - **ห้ามเอาแท็กสีมาสลับบรรทัดให้รก:** ต้องเขียนเนื้องานให้ชัดเจนว่าแต่ละข้อทำหน้าที่อะไรในลูป
 - **ห้ามตัดทอนหรือย่องานเดิมใน TODO.md เด็ดขาด:** ทุกการปรับปรุงต้องคงรายละเอียดสเปกครบ 100%
 - *(สำหรับแนวทางการจัดการ Backlog และ Re-prioritization ดูที่ [.learnings/FEEDBACK.md](file:///d:/01work/Active/workspace/bl1nk-kept/.learnings/FEEDBACK.md))*
+
+
+---
+
+## [ERR-20260910-001] sccache GHAC startup failure ทำให้ทุก cargo step ใน CI ล้มทั้ง job
+
+**บันทึกเมื่อ**: 2026-09-10T04:05:00+07:00
+**ลำดับความสำคัญ**: สูง
+**สถานะ**: แก้ไขแล้ว
+**ขอบเขต**: infra, ci
+
+### Summary
+
+เมื่อบริการ GitHub Actions Cache (`artifactcache.actions.githubusercontent.com`, service: `ghac`) ล่มชั่วคราว (HTTP 400 "Our services aren't available right now") sccache ที่ถูกกำหนด `RUSTC_WRAPPER=sccache` + `SCCACHE_GHA_ENABLED=true` ผ่าน `mozilla-actions/sccache-action@v0.0.6` fail ตั้งแต่ daemon startup ทำให้ทุกคำสั่ง cargo (clippy, test, schema) ใน job `ci/verify` ล้มก่อน compile เริ่มเลย
+
+### Error
+
+```text
+sccache: error: Server startup failed: cache storage failed to read: Unexpected (permanent) at read
+service: ghac, path: .sccache_check, response status: 400
+```
+
+### Root cause
+
+- sccache probe storage health (อ่าน key `.sccache_check`) **ตอน daemon startup เท่านั้น** และ startup failure เป็น fatal ต่อทุกคำสั่ง cargo ที่ผ่าน `RUSTC_WRAPPER` — CI จึงกลายเป็น hard dependency ของบริการ cache ที่ล่มได้
+- Error ตอน runtime หลัง daemon start แล้ว (read/write fail เป็นราย request) เป็นแค่ cache miss ไม่พัง job — จุดตายมีแค่ startup เท่านั้น
+
+### Suggested Fix
+
+ทำ step "Set sccache env" เป็น fail-open gate: รัน `sccache --start-server` ก่อนเขียน `RUSTC_WRAPPER`; ถ้า start ไม่ได้ให้ emit `::warning::` แล้วเขียนค่าว่าง `RUSTC_WRAPPER=` (cargo ถือว่า empty = unset) เพื่อรันต่อโดยไม่มี compiler cache (`Swatinem/rust-cache@v2` ยัง restore `target/` artifacts อยู่)
+
+### Metadata
+- ทำซ้ำได้: ใช่ (ขึ้นกับ GHAC outage จริง)
+- ไฟล์ที่เกี่ยวข้อง: `.github/workflows/ci.yml`
+
+### การแก้ไข
+- **แก้ไขเมื่อ**: 2026-09-10T04:10:00+07:00
+- **หมายเหตุ**: เปลี่ยน step "Set sccache env" ใน `ci.yml` ให้ health-check daemon ก่อนเปิดใช้งาน และ fail-open เมื่อ GHAC ไม่พร้อม

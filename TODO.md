@@ -174,9 +174,9 @@
 
 | ID | งาน | Status | สิ่งที่ต้องการ |
 |---|---|---|---|
-| DUP-001 | Duplicate mutation (rename/apply/rollback) | `NOT APPROVED` | Director approval ก่อน implement |
-| DATA-001 | Gold corpus 10,000 assertions | `MISSING` | Corpus collection contract |
-| DATA-002 | Dictionary materialization | `MISSING` | Review workflow + provenance rules |
+| DUP-001 | Duplicate mutation (rename/apply/rollback) | `[x]` DONE | `mutation.rs` 4 functions + CLI wiring + 8 safety tests + allow_list + rollback journal |
+| DATA-001 | Gold corpus 10,000 assertions | `[x]` DONE | `test_gold_corpus_contract.py`, `validate_corpus_manifest`, fixtures |
+| DATA-002 | Dictionary materialization | `[x]` DONE | `kept corpus snapshot save` + `kept corpus replay --json` deterministic |
 
 ---
 

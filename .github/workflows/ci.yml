@@ -53,6 +53,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - uses: mozilla-actions/sccache-action@v0.0.6
+        id: sccache
 
       - uses: actions/setup-python@v5
         with:
@@ -67,10 +68,15 @@ jobs:
             echo "PY=python3" >> "$GITHUB_ENV"
           fi
 
-      - name: Set sccache env
+      # sccache is best-effort: if the GHA cache backend is unreachable,
+      # sccache panics at compile time.  Only enable it when the binary
+      # was installed successfully by the action above.
+      # Use disk cache (not GHA backend) to avoid Azure CDN outages.
+      - name: Set sccache env (best-effort)
         shell: bash
+        if: steps.sccache.outcome == 'success'
         run: |
-          echo "SCCACHE_GHA_ENABLED=true" >> "$GITHUB_ENV"
+          echo "SCCACHE_GHA_ENABLED=false" >> "$GITHUB_ENV"
           echo "RUSTC_WRAPPER=sccache" >> "$GITHUB_ENV"
 
       # Fast Fail: Format & Lint first (fails in seconds if styled wrong)

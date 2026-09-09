@@ -124,11 +124,13 @@
 - [ ] ออกแบบ tests: unsupported property types, mention resolution, nested blocks (Red)
 - [ ] Implement typed mapping + diagnostics (Green)
 
-### 3.3 PDF Inspection (ADR-002)
+### 3.3 PDF Inspection & OCR (ADR-002)
 
-- [ ] ทำ `kept doc inspect-pdf` บน `PdfAdapter` ที่มีอยู่ (Green)
-- [ ] คืน native-text Markdown, per-page provenance, diagnostics (Green)
-- [ ] ออกแบบ PDF fixtures: text, scanned, malformed, password error (Red)
+- [ ] เพิ่ม `pdf-inspector` เป็น optional dependency ใน kept-doc (feature: `pdf-inspector`) ตาม `docs/research/PDF_INSPECTOR_RESEARCH.md` (Green)
+- [ ] ทำ `pdf-inspector` adapter: `detect_pdf` แยก TextBased/Scanned/ImageBased/Mixed + confidence, `process_pdf` คืน Markdown รายหน้า + needs_ocr + is_complex (Green)
+- [ ] ทำ `kept doc inspect-pdf` บน pdf-inspector adapter — คืน native-text Markdown, per-page provenance, OCR status, diagnostics (Green)
+- [ ] เปิด OCR feature opt-in (`vision`, `model-cache`, `model-download`) — ไม่เพิ่ม dependency/size โดยไม่จำเป็น (Green)
+- [ ] ออกแบบ PDF fixtures: text PDF, scanned PDF, mixed PDF, image-based PDF, malformed, password error (Red)
 
 ### 3.4 Review Queue
 

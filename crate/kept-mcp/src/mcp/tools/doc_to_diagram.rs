@@ -110,11 +110,14 @@ impl DocumentToDiagramTool {
                     let (to_label, edge_label) = if to_part.contains(':') {
                         let sub: Vec<&str> = to_part.splitn(2, ':').collect();
                         (sub[0].trim(), Some(sub[1].trim().to_string()))
-                    } else if to_part.contains('(') && to_part.ends_with(')') {
-                        let open_idx = to_part.find('(').unwrap();
-                        let dest = to_part[..open_idx].trim();
-                        let payload = to_part[open_idx + 1..to_part.len() - 1].trim();
-                        (dest, Some(payload.to_string()))
+                    } else if let Some(open_idx) = to_part.find('(') {
+                        if to_part.ends_with(')') {
+                            let dest = to_part[..open_idx].trim();
+                            let payload = to_part[open_idx + 1..to_part.len() - 1].trim();
+                            (dest, Some(payload.to_string()))
+                        } else {
+                            (to_part, None)
+                        }
                     } else {
                         (to_part, None)
                     };

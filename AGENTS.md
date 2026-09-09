@@ -1,21 +1,20 @@
 # bl1nk-kept — คู่มือการส่งต่องาน Agent
 
-เอกสารแนวทางการทำงานร่วมกันของ AI Agent ภายใน Workspace `bl1nk-kept`
-
----
-
 ## 0. Rust Core Standards
 
 ### 1. Safety & Error Handling
+
 - **ห้าม panic / หลีกเลี่ยง `unwrap()`:** ให้ใช้ `?`, `match`, หรือ `if let` เสมอ
 - **ห้ามกลืน error ด้วย `let _ =`:** สำหรับการทำงานที่อาจ fail ต้องส่งต่อด้วย `?` หรือ log เสมอ (ห้ามละเลยเงียบ ๆ)
-- **ระวัง Index Out of Bounds:** หลีกเลี่ยง `arr[i]` ตรง ๆ ให้ใช้ `.get(i)` เพื่อความปลอดภัย
+- **ระวัง Index Out of Bounds:** หลีกเลี่ยง `arr[i]`ตรง ๆ ให้ใช้ `.get(i)` เพื่อความปลอดภัย
 
 ### 2. Coding Philosophy & Ergonomics
+
 - **เน้น Correctness ก่อน Performance:** โค้ดต้องถูกต้องและอ่านเข้าใจง่ายก่อนเสมอ ยกเว้นส่วนที่เป็น hot path และมี benchmark กำกับ
 - **ใช้ชื่อเต็มสำหรับตัวแปร:** ไม่ใช้ตัวย่อกำกวม (เช่น `query` แทน `q`, `buffer` แทน `buf`)
 - **ห้ามสร้างไฟล์ย่อยพร่ำเพรื่อ:** พัฒนาต่อในโมดูลเดิมที่มีอยู่ เว้นแต่จะเป็น logical component ใหม่จริง ๆ
-- **Variable Shadowing ใน Async/Clones:** ใช้ shadowing เพื่อจำกัด scope ของ clone และลดอายุของ borrowed reference ให้อยู่เฉพาะใน closure เช่น:
+- **Variable Shadowing ใน Async/Clones:** ใช้ shadowing เพื่อจำกัด scope ของ clone:
+
   ```rust
   let client = client.clone();
   tokio::spawn(async move {
@@ -24,73 +23,29 @@
   ```
 
 ### 3. Module Structure
-- **ห้ามสร้าง `mod.rs`:** ให้ใช้ Rust modern path convention เช่น `src/scanner.rs` คู่กับโฟลเดอร์ `src/scanner/fff.rs` เพื่อไม่ให้เปิดแท็บ `mod.rs` ซ้ำกันหลายแท็บ
 
-### 4. Agent Discipline & Rule Hygiene
+- **ห้ามสร้าง `mod.rs`:** ให้ใช้ Rust modern path convention เช่น `src/scanner.rs` คู่กับโฟลเดอร์ `src/scanner/fff.rs`
+
+### 4. Agent Discipline
+
 - **ห้ามคิดเองเออเองเกินสั่ง:** ทำงานตามขอบเขต (scope) ที่ตกลงกันไว้อย่างเคร่งครัด
-- **กฎคือ "กับดักที่ต้องเลี่ยง" (Traps to avoid):** ไม่ใช่แผนที่ architecture ที่เปลี่ยนบ่อย
-
-### 5. Core Philosophy & Anti-Bias (เป้าหมายสูงสุดของระบบ)
-- **อย่าเดาคำกำกวมเป็น Action โปรดของตัวเอง (Semantic Disambiguation):**
-  - **"ทดสอบ":** $\neq$ `cargo test` เสมอไป ผู้ใช้อาจหมายถึง **Dogfooding**, การรันลองใช้คำสั่งจริง (CLI Execution), หรือการตรวจเทียบผลลัพธ์กับสเปก ให้สังเกตบริบทเสมอ
-  - **"ข้อผิดพลาด / ปัญหา":** $\neq$ Syntax error / Code panic เสมอไป อาจหมายถึง **Agent คิดไปเอง (Hallucination)**, งานไม่ตรงบรีฟ, หรือทำงานค้าง
-- **Acquisition ต้องมี Accountability (ค้นหาแล้วต้องบันทึก):**
-  - การอ่าน/ค้นหาข้อมูลเข้ามาในหัวแล้วไม่นำเสนอ ไม่สรุป insight หรือไม่บันทึกเป็น artifact/file ถือเป็นการกระทำที่สูญเปล่า (Unproductive Acquisition)
-- **ห้ามอ่านซ้ำถ้าของอยู่ในหัวแล้ว (In-Context Memory):**
-  - หากไฟล์นั้นเพิ่งถูกอ่านไปในเซสชันเดียวกันและยังไม่มีการแก้ไขบนดิสก์ ข้อมูลอยู่ใน Prompt Context แล้ว ห้ามอ่านซ้ำเด็ดขาด ให้ใช้บริบทที่มีอยู่ทันที
+- **ห้ามเดาคำกำกวมเป็น Action โปรดของตัวเอง:**
+  - **"ทดสอบ":** อาจหมายถึง `cargo test`, Dogfooding, CLI Execution, หรือการตรวจเทียบผลลัพธ์ — ให้สังเกตบริบทเสมอ
+  - **"ข้อผิดพลาด / ปัญหา":** อาจหมายถึง Agent คิดไปเอง, งานไม่ตรงบรีฟ, หรือทำงานค้าง — ไม่ใช่แค่ Syntax error
+- **ค้นหาแล้วต้องบันทึก:** การอ่าน/ค้นหาข้อมูลเข้ามาแล้วไม่นำเสนอ ไม่สรุป insight หรือไม่บันทึกเป็น artifact ถือเป็น Unproductive Acquisition
+- **ห้ามอ่านซ้ำถ้าของอยู่ในหัวแล้ว:** หากไฟล์เพิ่งถูกอ่านไปในเซสชันเดียวกันและยังไม่มีการแก้ไข ให้ใช้บริบทที่มีอยู่ทันที
 
 ---
 
-## 1. Environment & Tools
+## 1. Workspace Overview
 
-เพื่อให้การทำงานร่วมกันเป็นไปอย่างราบรื่น Agent ต้องเข้าใจทรัพยากรที่มีอยู่ใน Workspace ดังนี้:
-
-### 1. Context Management System
-- **`FFF` (Foresight, Filter, Fusion):** แกนหลักในการสำรวจและจัดการข้อมูล
-- **`look`:** ใช้สำหรับสำรวจ `identity` และ `outline` (ต้นทุนต่ำ เหมาะกับการค้นหาเป้าหมาย)
-- **`view`:** ใช้สำหรับดึงข้อมูลเนื้อหาจริง (Materialization) เมื่อจำเป็นต้องอ่านรายละเอียด
-- **`Judge`:** ทำหน้าที่ประมวลผลและกลั่นกรอง Context ที่ส่งต่อไปยัง LLM (`PASS` / `REFERENCE` / `DELTA` / `COMPRESS`)
-- **`SERENA`:** เครื่องมือหลักสำหรับ `view` operation (ดู `SERENA.md` สำหรับรายละเอียด)
-
-### 2. Git Integration
-- **`GitProvider`** และ **`GitCommands`**: เครื่องมือมาตรฐานสำหรับจัดการ Git repositories
-- **`GitLogReader`**: ใช้สำหรับอ่านประวัติ commit และข้อมูลการแก้ไข
-
-### 3. File System
-- **`FilesystemProvider`** และ **`FilesystemCommands`**: มาตรฐานการเข้าถึงไฟล์และไดเรกทอรี
-- **Context URI Pattern**:
-  - **Local Files**: `file:///path/to/file`
-  - **Workspace Files**: `workspace:///src/lib.rs` (มีการ resolve absolute path ให้แล้ว)
-  - **Git Files**: `git:///path/to/file` (ต้องระบุ branch/revision เสมอ)
-  - **Standard Library**: `rust-std:///` (สำหรับข้อมูล stdio)
-- **Rules**:
-  - ห้ามส่งค่า raw path ไปยัง `view` โดยตรง ต้องผ่าน `ContextUri` เสมอ
-  - ห้ามสร้าง path นอก workspace โดยตรง ต้องใช้ prefix ที่ถูกต้องเท่านั้น
-  - ใช้ `look` เสมอเพื่อตรวจสอบความมีอยู่ของไฟล์ก่อน `view` เพื่อหลีกเลี่ยงค่าใช้จ่ายและข้อผิดพลาด
-
-### 4. Documents
-- **`DocProvider`**, **`DocReader`**, **`DocWriter`**: เครื่องมือจัดการไฟล์เอกสาร
-- **`Converter`**: เครื่องมือแปลงไฟล์ (รองรับ GFM, DOCX, PDF, NFM)
-- **Context URI Pattern**:
-  - **Local Documents**: `file:///path/to/document`
-  - **Remote Documents**: `http://...`, `https://...`
-- **Rules**:
-  - ใช้ `DocReader` เพื่ออ่านเอกสาร
-  - ใช้ `Converter` สำหรับการแปลงรูปแบบ
-  - สามารถใช้ `view` กับ Remote Document URIs ได้โดยตรง
-
-### 5. Tables
-- **`TableProvider`** และ **`TableReader`**: เครื่องมือจัดการข้อมูลตาราง
-- **`QueryExecutor`**: สำหรับ Query ข้อมูลด้วย SQL
-- **Context URI Pattern**:
-  - **CSV**: `file:///path/to/file.csv` หรือ `workspace:///path/to/file.csv`
-  - **JSON**: `file:///path/to/file.json` หรือ `workspace:///path/to/file.json`
-  - **SQLite**: `file:///path/to/database.db` หรือ `workspace:///path/to/database.db`
-- **Rules**:
-  - **ห้ามส่ง Context แบบ full tables ไปยัง LLM โดยตรง**
-  - ใช้ `view` เพื่ออ่านข้อมูลเบื้องต้น
-  - ใช้ `QueryExecutor` เพื่อดึงข้อมูลที่ต้องการเฉพาะส่วนที่จำเป็น
-  - สำหรับ Large Tables: ควรใช้ `QueryExecutor` ดึงข้อมูลที่ผ่านการกรอง/สรุปผลแล้ว แทนการส่งทั้งไฟล์
+| Crate | Purpose |
+|-------|---------|
+| `kept-core` | Core logic: keyword validation, search, filesystem, observation model, Judge engine |
+| `kept-cli` | CLI binary (`kept`) — command surface สำหรับผู้ใช้ |
+| `kept-mcp` | MCP server binary (`bl1nk-kept-mcp`) — long-running MCP service |
+| `kept-doc` | Document sync/conversion library (Notion, Markdown, PDF, DOCX) |
+| `kept-grammar` | Grammar types, keyword validation, naming profiles, config resolution |
 
 ---
 
@@ -107,19 +62,24 @@
 
 1. **TDD เคร่งครัด:** เขียน failing test ที่ตรงเป้าหมายก่อนเขียน production code เสมอ
 2. **Implement เล็กที่สุด:** ปรับแก้โค้ดเท่าที่จำเป็นเพื่อให้ test ผ่าน
-3. **มาตรฐานข้อมูล (Observation-first):** ทุกการ acquire ข้อมูลต้องผ่านโครงสร้าง `Observation` และระบุด้วย `Target` URI เสมอ
-4. **ตรวจสอบจริง:** รัน `cargo test --workspace` (หรือ `just check`) เพื่อยืนยันว่าไม่มี regression
-5. **อัปเดตสถานะ:** ทำเครื่องหมายใน `TODO.md` และบันทึก public change ใน `CHANGELOG.md`
+3. **ตรวจสอบจริง:** รัน `cargo test --workspace`, `cargo clippy --workspace -- -D warnings`, `cargo fmt --all -- --check`
+4. **อัปเดตสถานะ:** ทำเครื่องหมายใน `TODO.md` และบันทึก public change ใน `CHANGELOG.md`
 
 ---
 
-## 4. Core Architecture & Rules
+## 4. Comment & Language Standards
 
-- **FFF เป็น Acquisition Core:** ใช้ `look` สำหรับตรวจ identity/outline (ต้นทุนต่ำ) และ `view` เมื่อต้องการ materialize context
-- **Judge เป็นตัวตัดสิน Context:** ไม่ส่งข้อความซ้ำซ้อน พิจารณา treatment: `PASS`, `REFERENCE`, `DELTA`, `COMPRESS`
-- **ห้ามตัดสินใจแทนผู้ใช้:** เมื่องานมีทางเลือกเชิงนโยบาย ให้เสนอ blank checkbox `[ ]` ให้ผู้ใช้เลือก
-- **มาตรฐาน Comment & ภาษาใน Source Code:**
-  - **Internal Rationale:** ใช้ `// NOTE-001:`, `// NOTE-002:` รันเลขตามประเด็น โดยเขียนคำอธิบายภาษาไทยสำหรับอ่านเอง/ในทีม (ห้ามใช้ `///` ปน)
-  - **Public Rustdoc (`///`):** ใช้ภาษาอังกฤษล้วนสำหรับ Public APIs, Structs, CLI Help
-  - **Error Messages ในโค้ด:** ใช้ภาษาอังกฤษล้วนตามมาตรฐานระบบ
-  - **Project Docs & Guidelines:** ใช้ภาษาไทยสำหรับเอกสารจัดการงาน คู่มือ และคำอธิบายสำหรับผู้ใช้
+- **Internal Rationale:** ใช้ `// NOTE-001:`, `// NOTE-002:` เรียงเลขตามประเด็น ภาษาไทย
+- **Public Rustdoc (`///`):** ภาษาอังกฤษล้วน สำหรับ Public APIs, Structs, CLI Help
+- **Error Messages:** ภาษาอังกฤษล้วน
+- **Project Docs & Guidelines:** ภาษาไทย
+
+---
+
+## 5. External Tools
+
+| Tool | Binary | Purpose |
+|------|--------|---------|
+| FFF MCP | `C:\Users\Admin\AppData\Local\fff-mcp\bin\fff-mcp.exe` | Filesystem search, find, grep, multi-grep, rescan |
+| Serena MCP | `C:\Users\Admin\.local\bin\serena.exe start-mcp-server` | LSP, AST symbols, diagnostics, targeted edits |
+| SQZ MCP | `C:\Users\Admin\.cargo\bin\sqz-mcp.exe` | Token compression, context dedup, file reading |

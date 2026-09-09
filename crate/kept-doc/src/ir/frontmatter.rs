@@ -392,7 +392,9 @@ pub fn properties_to_yaml(
     let mut keys: Vec<&String> = props.keys().collect();
     keys.sort();
     for key in keys {
-        let value = props.get(key).expect("key present");
+        let Some(value) = props.get(key) else {
+            continue;
+        };
         let mut entry = serde_yaml::Mapping::new();
         match value {
             PropertyValue::Title { title } | PropertyValue::RichText { rich_text: title } => {

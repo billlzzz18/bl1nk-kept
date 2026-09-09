@@ -27,11 +27,11 @@ pub struct NotionClient {
 
 impl NotionClient {
     /// Creates a new Notion API client with the given integration token.
-    pub fn new(token: impl Into<String>) -> Self {
+    pub fn new(token: impl Into<String>) -> Result<Self> {
         let token = token.into();
         let mut headers = HeaderMap::new();
-        let mut auth_value =
-            HeaderValue::from_str(&format!("Bearer {}", token)).expect("Invalid token format");
+        let mut auth_value = HeaderValue::from_str(&format!("Bearer {}", token))
+            .map_err(|e| NotionError::Client(format!("invalid token format: {e}")))?;
         auth_value.set_sensitive(true);
         headers.insert(AUTHORIZATION, auth_value);
         headers.insert("Notion-Version", HeaderValue::from_static("2026-03-11"));
@@ -40,19 +40,19 @@ impl NotionClient {
         let http = HttpClient::builder()
             .default_headers(headers)
             .build()
-            .expect("Failed to build HTTP client");
+            .map_err(|e| NotionError::Client(format!("failed to build HTTP client: {e}")))?;
 
         // Notion default limit is 3 requests per second.
         // We set it slightly lower for safety, or let user configure later.
-        let quota = Quota::per_second(NonZeroU32::new(3).unwrap());
+        let quota = Quota::per_second(NonZeroU32::new(3).unwrap_or(NonZeroU32::MIN));
         let limiter = Arc::new(RateLimiter::direct(quota));
 
-        Self {
+        Ok(Self {
             http,
             token,
             base_url: "https://api.notion.com/v1".to_string(),
             limiter,
-        }
+        })
     }
 
     /// Overrides the base API URL (useful for testing).

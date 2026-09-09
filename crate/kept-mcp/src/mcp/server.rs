@@ -82,7 +82,7 @@ pub fn build() -> Result<Server, Box<dyn std::error::Error>> {
         use tools::notion_live::{
             CreatePageTool, GetBlocksTool, GetPageBlocksTool, GetPageTool, SearchTool, TrashTool,
         };
-        let client = Arc::new(NotionClient::new(token));
+        let client = Arc::new(NotionClient::new(token)?);
         builder = builder
             .tool(
                 "get_notion_page_blocks",

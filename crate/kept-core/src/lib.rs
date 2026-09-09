@@ -30,9 +30,12 @@ pub use foundation::{
 pub use migration::{migrate_registry, MigrationError, CURRENT_REGISTRY_VERSION};
 pub use policy::{
     analyze_index_naming, analyze_naming, create_user_config_if_missing, default_user_config_path,
-    load_user_config, resolve_naming_rule, save_user_config, ConfigDefaults, NamingFinding,
-    NamingIssue, NamingIssueKind, NamingProfile, NamingScope, NamingSettings, PolicyError,
-    ResolvedNamingRule, UserConfig, USER_CONFIG_FILE_NAME, USER_CONFIG_VERSION,
+    load_user_config, resolve_naming_rule, save_user_config, ConfigDefaults, LengthSettings,
+    NamingFinding, NamingIssue, NamingIssueKind, NamingProfile, NamingScope, NamingSettings,
+    NumberSettings, PolicyError, PrefixSettings, RangeLimit, ResolvedNamingRule, ScopeOverrides,
+    SemanticSearchSettings, SimilarityRule, SimilaritySettings, TokenPosition, TokenReplacement,
+    TokenReposition, UserConfig, WhitespaceSettings, WordSettings, USER_CONFIG_FILE_NAME,
+    USER_CONFIG_VERSION,
 };
 pub use scanner::{
     build_treemap, check_file_extension_integrity, compile_query, create_duplicate_mutation_plan,

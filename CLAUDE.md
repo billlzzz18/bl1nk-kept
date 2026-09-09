@@ -4,21 +4,21 @@
 
 ---
 
-## สถาปัตยกรรมระบบ (System Architecture)
-- **Acquisition:** FFF Adapter จัดการ filesystem (`look`, `view`, `grep`, `watch`)
-- **Structure:** Tree-sitter วิเคราะห์ Code AST และ `kept-doc` วิเคราะห์ Document IR
-- **Model:** แปลงข้อมูลเป็น `Observation` พร้อม `Target` URI (`file://`, `symbol://`, `document://`)
-- **Judge & Admission:** เปรียบเทียบกับ Context Registry แล้วส่ง treatment (`PASS`, `REFERENCE`, `DELTA`, `COMPRESS`) ผ่าน `kept-mcp`
-- **Tooling:**
-  - **FFF MCP:** (`C:\Users\Admin\AppData\Local\fff-mcp\bin\fff-mcp.exe`) ค้นหาไฟล์และสำรวจโครงสร้างความเร็วสูง
-  - **Serena MCP:** (`C:\Users\Admin\.local\bin\serena.exe start-mcp-server`) ตรวจจับ Language Server/LSP (Rust, Python), Code AST symbols, diagnostics และ targeted edits
-  - **SQZ MCP:** (`C:\Users\Admin\.cargo\bin\sqz-mcp.exe`) จัดการ Token Compression, Shannon Entropy, Context Dedup (`sqz_read_file`, `sqz_grep`, `compress`)
+## Workspace Structure
+
+```
+crate/
+├── kept-core/      # Core logic: keyword validation, search, filesystem, observation model
+├── kept-cli/       # CLI binary (`kept`) — command surface for users
+├── kept-mcp/       # MCP server binary (`bl1nk-kept-mcp`) — long-running MCP service
+├── kept-doc/       # Document sync/conversion library (Notion, Markdown, PDF, DOCX)
+└── kept-grammar/   # Grammar types, keyword validation, naming profiles, config
+```
 
 ---
 
-## คำสั่งที่ใช้งานบ่อย (Essential Commands)
+## Build & Test Commands
 
-### Build & Test
 ```bash
 # คอมไพล์ทั้ง workspace
 cargo build --workspace
@@ -28,29 +28,65 @@ cargo test --workspace
 
 # รันเฉพาะ crate
 cargo test -p kept-core
+cargo test -p kept-grammar
 cargo test -p kept-doc
 cargo test -p kept-cli
 cargo test -p kept-mcp
 
-# รัน static analysis
+# static analysis
 cargo clippy --workspace
-```
-
-### Full Validation Suite
-```bash
-# รัน validation ทั้งหมดของโปรเจกต์ (format, clippy, tests, schema)
-just check
+cargo clippy --workspace -- -D warnings
+cargo fmt --all -- --check
 ```
 
 ---
 
-## Cognitive Guardrail
+## Rust Coding Standards
 
-- อ่าน `docs/specs/cognitive_guardrail_architecture.md` ก่อนแตะ P0.1–P0.3
-- Router ต้องตัดสินก่อน acquisition หรือ tool dispatch
-- SQLite Correction Ledger เป็น enforcement authority; Vault/Markdown เป็น audit projection
+- TDD workflow: Red → Green → Refactor
+- `rustfmt` format, `clippy` 0 warnings
+- Restriction lints: `clippy::unwrap_used` และ `clippy::expect_used` = warn (workspace-level)
+- Error handling: `thiserror` สำหรับ library layers, `anyhow` สำหรับ application layers
+- หลีกเลี่ยง `unwrap()` / `expect()` — ใช้ `?`, `match`, `if let`
+- ห้ามกลืน error ด้วย `let _ =` สำหรับ operations ที่อาจ fail
+- ใช้ `.get(i)` แทน `arr[i]` เพื่อป้องกัน index out of bounds
+- Variable shadowing ใน async/clone scopes เพื่อจำกัด lifetime:
+  ```rust
+  let client = client.clone();
+  tokio::spawn(async move {
+      client.execute().await;
+  });
+  ```
+- ห้ามสร้าง `mod.rs` — ใช้ Rust modern path convention
+- ห้ามสร้างไฟล์ย่อยพร่ำเพรื่อ — พัฒนาต่อในโมดูลเดิม เว้นแต่ logical component ใหม่จริง
 
-## กฎการโค้ดดิ้ง (Coding Guidelines)
-- พัฒนาแบบ TDD (Red -> Green -> Refactor)
-- โค้ด Rust ต้องจัดรูปแบบตาม `rustfmt` และผ่าน `clippy` 0 warnings
-- เก็บ error handling ชัดเจนผ่าน `thiserror` หรือ `anyhow` ตามความเหมาะสมของเลเยอร์
+---
+
+## Comment Standards
+
+- **Internal Rationale:** `// NOTE-001:` เรียงเลขตามประเด็น, ภาษาไทย
+- **Public Rustdoc (`///`):** ภาษาอังกฤษล้วน สำหรับ Public APIs, Structs, CLI Help
+- **Error Messages:** ภาษาอังกฤษล้วน
+- **Project Docs & Guidelines:** ภาษาไทย
+
+---
+
+## External Tools (MCP)
+
+| Tool | Binary Path | Purpose |
+|------|------------|---------|
+| FFF MCP | `C:\Users\Admin\AppData\Local\fff-mcp\bin\fff-mcp.exe` | Filesystem search, find, grep, multi-grep, rescan |
+| Serena MCP | `C:\Users\Admin\.local\bin\serena.exe start-mcp-server` | LSP, AST symbols, diagnostics, targeted edits |
+| SQZ MCP | `C:\Users\Admin\.cargo\bin\sqz-mcp.exe` | Token compression, context dedup, file reading |
+
+---
+
+## Domain Glossary
+
+ดูที่ `CONTEXT.md` สำหรับคำศัพท์เฉพาะของ Domain
+
+---
+
+## Agent Handoff
+
+ดูที่ `AGENTS.md` สำหรับคู่มือการส่งต่องานระหว่าง Agent

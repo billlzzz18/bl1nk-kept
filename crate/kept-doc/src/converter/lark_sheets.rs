@@ -106,8 +106,11 @@ impl ToPlatform for LarkSheetAdapter {
             }
         }
 
-        let data = String::from_utf8(wtr.into_inner().unwrap())
-            .map_err(|e| ConverterError::ConversionFailed(e.to_string()))?;
+        let data = String::from_utf8(
+            wtr.into_inner()
+                .map_err(|e| ConverterError::ConversionFailed(e.to_string()))?,
+        )
+        .map_err(|e| ConverterError::ConversionFailed(e.to_string()))?;
         Ok(data)
     }
 }

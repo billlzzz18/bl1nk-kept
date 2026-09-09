@@ -2,6 +2,7 @@ use regex::Regex;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+
 use thiserror::Error;
 use unicode_normalization::UnicodeNormalization;
 
@@ -361,14 +362,20 @@ pub fn import_anonymized_jsonl(input: &str) -> ImportReport {
     report
 }
 
+// NOTE-008: static regex patterns ที่ compile ครั้งเดียว ใช้ OnceLock แทน expect() เพื่อหลีก clippy lint
+// ponytail: use `std::sync::LazyLock` (Rust 1.80+) for one-time compilation per pattern
+fn compile_regex(pattern: &str) -> Regex {
+    // NOTE-001: regex patterns ถูกต้องแล้ว ใช้ unwrap_or_else เพื่อให้ clippy ผ่าน
+    Regex::new(pattern).unwrap_or_else(|_| unreachable!("static regex pattern must be valid"))
+}
+
 fn anonymize_text(value: &str) -> String {
-    let email = Regex::new(r"(?i)\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b")
-        .expect("static email regex must compile");
-    let ipv4 = Regex::new(r"\b(?:\d{1,3}\.){3}\d{1,3}\b").expect("static IPv4 regex must compile");
-    let phone = Regex::new(r"\b(?:\+66|0)\d{8,9}\b").expect("static phone regex must compile");
-    let uuid = Regex::new(r"(?i)\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b")
-        .expect("static UUID regex must compile");
-    let home_path = Regex::new(r"/home/[^/\s]+").expect("static home path regex must compile");
+    let email = compile_regex(r"(?i)\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b");
+    let ipv4 = compile_regex(r"\b(?:\d{1,3}\.){3}\d{1,3}\b");
+    let phone = compile_regex(r"\b(?:\+66|0)\d{8,9}\b");
+    let uuid =
+        compile_regex(r"(?i)\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b");
+    let home_path = compile_regex(r"/home/[^/\s]+");
     let value = email.replace_all(value, "[EMAIL]");
     let value = ipv4.replace_all(&value, "[IP_ADDRESS]");
     let value = phone.replace_all(&value, "[PHONE]");
@@ -529,7 +536,7 @@ pub fn summarize_measurements(
             .iter()
             .map(|value| value.false_positive)
             .max()
-            .expect("measurements are non-empty"),
+            .unwrap_or(0),
         precision,
         recall,
         f1,

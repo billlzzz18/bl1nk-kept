@@ -4,25 +4,35 @@ use crate::foundation::{
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use thiserror::Error;
 
 pub const PUBLIC_REGISTRY_SCHEMA_VERSION: &str = "1.2.0";
 
-// NOTE-001: สร้าง JSON Schema จาก model registry ปัจจุบันเพื่อให้ artifact ภายนอกไม่ drift จาก Rust source
-pub fn export_keyword_registry_schema() -> schemars::schema::RootSchema {
-    let mut schema = serde_json::to_value(schemars::schema_for!(KeywordRegistry))
-        .expect("generated registry schema must serialize");
-    tighten_public_schema(&mut schema);
-    serde_json::from_value(schema).expect("tightened registry schema must remain valid")
+// NOTE-001: ข้อผิดพลาดจากการ export/flush JSON Schema
+#[derive(Debug, Error)]
+pub enum SchemaError {
+    #[error("schema serialization failed: {0}")]
+    Serialization(#[from] serde_json::Error),
+
+    #[error("unexpected schema structure: {0}")]
+    Structure(String),
 }
 
-fn tighten_public_schema(schema: &mut serde_json::Value) {
+// NOTE-002: สร้าง JSON Schema จาก model registry ปัจจุบันเพื่อให้ artifact ภายนอกไม่ drift จาก Rust source
+pub fn export_keyword_registry_schema() -> Result<schemars::schema::RootSchema, SchemaError> {
+    let mut schema = serde_json::to_value(schemars::schema_for!(KeywordRegistry))?;
+    tighten_public_schema(&mut schema)?;
+    Ok(serde_json::from_value(schema)?)
+}
+
+fn tighten_public_schema(schema: &mut serde_json::Value) -> Result<(), SchemaError> {
     let root = schema
         .as_object_mut()
-        .expect("generated registry schema must be an object");
+        .ok_or_else(|| SchemaError::Structure("schema root must be an object".into()))?;
     let required = root
         .get_mut("required")
         .and_then(serde_json::Value::as_array_mut)
-        .expect("generated registry schema must define required root fields");
+        .ok_or_else(|| SchemaError::Structure("schema must define required root fields".into()))?;
     if !required.iter().any(|field| field == "foundation") {
         required.push(serde_json::Value::String("foundation".to_string()));
     }
@@ -34,7 +44,7 @@ fn tighten_public_schema(schema: &mut serde_json::Value) {
     let properties = root
         .get_mut("properties")
         .and_then(serde_json::Value::as_object_mut)
-        .expect("generated registry schema must define root properties");
+        .ok_or_else(|| SchemaError::Structure("schema must define root properties".into()))?;
     properties.insert(
         "version".to_string(),
         serde_json::json!({ "const": PUBLIC_REGISTRY_SCHEMA_VERSION }),
@@ -47,7 +57,7 @@ fn tighten_public_schema(schema: &mut serde_json::Value) {
     let definitions = root
         .get_mut("definitions")
         .and_then(serde_json::Value::as_object_mut)
-        .expect("generated registry schema must define nested types");
+        .ok_or_else(|| SchemaError::Structure("schema must define nested types".into()))?;
     for name in [
         "ClassificationPolicy",
         "CorpusManifest",
@@ -72,7 +82,9 @@ fn tighten_public_schema(schema: &mut serde_json::Value) {
         definitions
             .get_mut(name)
             .and_then(serde_json::Value::as_object_mut)
-            .expect("generated definition must exist")
+            .ok_or_else(|| {
+                SchemaError::Structure(format!("generated definition '{name}' must exist"))
+            })?
             .insert(
                 "additionalProperties".to_string(),
                 serde_json::Value::Bool(false),
@@ -84,14 +96,16 @@ fn tighten_public_schema(schema: &mut serde_json::Value) {
         .and_then(|definition| definition.get_mut("properties"))
         .and_then(|properties| properties.get_mut("entries"))
         .and_then(serde_json::Value::as_object_mut)
-        .expect("KeywordGroup entries schema must exist")
+        .ok_or_else(|| SchemaError::Structure("KeywordGroup entries schema must exist".into()))?
         .insert("items".to_string(), serde_json::json!({ "type": "object" }));
 
     let normalization = definitions
         .get_mut("NormalizationProfile")
         .and_then(|definition| definition.get_mut("properties"))
         .and_then(serde_json::Value::as_object_mut)
-        .expect("NormalizationProfile properties must exist");
+        .ok_or_else(|| {
+            SchemaError::Structure("NormalizationProfile properties must exist".into())
+        })?;
     for (field, value) in [
         ("encoding", "utf-8"),
         ("unicodeForm", "nfc"),
@@ -101,6 +115,7 @@ fn tighten_public_schema(schema: &mut serde_json::Value) {
     ] {
         normalization.insert(field.to_string(), serde_json::json!({ "const": value }));
     }
+    Ok(())
 }
 
 // ============= Registry Types =============
@@ -466,7 +481,7 @@ mod schema_export_tests {
 
     #[test]
     fn public_schema_export_contains_current_registry_and_foundation_profile() {
-        let schema = export_keyword_registry_schema();
+        let schema = export_keyword_registry_schema().expect("schema export must succeed");
 
         assert!(schema
             .schema
@@ -478,8 +493,10 @@ mod schema_export_tests {
 
     #[test]
     fn public_schema_is_meta_valid_and_validates_the_rust_registry_contract() {
-        let schema = serde_json::to_value(export_keyword_registry_schema())
-            .expect("schema export must serialize to JSON");
+        let schema = serde_json::to_value(
+            export_keyword_registry_schema().expect("schema export must succeed"),
+        )
+        .expect("schema export must serialize to JSON");
         assert!(jsonschema::draft7::meta::is_valid(&schema));
 
         let validator =
@@ -516,8 +533,10 @@ mod schema_export_tests {
 
     #[test]
     fn public_schema_rejects_noncanonical_registry_shape_and_zero_search_budgets() {
-        let schema = serde_json::to_value(export_keyword_registry_schema())
-            .expect("schema export must serialize to JSON");
+        let schema = serde_json::to_value(
+            export_keyword_registry_schema().expect("schema export must succeed"),
+        )
+        .expect("schema export must serialize to JSON");
         let validator =
             jsonschema::validator_for(&schema).expect("schema must compile for consumers");
         let canonical = json!({
@@ -598,8 +617,10 @@ mod schema_export_tests {
         assert!(Validator::new(migrated.clone()).validate_registry().is_ok());
 
         let instance = serde_json::to_value(&migrated).expect("migrated registry must serialize");
-        let schema = serde_json::to_value(export_keyword_registry_schema())
-            .expect("schema export must serialize to JSON");
+        let schema = serde_json::to_value(
+            export_keyword_registry_schema().expect("schema export must succeed"),
+        )
+        .expect("schema export must serialize to JSON");
         let consumer =
             jsonschema::validator_for(&schema).expect("schema must compile for consumers");
         assert!(consumer.is_valid(&instance));

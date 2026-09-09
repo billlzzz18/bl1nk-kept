@@ -573,14 +573,15 @@ impl IndexManager {
 
     /// Returns an Arc snapshot of the current scope graph index.
     pub fn get_snapshot(&self) -> Arc<ScopeGraphIndex> {
-        let guard = self.index.read().unwrap();
+        // NOTE-009: RwLock poison recovery — ใช้ into_inner() เมื่อ lock poisoned เพื่อไม่ panic
+        let guard = self.index.read().unwrap_or_else(|e| e.into_inner());
         Arc::new(guard.clone())
     }
 
     /// Process a batch of incremental file events with coalescing.
     pub fn apply_events(&self, events: &[FileEvent]) {
         let coalesced = coalesce_file_events(events);
-        let mut guard = self.index.write().unwrap();
+        let mut guard = self.index.write().unwrap_or_else(|e| e.into_inner());
 
         for event in coalesced {
             let path_str = event.path.to_string_lossy().replace('\\', "/");

@@ -5,6 +5,10 @@ use thiserror::Error;
 /// The main error type for the Notion API SDK.
 #[derive(Error, Debug)]
 pub enum NotionError {
+    /// Client initialization failed.
+    #[error("Client error: {0}")]
+    Client(String),
+
     /// HTTP request failed.
     #[error("HTTP request failed: {0}")]
     Request(#[from] reqwest::Error),

@@ -70,3 +70,9 @@ opt-level = 3
 lto = true
 codegen-units = 1
 strip = true
+
+# Phase 0: Restriction lints — warn on unwrap/expect in production code
+# Track: 130 unwrap/expect in kept-core/src to be eliminated
+[workspace.lints.clippy]
+unwrap_used = "warn"
+expect_used = "warn"

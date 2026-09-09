@@ -24,7 +24,7 @@ fn migrated_fixture() -> Result<KeywordRegistry, Box<dyn Error + Send + Sync>> {
 }
 
 fn run_demo() -> Result<Value, Box<dyn Error + Send + Sync>> {
-    let schema = serde_json::to_value(export_keyword_registry_schema())?;
+    let schema = serde_json::to_value(export_keyword_registry_schema()?)?;
     let draft7_meta_valid = jsonschema::draft7::meta::is_valid(&schema);
     let consumer = jsonschema::validator_for(&schema)?;
     let fixture = migrated_fixture()?;

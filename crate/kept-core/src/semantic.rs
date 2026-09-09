@@ -30,6 +30,8 @@ pub enum SemanticError {
     Request(String),
     #[error("unexpected response from provider: {0}")]
     Response(String),
+    #[error("serialization error: {0}")]
+    Serialization(String),
 }
 
 // NOTE-001: provider ที่รองรับมีแค่ ollama (local default) กับ jina (hosted, มีทั้ง embeddings และ rerank)
@@ -147,12 +149,15 @@ pub fn embeddings_endpoint(endpoint: &str) -> String {
     format!("{}/embeddings", endpoint.trim_end_matches('/'))
 }
 
-pub fn embeddings_request_body(model_id: &str, inputs: &[String]) -> serde_json::Value {
+pub fn embeddings_request_body(
+    model_id: &str,
+    inputs: &[String],
+) -> Result<serde_json::Value, SemanticError> {
     serde_json::to_value(EmbeddingsRequestBody {
         model: model_id,
         input: inputs,
     })
-    .expect("embeddings request serializes")
+    .map_err(|e| SemanticError::Serialization(e.to_string()))
 }
 
 #[derive(Deserialize)]
@@ -182,13 +187,17 @@ pub fn rerank_endpoint(endpoint: &str) -> String {
     format!("{}/rerank", endpoint.trim_end_matches('/'))
 }
 
-pub fn rerank_request_body(model_id: &str, query: &str, documents: &[String]) -> serde_json::Value {
+pub fn rerank_request_body(
+    model_id: &str,
+    query: &str,
+    documents: &[String],
+) -> Result<serde_json::Value, SemanticError> {
     serde_json::to_value(RerankRequestBody {
         model: model_id,
         query,
         documents,
     })
-    .expect("rerank request serializes")
+    .map_err(|e| SemanticError::Serialization(e.to_string()))
 }
 
 #[derive(Deserialize)]
@@ -256,7 +265,7 @@ pub async fn embed_texts(
     let body = post_json(
         config,
         embeddings_endpoint(&config.endpoint),
-        &embeddings_request_body(&config.embedding_model_id, inputs),
+        &embeddings_request_body(&config.embedding_model_id, inputs)?,
     )
     .await?;
     parse_embeddings_response(&body)
@@ -271,7 +280,7 @@ pub async fn rerank_documents(
     let body = post_json(
         config,
         rerank_endpoint(&config.endpoint),
-        &rerank_request_body(&config.rerank_model_id, query, documents),
+        &rerank_request_body(&config.rerank_model_id, query, documents)?,
     )
     .await?;
     parse_rerank_response(&body)
@@ -433,7 +442,8 @@ mod tests {
             embeddings_endpoint("http://127.0.0.1:11434/v1"),
             "http://127.0.0.1:11434/v1/embeddings"
         );
-        let body = embeddings_request_body("bge-m3", &["first".to_string(), "second".to_string()]);
+        let body = embeddings_request_body("bge-m3", &["first".to_string(), "second".to_string()])
+            .expect("test serialization must succeed");
         assert_eq!(body["model"], "bge-m3");
         assert_eq!(body["input"][1], "second");
     }
@@ -454,7 +464,8 @@ mod tests {
             rerank_endpoint("http://127.0.0.1:11434/v1/"),
             "http://127.0.0.1:11434/v1/rerank"
         );
-        let body = rerank_request_body("bge-reranker-v2-m3", "invoice", &["a".into(), "b".into()]);
+        let body = rerank_request_body("bge-reranker-v2-m3", "invoice", &["a".into(), "b".into()])
+            .expect("test serialization must succeed");
         assert_eq!(body["query"], "invoice");
         assert_eq!(body["documents"][1], "b");
 

@@ -18,6 +18,15 @@ output-format: log
 
 Bloop: Claude never logs its own mistakes. This skill fixes that.
 
+## Tool Selection Rules
+
+| Task | Use | When |
+|------|-----|------|
+| Log error to file | **Write/Edit** | Append to .learnings/ERRORS.md |
+| Find existing errors | **FFF grep** | Search ERRORS.md for similar issues |
+| Check error patterns | **Read** | Review recent errors for patterns |
+| Update memory | **Write** | Add to persistent memory files |
+
 ## When to Log
 
 **Every time** any of these happen:

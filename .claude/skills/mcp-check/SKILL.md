@@ -16,6 +16,16 @@ output-format: report
 
 Verifies MCP servers are running and tools are available. Catches issues before they block work.
 
+## Tool Selection Rules
+
+| Task | Use | When |
+|------|-----|------|
+| Check MCP server status | **Bash** | Get-Process or ps aux |
+| List available tools | **ListMcpResourcesTool** | See what tools are registered |
+| Test tool call | **Any MCP tool** | Verify server responds |
+| Debug MCP connection | **MCP Inspector** | Real-time connection monitoring |
+| Check VSCode extension | **VSCode** | Open MCP Inspector panel |
+
 ## Check List
 
 ```

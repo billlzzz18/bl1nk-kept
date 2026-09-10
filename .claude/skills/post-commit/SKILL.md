@@ -15,6 +15,16 @@ output-format: checklist
 
 Runs mandatory checks after every commit. Prevents state divergence and forgotten updates.
 
+## Tool Selection Rules
+
+| Task | Use | When |
+|------|-----|------|
+| Check commit status | **Bash** | git log -1 --oneline |
+| Verify TODO.md | **Read** | Check for matching items |
+| Update TODO.md | **Edit** | Mark completed items [x] |
+| Check CHANGELOG.md | **Read** | See if public API changed |
+| Clean temp files | **Bash** | git status, rm temp files |
+
 ## Checklist (run in order)
 
 ```

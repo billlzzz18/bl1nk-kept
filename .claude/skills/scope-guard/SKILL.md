@@ -17,6 +17,20 @@ output-format: validation
 
 Prevents over-engineering and excessive changes. Locks scope to what was asked.
 
+## Tool Selection Rules
+
+| Task | Use | When |
+|------|-----|------|
+| Find symbol definition | **LSP goToDefinition** | Know where symbol is defined |
+| Find all references | **LSP findReferences** | Know who uses a symbol |
+| See all symbols in file | **LSP documentSymbol** | Understand file structure |
+| Search symbol across workspace | **LSP workspaceSymbol** | Find symbol by name pattern |
+| Search docs/library | **Context7** | Need API syntax or examples |
+| Find files by name | **FFF find** | Search by filename pattern |
+| Search file contents | **FFF grep** | Search by content pattern |
+| Compress large output | **SQZ** | Tool output > 500 lines |
+| AST operations | **Serena** | Find declarations, implementations |
+
 ## Pre-Edit Checklist
 
 Before any file modification:

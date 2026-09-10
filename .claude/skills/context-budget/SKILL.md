@@ -17,6 +17,16 @@ output-format: action
 
 Prevents context overflow by enforcing compression and pruning rules. Works with SQZ MCP.
 
+## Tool Selection Rules
+
+| Task | Use | When |
+|------|-----|------|
+| Read large file | **SQZ read** | File > 2KB |
+| Compress output | **SQZ compress** | Tool output > 500 lines |
+| Check cache | **SQZ cache list** | See what's cached |
+| Quick file check | **Read** | File < 1KB, need exact content |
+| Search file contents | **FFF grep** | Find specific patterns |
+
 ## Rules
 
 ### Before Reading Files

@@ -79,7 +79,7 @@ pub struct RegexRule {
     pub test_vectors: Vec<RegexTestVector>,
 }
 
-/// NOTE-001: regex ทุก rule ต้องพิสูจน์ด้วย vector สองทิศทางก่อน validator เรียกใช้
+// NOTE-001: regex ทุก rule ต้องพิสูจน์ด้วย vector สองทิศทางก่อน validator เรียกใช้
 pub fn validate_regex_rule(rule: &RegexRule) -> Result<(), FoundationError> {
     let regex = Regex::new(&rule.pattern).map_err(|error| FoundationError::InvalidRegexRule {
         rule_id: rule.id.clone(),
@@ -205,7 +205,7 @@ pub struct GlossaryTerm {
     pub confidence: f64,
 }
 
-/// NOTE-001: glossary ต้องมี raw term, normalized term และ source ที่ตรวจ checksum ได้ก่อนเป็น evidence
+// NOTE-002: glossary ต้องมี raw term, normalized term และ source ที่ตรวจ checksum ได้ก่อนเป็น evidence
 pub fn validate_glossary_term(
     term: &GlossaryTerm,
     provenance: &[ProvenanceRecord],
@@ -282,7 +282,7 @@ pub struct ImportReport {
     pub rejected: Vec<ImportRejection>,
 }
 
-/// NOTE-001: importer เก็บเฉพาะข้อมูลที่ถูก anonymize และคืน rejection รายบรรทัดเพื่อ audit ได้
+// NOTE-003: importer เก็บเฉพาะข้อมูลที่ถูก anonymize และคืน rejection รายบรรทัดเพื่อ audit ได้
 pub fn import_anonymized_jsonl(input: &str) -> ImportReport {
     let mut report = ImportReport::default();
     for (index, line) in input.lines().enumerate() {
@@ -365,7 +365,7 @@ pub fn import_anonymized_jsonl(input: &str) -> ImportReport {
 // NOTE-008: static regex patterns ที่ compile ครั้งเดียว ใช้ OnceLock แทน expect() เพื่อหลีก clippy lint
 // ponytail: use `std::sync::LazyLock` (Rust 1.80+) for one-time compilation per pattern
 fn compile_regex(pattern: &str) -> Regex {
-    // NOTE-001: regex patterns ถูกต้องแล้ว ใช้ unwrap_or_else เพื่อให้ clippy ผ่าน
+    // NOTE-004: regex patterns ถูกต้องแล้ว ใช้ unwrap_or_else เพื่อให้ clippy ผ่าน
     Regex::new(pattern).unwrap_or_else(|_| unreachable!("static regex pattern must be valid"))
 }
 
@@ -402,7 +402,7 @@ pub struct CorpusManifest {
     pub entries: Vec<CorpusManifestEntry>,
 }
 
-/// NOTE-001: manifest เป็น gate ก่อนอ่าน corpus เพื่อป้องกันข้อมูลที่ไม่มี provenance เข้า benchmark
+// NOTE-005: manifest เป็น gate ก่อนอ่าน corpus เพื่อป้องกันข้อมูลที่ไม่มี provenance เข้า benchmark
 pub fn validate_corpus_manifest(manifest: &CorpusManifest) -> Result<(), FoundationError> {
     if manifest.revision.trim().is_empty() {
         return Err(FoundationError::InvalidCorpusManifestEntry {
@@ -427,7 +427,7 @@ pub fn validate_corpus_manifest(manifest: &CorpusManifest) -> Result<(), Foundat
     Ok(())
 }
 
-/// NOTE-001: corpus จะผ่าน experiment ได้ก็ต่อเมื่อ bytes ตรงกับ checksum ที่ manifest ระบุ
+// NOTE-006: corpus จะผ่าน experiment ได้ก็ต่อเมื่อ bytes ตรงกับ checksum ที่ manifest ระบุ
 pub fn verify_corpus_bytes(entry: &CorpusManifestEntry, bytes: &[u8]) -> bool {
     let actual = hex::encode(Sha256::digest(bytes));
     actual.eq_ignore_ascii_case(&entry.content_sha256)
@@ -476,7 +476,7 @@ pub struct DistributionSummary {
     pub f1: f64,
 }
 
-/// NOTE-001: summary คำนวณจาก raw runs ทั้งหมดเพื่อแสดง distribution และ metric ที่ตรวจย้อนกลับได้
+// NOTE-007: summary คำนวณจาก raw runs ทั้งหมดเพื่อแสดง distribution และ metric ที่ตรวจย้อนกลับได้
 pub fn summarize_measurements(
     measurements: &[RunMeasurement],
 ) -> Result<DistributionSummary, FoundationError> {
@@ -580,7 +580,7 @@ pub struct SelectionConstraints {
     pub required_strata: Vec<String>,
 }
 
-/// NOTE-001: เลือกค่า default จากผลวัดที่ปลอดภัยก่อน แล้วใช้ F1/candidate cost เป็น tie-break ที่ระบุชัด
+// NOTE-008: เลือกค่า default จากผลวัดที่ปลอดภัยก่อน แล้วใช้ F1/candidate cost เป็น tie-break ที่ระบุชัด
 pub fn select_default_candidate<'a>(
     candidates: &'a [DefaultCandidate],
     constraints: &SelectionConstraints,
@@ -610,7 +610,7 @@ pub fn select_default_candidate<'a>(
         })
 }
 
-/// NOTE-001: คะแนนเกิดหลัง evidence ผ่านการตรวจเท่านั้น และ decision ไม่สั่งเพิ่ม keyword อัตโนมัติ
+// NOTE-009: คะแนนเกิดหลัง evidence ผ่านการตรวจเท่านั้น และ decision ไม่สั่งเพิ่ม keyword อัตโนมัติ
 pub fn classify_evidence(
     subject_id: &str,
     evidence: &[EvidenceRecord],
@@ -689,21 +689,21 @@ pub fn classify_evidence(
     })
 }
 
-/// NOTE-001: ปฏิเสธ bytes ที่ decode ไม่ได้ก่อนแปลงข้อความเป็น evidence หรือ keyword
+// NOTE-010: ปฏิเสธ bytes ที่ decode ไม่ได้ก่อนแปลงข้อความเป็น evidence หรือ keyword
 pub fn decode_utf8(input: &[u8]) -> Result<&str, FoundationError> {
     std::str::from_utf8(input).map_err(|error| FoundationError::InvalidEncoding {
         offset: error.valid_up_to(),
     })
 }
 
-/// NOTE-001: normalization ต้อง deterministic เพื่อให้ index, validator และ experiment ใช้ข้อความฐานเดียวกัน
+// NOTE-011: normalization ต้อง deterministic เพื่อให้ index, validator และ experiment ใช้ข้อความฐานเดียวกัน
 pub fn normalize_text(value: &str) -> Result<String, FoundationError> {
     let nfc: String = value.nfc().collect();
     let collapsed = nfc.split_whitespace().collect::<Vec<_>>().join(" ");
     Ok(collapsed.chars().map(lowercase_latin).collect::<String>())
 }
 
-/// NOTE-001: ลดตัวพิมพ์เฉพาะอักษร Latin เพื่อไม่เปลี่ยน script อื่นโดยไม่ตั้งใจ
+// NOTE-012: ลดตัวพิมพ์เฉพาะอักษร Latin เพื่อไม่เปลี่ยน script อื่นโดยไม่ตั้งใจ
 fn lowercase_latin(character: char) -> String {
     if is_latin(character) {
         character.to_lowercase().collect()

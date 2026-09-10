@@ -38,17 +38,17 @@ pub use policy::{
     USER_CONFIG_VERSION,
 };
 pub use scanner::{
-    build_treemap, check_file_extension_integrity, compile_query, create_duplicate_mutation_plan,
-    create_persistent_snapshot, execute_duplicate_mutation, filter_allowed_duplicates,
-    filter_index, find_content_duplicates, find_duplicates, find_duplicates_with_stats,
-    migrate_snapshot, parse_size_to_bytes, plan_incremental_refresh, rollback_duplicate_mutation,
-    scan_directory, scan_index_integrity, simulate_duplicate_mutation, ActionSimulation,
-    BadExtensionIssue, ContentDuplicateOptions, ContentDuplicateStats, CustomFilter,
-    CustomOperator, DuplicateActionKind, DuplicateAllowRule, DuplicateEvidence, DuplicateGroup,
-    DuplicateMutationPlan, DuplicateMutationPolicy, DuplicateOptions, DuplicatePlanAction,
-    DuplicateSearchStats, DuplicateSimulationResult, FileFilter, FileRecord, FilterSet,
-    IntegrityStatus, PersistentScanSnapshot, QueryClause, QueryPlan, RefreshPlan, RollbackEntry,
-    RollbackJournal, ScanIndex, ScanIssue, ScanIssueKind, ScanOptions, TreemapNode,
+    apply_refresh_plan, build_treemap, check_file_extension_integrity, compile_query,
+    create_duplicate_mutation_plan, create_persistent_snapshot, execute_duplicate_mutation,
+    filter_allowed_duplicates, filter_index, find_content_duplicates, find_duplicates,
+    find_duplicates_with_stats, migrate_snapshot, parse_size_to_bytes, plan_incremental_refresh,
+    rollback_duplicate_mutation, scan_directory, scan_index_integrity, simulate_duplicate_mutation,
+    ActionSimulation, BadExtensionIssue, ContentDuplicateOptions, ContentDuplicateStats,
+    CustomFilter, CustomOperator, DuplicateActionKind, DuplicateAllowRule, DuplicateEvidence,
+    DuplicateGroup, DuplicateMutationPlan, DuplicateMutationPolicy, DuplicateOptions,
+    DuplicatePlanAction, DuplicateSearchStats, DuplicateSimulationResult, FileFilter, FileRecord,
+    FilterSet, IntegrityStatus, PersistentScanSnapshot, QueryClause, QueryPlan, RefreshPlan,
+    RollbackEntry, RollbackJournal, ScanIndex, ScanIssue, ScanIssueKind, ScanOptions, TreemapNode,
     CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION,
 };
 pub use search::KeywordSearch;
@@ -65,7 +65,7 @@ use crate::schema::KeywordRegistry;
 use std::fs;
 use std::path::Path;
 
-/// NOTE-001: โหลด registry โดยรองรับทั้ง JSON และ YAML อัตโนมัติจากนามสกุลไฟล์
+// NOTE-001: โหลด registry โดยรองรับทั้ง JSON และ YAML อัตโนมัติจากนามสกุลไฟล์
 pub fn load_registry<P: AsRef<Path>>(
     path: P,
 ) -> Result<KeywordRegistry, Box<dyn std::error::Error + Send + Sync>> {
@@ -105,7 +105,7 @@ pub fn load_registry<P: AsRef<Path>>(
     Ok(migrated)
 }
 
-/// NOTE-001: บันทึก registry โดยรองรับทั้ง JSON และ YAML
+// NOTE-002: บันทึก registry โดยรองรับทั้ง JSON และ YAML
 pub fn save_registry<P: AsRef<Path>>(
     path: P,
     registry: &KeywordRegistry,
@@ -143,7 +143,7 @@ pub fn save_registry<P: AsRef<Path>>(
     Ok(())
 }
 
-/// NOTE-001: นำเข้าข้อมูลจาก CSV เพื่อสร้างกลุ่มและรายการอัตโนมัติ
+// NOTE-003: นำเข้าข้อมูลจาก CSV เพื่อสร้างกลุ่มและรายการอัตโนมัติ
 pub fn import_csv<P: AsRef<Path>>(
     path: P,
     group_id: &str,
@@ -184,7 +184,7 @@ pub fn import_csv<P: AsRef<Path>>(
             .into());
         }
 
-        // NOTE-001: custom CSV columns ต้องยังอยู่ใน entry แต่ aliases ต้องเป็น array ตาม schema contract ไม่ใช่ string ดิบจาก CSV
+        // NOTE-004: custom CSV columns ต้องยังอยู่ใน entry แต่ aliases ต้องเป็น array ตาม schema contract ไม่ใช่ string ดิบจาก CSV
         let mut entry = serde_json::Map::new();
         entry.insert("id".to_string(), serde_json::Value::String(id));
         entry.insert(
@@ -248,7 +248,7 @@ pub fn import_csv<P: AsRef<Path>>(
     })
 }
 
-/// NOTE-001: สร้างเอกสาร Markdown จาก registry
+// NOTE-005: สร้างเอกสาร Markdown จาก registry
 pub fn generate_markdown(registry: &KeywordRegistry) -> String {
     let mut md = String::new();
     md.push_str(&format!("# {}\n\n", registry.metadata.description));

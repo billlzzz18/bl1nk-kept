@@ -121,7 +121,7 @@ impl Sink for NotionToPlatform {
         _client: &crate::client::NotionClient,
         _plan: &crate::sync::ChangeSet,
     ) -> Result<(), ConvertError> {
-        // NOTE-001: ในการใช้งานจริง จะต้องส่ง ChangeSet ไปยัง Notion API
+        // NOTE-002: ในการใช้งานจริง จะต้องส่ง ChangeSet ไปยัง Notion API
         Err(ConvertError::ConversionFailed(
             "Live apply not implemented in this demo".into(),
         ))

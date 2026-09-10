@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use thiserror::Error;
 
-/// NOTE-001: รวม Error ทั้งหมดที่เกิดจากการแปลงข้อมูลไว้ในซองเดียว (Unified Error Envelope)
+// NOTE-001: รวม Error ทั้งหมดที่เกิดจากการแปลงข้อมูลไว้ในซองเดียว (Unified Error Envelope)
 #[derive(Error, Debug, Serialize, Deserialize)]
 pub enum ConvertError {
     #[error("Unsupported platform: {0}")]
@@ -26,7 +26,7 @@ pub enum ConvertError {
     PlatformError { platform: String, message: String },
 }
 
-// NOTE-001: M2 - Reader/Writer Traits (Synchronous, Total functions over bytes)
+// NOTE-002: M2 - Reader/Writer Traits (Synchronous, Total functions over bytes)
 // ช่วยให้ Registry จัดการ Crate ได้อย่างปลอดภัยโดยไม่ต้องใช้ Box<dyn Any>
 
 /// Trait สำหรับการอ่านไฟล์จาก bytes เข้าสู่ Universal IR
@@ -39,7 +39,7 @@ pub trait Writer: Send + Sync {
     fn write(&self, doc: &UniversalDocument) -> Result<Vec<u8>, ConvertError>;
 }
 
-// NOTE-001: M4 - Source/Sink Traits (Asynchronous, for live platforms)
+// NOTE-003: M4 - Source/Sink Traits (Asynchronous, for live platforms)
 
 /// Trait สำหรับการดึงข้อมูลจาก API ภายนอกเข้าสู่ Universal IR
 #[async_trait]
@@ -105,13 +105,13 @@ pub trait ToPlatform {
 }
 
 /// Converter registry for dynamic platform discovery
-/// NOTE-001: M2 - ปรับปรุง Registry ให้ใช้ Reader/Writer ที่เป็น Uniform Traits
+// NOTE-004: M2 - ปรับปรุง Registry ให้ใช้ Reader/Writer ที่เป็น Uniform Traits
 /// กำจัดความจำเป็นในการใช้ Box<dyn Any> และ Downcasting ในการแปลงไฟล์ทั่วไป
 #[derive(Default)]
 pub struct ConverterRegistry {
     readers: HashMap<Platform, Box<dyn Reader>>,
     writers: HashMap<Platform, Box<dyn Writer>>,
-    // NOTE-001: เก็บ Source/Sink สำหรับ live platforms
+    // NOTE-005: เก็บ Source/Sink สำหรับ live platforms
     sources: HashMap<Platform, Box<dyn Source>>,
     sinks: HashMap<Platform, Box<dyn Sink>>,
 }
@@ -181,7 +181,7 @@ pub use pdf::PdfAdapter;
 
 // --- Blanket Implementations for M2 ---
 
-/// NOTE-001: M2 - Blanket implementation สำหรับ Reader
+// NOTE-006: M2 - Blanket implementation สำหรับ Reader
 /// ช่วยให้ Adapter ที่เป็น String-based (เช่น Markdown) ย้ายมาใช้ Reader ได้ทันที
 impl<T> Reader for T
 where
@@ -194,7 +194,7 @@ where
     }
 }
 
-/// NOTE-001: M2 - Blanket implementation สำหรับ Writer
+// NOTE-007: M2 - Blanket implementation สำหรับ Writer
 /// ช่วยให้ Adapter ที่เป็น String-based ย้ายมาใช้ Writer ได้ทันที
 impl<T> Writer for T
 where

@@ -77,10 +77,10 @@ pub fn thai_to_qwerty(text: &str) -> String {
         .collect()
 }
 
-/// NOTE-001: ใช้สัดส่วน 70% เพื่อหลีกเลี่ยงการแปลงคำอังกฤษปกติที่มีตัวอักษรตรงกับ map บางส่วน
+// NOTE-002: ใช้สัดส่วน 70% เพื่อหลีกเลี่ยงการแปลงคำอังกฤษปกติที่มีตัวอักษรตรงกับ map บางส่วน
 pub fn likely_thai_wrong_layout(text: &str) -> bool {
     let chars: Vec<char> = text.chars().collect();
-    // NOTE-001: ไม่แปลงคำที่มีเครื่องหมายคั่น เช่น api-docs เพราะมักเป็นภาษาอังกฤษที่ถูกต้อง
+    // NOTE-003: ไม่แปลงคำที่มีเครื่องหมายคั่น เช่น api-docs เพราะมักเป็นภาษาอังกฤษที่ถูกต้อง
     if chars.is_empty()
         || chars
             .iter()

@@ -162,7 +162,7 @@ pub fn handle_evidence(cmd: EvidenceCommands) -> anyhow::Result<()> {
             bad_fixture,
             require_no_mutation,
         } => {
-            // NOTE-001: --require-no-mutation คือ safety gate จริง — ต้อง validate fixture ที่มีอยู่โดยไม่เขียนทับ
+            // NOTE-002: --require-no-mutation คือ safety gate จริง — ต้อง validate fixture ที่มีอยู่โดยไม่เขียนทับ
             if require_no_mutation {
                 for (label, path) in [("good", &good_fixture), ("bad", &bad_fixture)] {
                     let content = std::fs::read_to_string(path).map_err(|error| {

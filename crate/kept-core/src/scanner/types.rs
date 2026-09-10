@@ -203,6 +203,29 @@ pub fn plan_incremental_refresh(
     Ok(plan)
 }
 
+/// Apply a RefreshPlan delta to the records list in-place.
+///
+// NOTE-REFRESH-001: ใช้สำหรับ rescan no-op fix — อัปเด트 records ตาม plan
+/// โดยไม่ต้อง re-read ทั้งหมดใหม่
+pub fn apply_refresh_plan(
+    records: &mut Vec<FileRecord>,
+    plan: &RefreshPlan,
+    new_records: &[FileRecord],
+) {
+    // ลบ records ที่ถูก mark ว่า removed
+    records.retain(|r| !plan.removed.contains(&r.path));
+    // อัปเดต/เพิ่ม records ที่ added หรือ modified จาก new_records
+    for new_rec in new_records {
+        if plan.modified.contains(&new_rec.path) || plan.added.contains(&new_rec.path) {
+            if let Some(existing) = records.iter_mut().find(|r| r.path == new_rec.path) {
+                *existing = new_rec.clone();
+            } else {
+                records.push(new_rec.clone());
+            }
+        }
+    }
+}
+
 fn file_changed(previous: &FileRecord, current: &FileRecord) -> bool {
     previous.size != current.size
         || previous.modified_unix != current.modified_unix
@@ -383,5 +406,91 @@ mod tests {
             index: make_index("/root", vec![]),
         };
         assert!(migrate_snapshot(snapshot).is_err());
+    }
+
+    #[test]
+    fn apply_refresh_plan_adds_removes_and_modifies_records() {
+        let mut records = vec![
+            FileRecord {
+                path: "unchanged.txt".into(),
+                name: "unchanged.txt".into(),
+                extension: "txt".into(),
+                size: 10,
+                modified_unix: 1,
+                kind: "file".into(),
+                is_binary: None,
+                git_status: None,
+            },
+            FileRecord {
+                path: "modified.txt".into(),
+                name: "modified.txt".into(),
+                extension: "txt".into(),
+                size: 10,
+                modified_unix: 1,
+                kind: "file".into(),
+                is_binary: None,
+                git_status: None,
+            },
+            FileRecord {
+                path: "removed.txt".into(),
+                name: "removed.txt".into(),
+                extension: "txt".into(),
+                size: 10,
+                modified_unix: 1,
+                kind: "file".into(),
+                is_binary: None,
+                git_status: None,
+            },
+        ];
+        let new_records = vec![
+            FileRecord {
+                path: "unchanged.txt".into(),
+                name: "unchanged.txt".into(),
+                extension: "txt".into(),
+                size: 10,
+                modified_unix: 1,
+                kind: "file".into(),
+                is_binary: None,
+                git_status: None,
+            },
+            FileRecord {
+                path: "modified.txt".into(),
+                name: "modified.txt".into(),
+                extension: "txt".into(),
+                size: 99,
+                modified_unix: 2,
+                kind: "file".into(),
+                is_binary: None,
+                git_status: None,
+            },
+            FileRecord {
+                path: "added.txt".into(),
+                name: "added.txt".into(),
+                extension: "txt".into(),
+                size: 5,
+                modified_unix: 3,
+                kind: "file".into(),
+                is_binary: None,
+                git_status: None,
+            },
+        ];
+        let plan = RefreshPlan {
+            added: vec!["added.txt".into()],
+            modified: vec!["modified.txt".into()],
+            removed: vec!["removed.txt".into()],
+            unchanged: vec!["unchanged.txt".into()],
+        };
+
+        apply_refresh_plan(&mut records, &plan, &new_records);
+
+        assert_eq!(records.len(), 3);
+        assert!(records
+            .iter()
+            .any(|r| r.path == "unchanged.txt" && r.size == 10));
+        assert!(records
+            .iter()
+            .any(|r| r.path == "modified.txt" && r.size == 99));
+        assert!(records.iter().any(|r| r.path == "added.txt" && r.size == 5));
+        assert!(!records.iter().any(|r| r.path == "removed.txt"));
     }
 }

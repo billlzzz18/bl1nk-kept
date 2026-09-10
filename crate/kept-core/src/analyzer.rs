@@ -5,7 +5,7 @@ use std::collections::{HashMap, HashSet};
 pub struct RegistryAnalyzer;
 
 impl RegistryAnalyzer {
-    /// NOTE-001: สร้าง index และสถิติจากข้อมูล registry ปัจจุบันโดยไม่แก้ไข entries ต้นทาง
+    // NOTE-001: สร้าง index และสถิติจากข้อมูล registry ปัจจุบันโดยไม่แก้ไข entries ต้นทาง
     pub fn build_index_and_stats(registry: &mut KeywordRegistry) {
         let mut synonyms = HashMap::new();
         let mut homographs = HashMap::new();

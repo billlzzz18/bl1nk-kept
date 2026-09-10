@@ -6,7 +6,7 @@
 use crate::converter::ConvertError;
 use crate::ir::UniversalDocument;
 
-/// NOTE-001: M3 - Filter Trait
+// NOTE-001: M3 - Filter Trait
 /// อินเทอร์เฟซสำหรับตัวกรองเอกสารที่ทำงานกับ Universal IR โดยตรง
 pub trait Filter: Send + Sync {
     /// ชื่อของตัวกรอง (สำหรับการทำ Logging/Debugging)
@@ -16,7 +16,7 @@ pub trait Filter: Send + Sync {
     fn apply(&self, doc: &mut UniversalDocument) -> Result<(), ConvertError>;
 }
 
-/// NOTE-001: M3 - FilterPipeline
+// NOTE-002: M3 - FilterPipeline
 /// ระบบรวบรวมและรันตัวกรองตามลำดับที่กำหนด (Middleware Pattern)
 #[derive(Default)]
 pub struct FilterPipeline {
@@ -42,7 +42,7 @@ impl FilterPipeline {
     }
 }
 
-/// NOTE-001: M3 - ThaiSanitizationFilter
+// NOTE-003: M3 - ThaiSanitizationFilter
 /// ตัวกรองสำหรับทำความสะอาดข้อความภาษาไทย (เช่น ลบช่องว่างส่วนเกิน, ปรับมาตรฐานวรรณยุกต์)
 pub struct ThaiSanitizationFilter;
 
@@ -87,14 +87,14 @@ impl ThaiSanitizationFilter {
         use crate::ir::inline::InlineElement::*;
         for element in content {
             if let TextRun { content, .. } = element {
-                // NOTE-001: ลดช่องว่างซ้ำก่อนส่ง Universal IR ไปยัง converter ปลายทาง
+                // NOTE-004: ลดช่องว่างซ้ำก่อนส่ง Universal IR ไปยัง converter ปลายทาง
                 *content = content.replace("  ", " ");
             }
         }
     }
 }
 
-/// NOTE-001: M3 - MarkdownAlertFilter
+// NOTE-005: M3 - MarkdownAlertFilter
 /// แปลง GitHub Alerts (> [!NOTE], > [!TIP], > [!IMPORTANT], > [!WARNING], > [!CAUTION]) ให้เป็น IR Callout
 pub struct MarkdownAlertFilter;
 

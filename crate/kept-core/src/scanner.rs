@@ -37,9 +37,9 @@ pub use mutation::{
 pub use query::{compile_query, parse_size_to_bytes, QueryClause, QueryPlan};
 pub use scan::scan_directory;
 pub use types::{
-    create_persistent_snapshot, migrate_snapshot, plan_incremental_refresh, FileRecord,
-    PersistentScanSnapshot, RefreshPlan, ScanIndex, ScanIssue, ScanIssueKind, ScanOptions,
-    CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION,
+    apply_refresh_plan, create_persistent_snapshot, migrate_snapshot, plan_incremental_refresh,
+    FileRecord, PersistentScanSnapshot, RefreshPlan, ScanIndex, ScanIssue, ScanIssueKind,
+    ScanOptions, CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION,
 };
 
 #[cfg(test)]

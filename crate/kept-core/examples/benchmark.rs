@@ -153,7 +153,7 @@ fn microseconds(duration: Duration) -> f64 {
     duration.as_secs_f64() * 1_000_000.0
 }
 
-/// NOTE-001: fixture deterministic เพื่อเปรียบเทียบ release benchmark คนละรอบได้โดยไม่เก็บไฟล์ benchmark ขนาดใหญ่
+// NOTE-002: fixture deterministic เพื่อเปรียบเทียบ release benchmark คนละรอบได้โดยไม่เก็บไฟล์ benchmark ขนาดใหญ่
 fn synthetic_registry(objects: usize) -> KeywordRegistry {
     let entries = (0..objects)
         .map(|index| {

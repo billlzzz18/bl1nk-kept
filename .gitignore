@@ -58,7 +58,8 @@ codeql-custom-queries-rust
 
 # Test / Misc ignored
 ignored.txt
-
+.superpowers/
+.pytest_cache
 # Dogfooding artifacts and logs
 dogfood-cli-output/
 *.log

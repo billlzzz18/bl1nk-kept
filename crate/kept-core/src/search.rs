@@ -186,7 +186,7 @@ impl Bm25Index {
         let mut overlap_counts = HashMap::<usize, usize>::new();
         for ngram in character_ngrams(query, policy.fuzzy_ngram_size) {
             if let Some(postings) = self.fuzzy_postings.get(&ngram) {
-                // NOTE-001: n-gram ที่พบบ่อยเกินไปไม่ช่วยคัด candidate และทำให้กลับเป็น O(N)
+                // NOTE-008: n-gram ที่พบบ่อยเกินไปไม่ช่วยคัด candidate และทำให้กลับเป็น O(N)
                 if postings.len() > policy.max_fuzzy_ngram_postings {
                     continue;
                 }
@@ -448,7 +448,7 @@ fn entry_fuzzy_score(matcher: &SkimMatcherV2, entry: &Value, query: &str) -> i64
         .unwrap_or_default()
 }
 
-/// NOTE-007: policy ใช้ normalized similarity เพื่อให้ค่า 0.0–1.0 เปรียบเทียบได้ ต่างจาก raw score ของ matcher
+// NOTE-007: policy ใช้ normalized similarity เพื่อให้ค่า 0.0–1.0 เปรียบเทียบได้ ต่างจาก raw score ของ matcher
 fn entry_fuzzy_similarity(entry: &Value, query: &str) -> f64 {
     entry_terms(entry)
         .map(|term| normalized_similarity(&normalize_query(term), query))

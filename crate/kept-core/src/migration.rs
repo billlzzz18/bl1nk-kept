@@ -15,7 +15,7 @@ pub enum MigrationError {
     MissingFoundationProfile(String),
 }
 
-/// NOTE-001: migration ทำงานก่อน validation และใช้ timestamp เดิมเพื่อให้ rerun ให้ผลเหมือนเดิม
+// NOTE-001: migration ทำงานก่อน validation และใช้ timestamp เดิมเพื่อให้ rerun ให้ผลเหมือนเดิม
 pub fn migrate_registry(mut registry: KeywordRegistry) -> Result<KeywordRegistry, MigrationError> {
     match registry.version.as_str() {
         LEGACY_REGISTRY_VERSION => {

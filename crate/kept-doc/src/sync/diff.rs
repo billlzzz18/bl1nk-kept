@@ -4,7 +4,7 @@ use crate::sync::{ChangeSet, Op, Result};
 pub struct Reconciler;
 
 impl Reconciler {
-    /// NOTE-001: สร้างแผนเปลี่ยนแปลงตามลำดับบล็อก; remote IDs จริงยังเป็นงานของ Notion safe sync
+    // NOTE-001: สร้างแผนเปลี่ยนแปลงตามลำดับบล็อก; remote IDs จริงยังเป็นงานของ Notion safe sync
     pub fn diff(local: &UniversalDocument, remote: &UniversalDocument) -> Result<ChangeSet> {
         let mut changes = ChangeSet::new();
         let shared_length = local.blocks.len().min(remote.blocks.len());

@@ -1,0 +1,55 @@
+{
+  "rg": {
+    "exact_identifier": {
+      "expected": 1,
+      "found": 1,
+      "accuracy": 1.0,
+      "missing": []
+    },
+    "function_prefix": {
+      "expected": 3,
+      "found": 3,
+      "accuracy": 1.0,
+      "missing": []
+    },
+    "struct_declaration": {
+      "expected": 1,
+      "found": 1,
+      "accuracy": 1.0,
+      "missing": []
+    },
+    "todo_markers": {
+      "expected": 2,
+      "found": 2,
+      "accuracy": 1.0,
+      "missing": []
+    },
+    "nested_braces": {
+      "expected": 1,
+      "found": 1,
+      "accuracy": 1.0,
+      "missing": []
+    },
+    "multi_pattern": {
+      "expected": 3,
+      "found": 3,
+      "accuracy": 1.0,
+      "missing": []
+    },
+    "thai_text": {
+      "expected": 1,
+      "found": 1,
+      "accuracy": 1.0,
+      "missing": []
+    },
+    "pub_symbols": {
+      "expected": 2,
+      "found": 2,
+      "accuracy": 1.0,
+      "missing": []
+    }
+  },
+  "overall_accuracy": 1.0,
+  "total_expected": 14,
+  "total_found": 14
+}

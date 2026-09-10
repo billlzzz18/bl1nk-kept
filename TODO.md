@@ -113,7 +113,14 @@
 ### 2.3 Benchmark Infrastructure
 
 - [ ] ทำ gain scoreboard: เปรียบเทียบเฉพาะ runs ที่มี comparable contract
-- [ ] ทำ component benchmark: FFF grep vs ripgrep (throughput, latency, memory)
+- [x] Component benchmark: FFF grep vs ripgrep (throughput, latency, memory) — ✅ `benchmarks/scripts/mcp_tool_benchmark.py`
+- [x] MCP tool benchmarks — ✅ เปรียบเทียบ kept vs rg: file search 21ms, grep 28ms, multi-grep 28ms
+  - `filesystem_find` vs `rg --files` — ✅ 21ms avg
+  - `filesystem_grep` vs `rg <pattern>` — ✅ 28ms avg
+  - `filesystem_multi_grep` vs `rg -e <p1> -e <p2>` — ✅ 28ms avg
+- [x] Read speed benchmark — ✅ direct read 20 MB/s, cat 2.5 MB/s, rg 0.4 MB/s
+- [x] Accuracy benchmark — ✅ 14/14 (100%) บน 8 test cases
+- [ ] MCP inspector testing — ⚠️ ต้องติดตั้ง `@anthropic-ai/mcp-inspector` ก่อน
 - [ ] ทำ workflow benchmark: end-to-end tasks
 
 ---

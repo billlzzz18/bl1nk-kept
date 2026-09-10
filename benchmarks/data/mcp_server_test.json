@@ -1,0 +1,11 @@
+{
+  "check": {
+    "status": "PASS",
+    "output": "bl1nk-kept-mcp 0.3.1: OK",
+    "error": null
+  },
+  "stdio": {
+    "status": "FAIL",
+    "reason": "No response within 3s"
+  }
+}

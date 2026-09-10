@@ -1,0 +1,452 @@
+{
+  "direct_read": {
+    "files": [
+      {
+        "path": "Cargo.toml",
+        "size_bytes": 111,
+        "times_ms": [
+          6.797,
+          0.168,
+          0.104,
+          0.073,
+          0.065
+        ],
+        "avg_ms": 1.441,
+        "min_ms": 0.065,
+        "max_ms": 6.797
+      },
+      {
+        "path": "README.md",
+        "size_bytes": 539,
+        "times_ms": [
+          0.098,
+          0.069,
+          0.063,
+          0.061,
+          0.06
+        ],
+        "avg_ms": 0.07,
+        "min_ms": 0.06,
+        "max_ms": 0.098
+      },
+      {
+        "path": "CLAUDE.md",
+        "size_bytes": 1225,
+        "times_ms": [
+          0.24,
+          0.083,
+          0.066,
+          0.063,
+          0.067
+        ],
+        "avg_ms": 0.104,
+        "min_ms": 0.063,
+        "max_ms": 0.24
+      },
+      {
+        "path": "files.rs",
+        "size_bytes": 2063,
+        "times_ms": [
+          0.244,
+          0.081,
+          0.065,
+          0.063,
+          0.063
+        ],
+        "avg_ms": 0.103,
+        "min_ms": 0.063,
+        "max_ms": 0.244
+      },
+      {
+        "path": "source_graph_contract.rs",
+        "size_bytes": 3233,
+        "times_ms": [
+          0.255,
+          0.081,
+          0.12,
+          0.144,
+          0.12
+        ],
+        "avg_ms": 0.144,
+        "min_ms": 0.081,
+        "max_ms": 0.255
+      },
+      {
+        "path": "markdown_frontmatter.rs",
+        "size_bytes": 4181,
+        "times_ms": [
+          0.142,
+          0.111,
+          0.097,
+          0.106,
+          0.098
+        ],
+        "avg_ms": 0.111,
+        "min_ms": 0.097,
+        "max_ms": 0.142
+      },
+      {
+        "path": "metadata.rs",
+        "size_bytes": 5282,
+        "times_ms": [
+          0.282,
+          0.146,
+          0.121,
+          0.105,
+          0.094
+        ],
+        "avg_ms": 0.15,
+        "min_ms": 0.094,
+        "max_ms": 0.282
+      },
+      {
+        "path": "naming_config_contract.rs",
+        "size_bytes": 7786,
+        "times_ms": [
+          0.276,
+          0.112,
+          0.089,
+          0.091,
+          0.086
+        ],
+        "avg_ms": 0.131,
+        "min_ms": 0.086,
+        "max_ms": 0.276
+      },
+      {
+        "path": "webhooks.rs",
+        "size_bytes": 10542,
+        "times_ms": [
+          0.114,
+          0.103,
+          0.087,
+          0.109,
+          0.091
+        ],
+        "avg_ms": 0.101,
+        "min_ms": 0.087,
+        "max_ms": 0.114
+      },
+      {
+        "path": "mutation.rs",
+        "size_bytes": 16815,
+        "times_ms": [
+          0.138,
+          0.11,
+          0.097,
+          0.104,
+          0.1
+        ],
+        "avg_ms": 0.11,
+        "min_ms": 0.097,
+        "max_ms": 0.138
+      }
+    ],
+    "aggregate": {
+      "total_files": 10,
+      "total_size_bytes": 51777,
+      "total_avg_ms": 2.465,
+      "throughput_mbps": 20.03
+    }
+  },
+  "cat/type": {
+    "files": [
+      {
+        "path": "Cargo.toml",
+        "size_bytes": 111,
+        "times_ms": [
+          3.258,
+          2.052,
+          1.778,
+          2.116,
+          1.885
+        ],
+        "avg_ms": 2.218,
+        "min_ms": 1.778,
+        "max_ms": 3.258
+      },
+      {
+        "path": "README.md",
+        "size_bytes": 539,
+        "times_ms": [
+          1.776,
+          1.695,
+          2.35,
+          1.804,
+          1.688
+        ],
+        "avg_ms": 1.862,
+        "min_ms": 1.688,
+        "max_ms": 2.35
+      },
+      {
+        "path": "CLAUDE.md",
+        "size_bytes": 1225,
+        "times_ms": [
+          1.708,
+          2.774,
+          2.097,
+          1.681,
+          2.773
+        ],
+        "avg_ms": 2.206,
+        "min_ms": 1.681,
+        "max_ms": 2.774
+      },
+      {
+        "path": "files.rs",
+        "size_bytes": 2063,
+        "times_ms": [
+          2.332,
+          1.651,
+          2.564,
+          2.012,
+          1.637
+        ],
+        "avg_ms": 2.039,
+        "min_ms": 1.637,
+        "max_ms": 2.564
+      },
+      {
+        "path": "source_graph_contract.rs",
+        "size_bytes": 3233,
+        "times_ms": [
+          2.01,
+          1.76,
+          1.638,
+          1.597,
+          2.482
+        ],
+        "avg_ms": 1.897,
+        "min_ms": 1.597,
+        "max_ms": 2.482
+      },
+      {
+        "path": "markdown_frontmatter.rs",
+        "size_bytes": 4181,
+        "times_ms": [
+          1.918,
+          1.711,
+          1.583,
+          2.343,
+          1.853
+        ],
+        "avg_ms": 1.882,
+        "min_ms": 1.583,
+        "max_ms": 2.343
+      },
+      {
+        "path": "metadata.rs",
+        "size_bytes": 5282,
+        "times_ms": [
+          1.694,
+          1.813,
+          1.677,
+          1.609,
+          1.579
+        ],
+        "avg_ms": 1.674,
+        "min_ms": 1.579,
+        "max_ms": 1.813
+      },
+      {
+        "path": "naming_config_contract.rs",
+        "size_bytes": 7786,
+        "times_ms": [
+          1.607,
+          2.628,
+          2.372,
+          1.93,
+          2.139
+        ],
+        "avg_ms": 2.135,
+        "min_ms": 1.607,
+        "max_ms": 2.628
+      },
+      {
+        "path": "webhooks.rs",
+        "size_bytes": 10542,
+        "times_ms": [
+          1.665,
+          1.623,
+          1.67,
+          2.25,
+          1.797
+        ],
+        "avg_ms": 1.801,
+        "min_ms": 1.623,
+        "max_ms": 2.25
+      },
+      {
+        "path": "mutation.rs",
+        "size_bytes": 16815,
+        "times_ms": [
+          1.728,
+          1.872,
+          1.808,
+          1.768,
+          1.607
+        ],
+        "avg_ms": 1.757,
+        "min_ms": 1.607,
+        "max_ms": 1.872
+      }
+    ],
+    "aggregate": {
+      "total_files": 10,
+      "total_size_bytes": 51777,
+      "total_avg_ms": 19.471,
+      "throughput_mbps": 2.54
+    }
+  },
+  "rg_count": {
+    "files": [
+      {
+        "path": "Cargo.toml",
+        "size_bytes": 111,
+        "times_ms": [
+          16.186,
+          11.365,
+          9.829,
+          10.289,
+          10.996
+        ],
+        "avg_ms": 11.733,
+        "min_ms": 9.829,
+        "max_ms": 16.186
+      },
+      {
+        "path": "README.md",
+        "size_bytes": 539,
+        "times_ms": [
+          12.202,
+          10.94,
+          10.548,
+          11.614,
+          11.124
+        ],
+        "avg_ms": 11.285,
+        "min_ms": 10.548,
+        "max_ms": 12.202
+      },
+      {
+        "path": "CLAUDE.md",
+        "size_bytes": 1225,
+        "times_ms": [
+          12.975,
+          12.498,
+          11.965,
+          12.562,
+          12.112
+        ],
+        "avg_ms": 12.423,
+        "min_ms": 11.965,
+        "max_ms": 12.975
+      },
+      {
+        "path": "files.rs",
+        "size_bytes": 2063,
+        "times_ms": [
+          13.341,
+          10.215,
+          11.425,
+          9.898,
+          11.286
+        ],
+        "avg_ms": 11.233,
+        "min_ms": 9.898,
+        "max_ms": 13.341
+      },
+      {
+        "path": "source_graph_contract.rs",
+        "size_bytes": 3233,
+        "times_ms": [
+          14.43,
+          12.193,
+          10.619,
+          11.676,
+          11.69
+        ],
+        "avg_ms": 12.122,
+        "min_ms": 10.619,
+        "max_ms": 14.43
+      },
+      {
+        "path": "markdown_frontmatter.rs",
+        "size_bytes": 4181,
+        "times_ms": [
+          13.028,
+          10.029,
+          11.93,
+          12.254,
+          10.041
+        ],
+        "avg_ms": 11.457,
+        "min_ms": 10.029,
+        "max_ms": 13.028
+      },
+      {
+        "path": "metadata.rs",
+        "size_bytes": 5282,
+        "times_ms": [
+          12.711,
+          11.339,
+          12.933,
+          10.279,
+          9.682
+        ],
+        "avg_ms": 11.389,
+        "min_ms": 9.682,
+        "max_ms": 12.933
+      },
+      {
+        "path": "naming_config_contract.rs",
+        "size_bytes": 7786,
+        "times_ms": [
+          13.143,
+          11.31,
+          10.51,
+          9.79,
+          10.174
+        ],
+        "avg_ms": 10.986,
+        "min_ms": 9.79,
+        "max_ms": 13.143
+      },
+      {
+        "path": "webhooks.rs",
+        "size_bytes": 10542,
+        "times_ms": [
+          12.074,
+          12.937,
+          15.031,
+          12.958,
+          10.525
+        ],
+        "avg_ms": 12.705,
+        "min_ms": 10.525,
+        "max_ms": 15.031
+      },
+      {
+        "path": "mutation.rs",
+        "size_bytes": 16815,
+        "times_ms": [
+          12.933,
+          10.673,
+          10.779,
+          10.828,
+          11.018
+        ],
+        "avg_ms": 11.246,
+        "min_ms": 10.673,
+        "max_ms": 12.933
+      }
+    ],
+    "aggregate": {
+      "total_files": 10,
+      "total_size_bytes": 51777,
+      "total_avg_ms": 116.579,
+      "throughput_mbps": 0.42
+    }
+  }
+}

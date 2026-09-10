@@ -63,3 +63,4 @@ ignored.txt
 # Dogfooding artifacts and logs
 dogfood-cli-output/
 *.log
+.agent_test_cache

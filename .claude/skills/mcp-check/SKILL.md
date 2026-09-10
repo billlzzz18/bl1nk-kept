@@ -49,6 +49,17 @@ Get-Process | Where-Object {$_.ProcessName -like "*bl1nk-kept*"}
 # If fails, server may be down
 ```
 
+## VSCode Integration
+
+Install MCP Inspector extension for real-time debugging:
+```
+ext install wso2.vscode-mcp-inspector
+```
+
+Commands:
+- `Open MCP Inspector` — view connections
+- `Open MCP Inspector with URL` — connect to specific server
+
 ## Common Issues
 
 | Symptom | Cause | Fix |
@@ -57,6 +68,7 @@ Get-Process | Where-Object {$_.ProcessName -like "*bl1nk-kept*"}
 | Connection timeout | Server hung | Kill and restart |
 | Permission denied | Tool not in allowed list | Check settings |
 | Tool returns error | Server bug | Check server logs |
+| Extension not visible | VSCode not installed | Install VSCode first |
 
 ## Output Format
 

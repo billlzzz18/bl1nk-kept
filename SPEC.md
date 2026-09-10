@@ -1,6 +1,6 @@
 # ข้อกำหนดผลิตภัณฑ์ bl1nk-kept
 
-**Workspace package version:** `0.3.1`
+**Workspace package version:** `0.4.0`
 
 **Registry schema version:** `1.2.0`
 

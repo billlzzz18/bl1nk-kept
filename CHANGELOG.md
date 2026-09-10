@@ -4,6 +4,7 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-10
 ### Changed
 - ลบ `panic!` ออกจาก production path ของ kept-doc: `DatabaseSchema::title()` เปลี่ยน signature จาก `Self` เป็น `Result<Self, SyncError>` (คืน `SyncError::ValidationError("Only one title property allowed per database")` เมื่อ schema มี title property อยู่แล้ว) พร้อม public rustdoc ภาษาอังกฤษ; builder นี้ไม่มี call site ภายนอก จึงไม่กระทบ contract อื่น — evidence: unit tests ใหม่ `sync::schema::tests::title_accepts_first_title_property` และ `sync::schema::tests::title_rejects_duplicate_title_property` (2/2 ผ่าน) พร้อม `cargo fmt --all -- --check` และ `cargo clippy --workspace -- -D warnings` ผ่าน
 

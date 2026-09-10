@@ -113,3 +113,20 @@ cargo fmt --all -- --check
 - **mutation confirmation:** CLI mutation commands ต้อง `--action <name> --yes` ในโหมด non-interactive
 - **clippy restriction lints:** `unwrap_used` และ `expect_used` = warn ทั้ง workspace
 - **NOTE numbering:** `// NOTE-001:` เรียงเลขตามประเด็น ห้ามข้าม
+
+---
+
+## Change Discipline
+
+- Never spawn worktrees or agents for simple fixes (< 5 files). Direct edits only.
+- After any commit, update TODO.md or CHANGELOG if relevant items exist.
+- Before releasing: run `cargo clippy`, `cargo test`, `rust-analyzer check`.
+- Clean up any temp files/worktrees you create before session end.
+
+---
+
+## Project Conventions
+
+- When creating new skills/configs, READ existing examples first. Never write from memory.
+- Do not change file scope beyond what's asked.
+- `kept` is the primary tool. Do not suggest alternatives unless explicitly asked.

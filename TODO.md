@@ -46,11 +46,82 @@
 
 ---
 
-## Phase 1: Tree-sitter AST & Semantic Search Wiring (งานถัดไปหลัง Phase 0)
+## Phase 1: Plugin System — Zed Extension Compatible, Local-first (Git Clone Based)
+
+> **Exit Gate:** `kept plugin install <git-url>` โหลด manifest + ลงทะเบียน contributions ได้จริง, `kept plugin dev <path>` โหลดพัฒนาได้
+
+### 1.1 Plugin Manifest (Zed Extension Schema)
+
+- [ ] ออกแบบ `PluginManifest` ตาม Zed extension.json:
+  ```json
+  {
+    "id": "author.name",
+    "name": "Display Name",
+    "version": "1.0.0",
+    "description": "Optional description",
+    "main": "index.js",                    // entry point (WASM/JS/TS/native)
+    "contributes": {
+      "themes": [{ "id": "...", "label": "...", "path": "theme.css", "base": "dark|light" }],
+      "languages": [{ "id": "...", "name": "...", "extensions": [".ext"], "grammar": "grammar.json", "configuration": "language-configuration.json" }],
+      "debuggers": [{ "type": "...", "label": "...", "program": "debugger.js", "configuration": {...} }],
+      "agents": [{ "id": "...", "name": "...", "description": "...", "entry": "agent.js", "capabilities": ["tools", "memory"] }],
+      "mcp": [{ "name": "...", "command": "server", "args": [...], "env": {...}, "transport": "stdio|sse" }],
+      "commands": [{ "id": "...", "title": "...", "category": "...", "when": "context", "icon": "..." }],
+      "settings": [{ "key": "...", "title": "...", "type": "string|number|boolean|select|json", "default": ..., "enum": [...] }],
+      "keybindings": [{ "key": "...", "command": "...", "when": "..." }]
+    },
+    "permissions": ["fs.read", "fs.write", "net.fetch", "shell.exec", "agent.tools"],
+    "activationEvents": ["onCommand:...", "onLanguage:...", "onStartup", "onMcp:..."]
+  }
+  ```
+  (Red) — tests ใน `tests/plugin_manifest_contract.rs`
+
+- [ ] Implement manifest validation: required fields, semver, contribution schema per type (Green) — `crate/kept-agent/src/plugin/manifest.rs`
+- [ ] Manifest → `PluginSummary` registry record + capabilities derivation (Green)
+
+### 1.2 Local Plugin Loader (Git Clone + Filesystem)
+
+- [ ] `kept plugin install <git-url>[@ref]` — clone shallow, resolve ref→commit SHA, validate manifest, copy to `~/.kept/plugins/installed/<id>@<sha>` (Green)
+- [ ] `kept plugin dev <path>` — symlink load สำหรับพัฒนา hot-reload (Green)
+- [ ] `kept plugin list` — แสดง id, name, version, source (git/dev), enabled, path
+- [ ] `kept plugin enable/disable <id>` — toggle ใน registry
+- [ ] `kept plugin uninstall <id>` — ลบ installed dir + registry entry (dev plugins แค่ unlink)
+
+### 1.3 Contribution Points (Zed Compatible)
+
+- [ ] `themes` — CSS theme files, base light/dark, register เข้า UI layer
+- [ ] `languages` — Tree-sitter grammar + language configuration (extend kept-core multilang)
+- [ ] `debuggers` — DAP adapter registration (future, optional)
+- [ ] `agents` — Agent definitions with capabilities → register เข้า kept-agent
+- [ ] `mcp` — MCP server definitions (name, command, args, env, transport) → auto-register เข้า `kept-mcp`
+- [ ] `commands` — CLI subcommands → dispatch ไป plugin entrypoint
+- [ ] `settings` — JSON schema per plugin, merge เข้า user config
+- [ ] `keybindings` — Keybinding registration (TUI future)
+
+### 1.4 Plugin Runtime & Isolation
+
+- [ ] Load plugin entrypoint (`main`: WASM component model via wasmtime) — portable, sandboxed
+- [ ] Permission gate: plugin declare permissionsใน manifest, host prompt user grant/revoke
+- [ ] Plugin logger → `~/.kept/plugins/logs/<id>.log` (structured JSONL)
+- [ ] Activation events: `onStartup`, `onCommand`, `onLanguage`, `onMcp` — lazy load
+
+### 1.5 CLI Commands
+
+- [ ] `kept plugin install <git-url>[@ref] [--pin <sha>]`
+- [ ] `kept plugin dev <path>`
+- [ ] `kept plugin list [--json]`
+- [ ] `kept plugin enable/disable <id>`
+- [ ] `kept plugin uninstall <id>`
+- [ ] `kept plugin update <id> [@ref]`
+- [ ] `kept plugin info <id>` — manifest + contributions + permissions + activation events
+
+---
+
+## Phase 2: Tree-sitter AST & Semantic Search Wiring (งานถัดไปหลัง Plugin System)
 
 > **Exit Gate:** `kept find` คืน structural symbols จาก AST, `kept search --semantic` ใช้ embedding pipeline จริง
 
-### 1.1 Tree-sitter Symbol Extraction (TODO 2.2.1)
+### 2.1 Tree-sitter Symbol Extraction (TODO 2.2.1)
 
 - [x] นำ `tree-sitter` และ `tree-sitter-rust` เข้า `Cargo.toml` (tree-sitter 0.25.10, tree-sitter-rust 0.24.2)
 - [x] ออกแบบ fixtures ทดสอบ symbol parsing ใน `source_graph.rs`: multi-line signatures, string literals, comments, generics, traits, enums, macros (Red) — `tests/source_graph_ast.rs` 7 cases

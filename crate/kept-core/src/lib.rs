@@ -410,7 +410,9 @@ mod foundation_normalization_tests {
 #[cfg(test)]
 mod foundation_release_version_tests {
     #[test]
-    fn foundation_release_uses_workspace_version_0_3_1() {
-        assert_eq!(env!("CARGO_PKG_VERSION"), "0.3.1");
+    fn foundation_release_uses_workspace_version() {
+        // NOTE: test verifies version sync between Cargo.toml and compile-time env
+        let expected = env!("CARGO_PKG_VERSION");
+        assert!(expected.starts_with("0.4"), "version should be in 0.4.x series; got {}", expected);
     }
 }

@@ -46,8 +46,7 @@ fuzzy-matcher = "0.3"
 schemars = "0.8"
 # NOTE-003: strsim ใช้คำนวณ levenshtein similarity ใน kept-core/src/scanner/duplicate.rs
 strsim = "0.11"
-walkdir = "2.5"
-dashmap = "6.1"
+
 fff-search = "0.10.6"
 
 # Document / Markdown

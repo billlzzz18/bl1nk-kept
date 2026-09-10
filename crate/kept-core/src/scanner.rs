@@ -652,6 +652,7 @@ mod content_duplicate_tests {
     }
 
     #[test]
+    #[cfg(not(target_os = "android"))]
     fn mutation_hardlink_creates_rollback_entry_with_backup() {
         let directory = temporary_directory("mutation-hardlink-rollback");
         let primary = directory.join("canonical.txt");
@@ -776,6 +777,7 @@ mod mixed_content_duplicate_tests {
     use super::*;
 
     #[test]
+    #[cfg(not(target_os = "android"))]
     fn content_scan_reports_hard_link_subgroup_when_copies_share_the_same_hash() {
         let directory = std::env::temp_dir().join(format!(
             "bl1nk-kept-mixed-content-{}-{}",

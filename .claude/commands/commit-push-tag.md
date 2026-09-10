@@ -1,3 +1,7 @@
+---
+description: Complete release preparation workflow — clippy, test, TODO sync, commit, tag, push
+---
+
 # Commit, Push, Tag
 
 Complete release preparation. Do not stop at status or summary.

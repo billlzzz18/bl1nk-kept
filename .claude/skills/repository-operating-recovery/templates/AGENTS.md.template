@@ -1,0 +1,35 @@
+# {{PROJECT_NAME}} agent guide
+
+## Read order
+
+1. Read `SPEC.md` for supported behavior and non-regression boundaries.
+2. Read `TODO.md` for current work only.
+3. Read `.learnings/ERRORS.md` before implementation. Retain it in source handoff; never use it as product input.
+4. Read the relevant `research/` file before changing a research-derived behavior.
+5. Read `benchmarks/README.md` before changing defaults, benchmark code, raw data or charts.
+6. Read `CHANGELOG.md` before changing a public contract.
+
+## Source map
+
+| Path | Role |
+|---|---|
+| `SPEC.md` | one active product specification |
+| `TODO.md` | one active backlog |
+| `schema/` | generated public schemas/contracts |
+| `research/` | retained source-backed research |
+| `benchmarks/` | raw benchmark data and reproducible charts |
+| `tools/` | tested repository automation |
+| `.learnings/` | retained agent memory, never product input |
+
+## Required loop
+
+1. Find the exact task in `TODO.md` or contract in `SPEC.md`.
+2. Inventory the behavior that must not regress.
+3. Write and run a failing test before production code.
+4. Implement the smallest change, then rerun the focused test.
+5. Run the project task runner before handoff.
+6. Update schema, benchmark, changelog or README only when their public contract changed.
+
+## Handoff boundary
+
+Include source, specification, research, benchmark raw data/charts and `.learnings/`. Exclude rebuildable build/cache/package artifacts. Never describe an unavailable command or unreviewed dataset as implemented.

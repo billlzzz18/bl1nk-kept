@@ -1,0 +1,33 @@
+set shell := ["bash", "-cu"]
+
+fmt:
+    cargo fmt --all -- --check
+
+test:
+    cargo test --workspace
+
+clippy:
+    cargo clippy --workspace --all-targets -- -D warnings
+
+repo-contract:
+    python3 -m unittest tests/test_repository_contract.py tests/test_repository_tools.py
+
+schema:
+    cargo run -q -p {{SCHEMA_CRATE}} --example {{SCHEMA_EXPORT_EXAMPLE}} > schema/{{SCHEMA_FILE}}
+
+schema-check:
+    tmp=$(mktemp) && cargo run -q -p {{SCHEMA_CRATE}} --example {{SCHEMA_EXPORT_EXAMPLE}} > "$tmp" && cmp -s "$tmp" schema/{{SCHEMA_FILE}} && rm "$tmp"
+
+benchmark-chart:
+    python3 benchmarks/scripts/{{CHART_RENDERER}} benchmarks/data/{{BENCHMARK_RAW_FILE}} benchmarks/charts/{{BENCHMARK_CHART_FILE}}
+
+links:
+    python3 tools/check_markdown_links.py
+
+version-check:
+    python3 tools/check_version_contract.py
+
+check: fmt test clippy repo-contract schema-check links version-check
+
+package:
+    python3 tools/package_source.py

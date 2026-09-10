@@ -21,11 +21,11 @@ Locks in the correct TDD workflow: write test first, implement, verify, update T
 
 | Task | Use | When |
 |------|-----|------|
-| Understand existing code | **LSP documentSymbol** | See functions/structs in file |
-| Find symbol usage | **LSP findReferences** | Know where symbol is used |
-| Check type/signature | **LSP hover** | Need type info for symbol |
-| Find implementation | **LSP goToDefinition** | See where symbol is defined |
-| Check diagnostics | **rust-analyzer diagnostics** | See errors/warnings before they appear |
+| Understand existing code | **Serena get_symbols_overview** | See functions/structs in file |
+| Find symbol usage | **Serena find_referencing_symbols** | Know where symbol is used |
+| Check type/signature | **Serena find_declaration** | Need type info for symbol |
+| Find implementation | **Serena find_implementations** | See where symbol is defined |
+| Check diagnostics | **Serena get_diagnostics_for_file** | See errors/warnings before they appear |
 | Read file efficiently | **SQZ read** | File > 2KB |
 | Run tests | **Bash** | cargo test -p <crate> |
 | Run clippy | **Bash** | cargo clippy --workspace |

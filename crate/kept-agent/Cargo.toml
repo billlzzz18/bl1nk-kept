@@ -1,0 +1,18 @@
+[package]
+name = "kept-agent"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Agent lifecycle management for external CLI integrations"
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+which = "6"
+home = "0.5"
+
+[dev-dependencies]
+tempfile = "3"

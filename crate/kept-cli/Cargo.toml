@@ -14,8 +14,10 @@ path = "src/main.rs"
 anyhow.workspace = true
 dialoguer = "0.12.0"
 clap.workspace = true
+clap_complete.workspace = true
 serde_json.workspace = true
 serde_yaml.workspace = true
 tokio.workspace = true
 kept-core = { path = "../kept-core" }
 kept-doc = { path = "../kept-doc" }
+kept-agent = { path = "../kept-agent" }

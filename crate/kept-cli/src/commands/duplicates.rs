@@ -81,7 +81,7 @@ pub fn run_duplicate_action(
         DuplicateAction::Show => {
             println!("{}", serde_json::to_string_pretty(report)?);
             Ok(())
-        }
+        },
         DuplicateAction::ExportPlan => {
             let output = root.join("kept-duplicate-plan.json");
             if !yes && !confirm_action(&format!("บันทึก duplicate plan ไปยัง {}", output.display()))?
@@ -92,7 +92,7 @@ pub fn run_duplicate_action(
             std::fs::write(&output, serde_json::to_string_pretty(report)?)?;
             println!("Exported duplicate plan: {}", output.display());
             Ok(())
-        }
+        },
         DuplicateAction::Simulate
         | DuplicateAction::Trash
         | DuplicateAction::Delete
@@ -178,7 +178,7 @@ pub fn run_duplicate_action(
                 journal_file.display()
             );
             Ok(())
-        }
+        },
         DuplicateAction::Rollback => {
             if !journal_file.is_file() {
                 anyhow::bail!("No rollback journal found at: {}", journal_file.display());
@@ -198,7 +198,7 @@ pub fn run_duplicate_action(
             std::fs::write(&journal_file, serde_json::to_string_pretty(&journal)?)?;
             println!("Rollback complete: {restored} file(s) restored.");
             Ok(())
-        }
+        },
     }
 }
 
@@ -258,10 +258,7 @@ pub fn handle_task_duplicates(
     }
 
     let groups = report["groups"].as_array().map_or(&[][..], Vec::as_slice);
-    println!(
-        "Verified {} duplicate group(s) from the scan index.",
-        groups.len()
-    );
+    println!("Verified {} duplicate group(s) from the scan index.", groups.len());
     for (position, group) in groups.iter().enumerate() {
         let kind = group["kind"].as_str().unwrap_or("unknown");
         let items = group["items"].as_array().map_or(&[][..], Vec::as_slice);
@@ -279,13 +276,7 @@ pub fn handle_task_duplicates(
 
     if is_interactive_terminal() {
         if let Some(action) = choose_duplicate_action()? {
-            run_duplicate_action(
-                action,
-                &canonical_root,
-                &report,
-                false,
-                Some(&snapshot.index),
-            )?;
+            run_duplicate_action(action, &canonical_root, &report, false, Some(&snapshot.index))?;
         }
     }
     Ok(())

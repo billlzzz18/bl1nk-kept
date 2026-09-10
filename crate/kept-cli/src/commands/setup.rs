@@ -21,11 +21,11 @@ pub fn handle_setup() -> anyhow::Result<()> {
         SetupResult::Created(path) => {
             println!("สร้าง starter config สำเร็จ: '{}'", path.display());
             println!("คำแนะนำ: รัน kept config เพื่อดูค่า หรือ kept doctor เพื่อตรวจสอบ");
-        }
+        },
         SetupResult::AlreadyExists(path) => {
             println!("มี config อยู่แล้ว: '{}'", path.display());
             println!("คำแนะนำ: ใช้ kept config defaults/profile/scope เพื่อจัดการค่า");
-        }
+        },
     }
 
     if crate::helpers::is_interactive_terminal() {

@@ -1,5 +1,6 @@
 //! CLI domain command handlers and subcommand routers.
 
+pub mod agent;
 pub mod config;
 pub mod doc;
 pub mod doctor;
@@ -10,6 +11,7 @@ pub mod registry;
 pub mod scan;
 pub mod setup;
 
+pub use agent::{handle_agent, AgentSubcommand};
 pub use config::{
     config_field_default_value, handle_config, set_profile_field, unset_profile_field,
     ConfigCommands, DefaultCommands, ProfileCommands, ScopeCommands, ScopeExceptionCommands,

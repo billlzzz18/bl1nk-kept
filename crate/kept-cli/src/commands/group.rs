@@ -179,7 +179,7 @@ pub fn handle_group(cmd: GroupCommands) -> anyhow::Result<()> {
                 println!("{kind}\t{description}");
             }
             Ok(())
-        }
+        },
         GroupCommands::List { registry: path } => {
             let registry = load_registry_for_group(&path)?;
             println!("Index\tGroup ID\tName\tEntries\tFields\tDescription");
@@ -195,11 +195,8 @@ pub fn handle_group(cmd: GroupCommands) -> anyhow::Result<()> {
                 );
             }
             Ok(())
-        }
-        GroupCommands::Show {
-            registry: path,
-            id: group_id,
-        } => {
+        },
+        GroupCommands::Show { registry: path, id: group_id } => {
             let registry = load_registry_for_group(&path)?;
             let group = registry
                 .groups
@@ -208,7 +205,7 @@ pub fn handle_group(cmd: GroupCommands) -> anyhow::Result<()> {
                 .ok_or_else(|| anyhow::anyhow!("ไม่พบ group '{group_id}'"))?;
             println!("{}", serde_yaml::to_string(group)?);
             Ok(())
-        }
+        },
         GroupCommands::Add {
             registry: path,
             id: group_id,
@@ -229,7 +226,7 @@ pub fn handle_group(cmd: GroupCommands) -> anyhow::Result<()> {
             save_registry_for_group(&path, &registry)?;
             println!("Added group '{group_id}'");
             Ok(())
-        }
+        },
         GroupCommands::Set {
             registry: path,
             id: group_id,
@@ -251,11 +248,8 @@ pub fn handle_group(cmd: GroupCommands) -> anyhow::Result<()> {
             save_registry_for_group(&path, &registry)?;
             println!("Updated group '{group_id}'");
             Ok(())
-        }
-        GroupCommands::Remove {
-            registry: path,
-            id: group_id,
-        } => {
+        },
+        GroupCommands::Remove { registry: path, id: group_id } => {
             let mut registry = load_registry_for_group(&path)?;
             let position = registry
                 .groups
@@ -266,7 +260,7 @@ pub fn handle_group(cmd: GroupCommands) -> anyhow::Result<()> {
             save_registry_for_group(&path, &registry)?;
             println!("Removed group '{group_id}'");
             Ok(())
-        }
+        },
         GroupCommands::Move {
             registry: path,
             id: group_id,
@@ -298,17 +292,14 @@ pub fn handle_group(cmd: GroupCommands) -> anyhow::Result<()> {
             save_registry_for_group(&path, &registry)?;
             println!("Moved group '{group_id}'");
             Ok(())
-        }
+        },
         GroupCommands::Field { cmd } => handle_group_field(cmd),
     }
 }
 
 pub fn handle_group_field(cmd: GroupFieldCommands) -> anyhow::Result<()> {
     match cmd {
-        GroupFieldCommands::List {
-            registry: path,
-            group,
-        } => {
+        GroupFieldCommands::List { registry: path, group } => {
             let registry = load_registry_for_group(&path)?;
             let group = registry
                 .groups
@@ -333,7 +324,7 @@ pub fn handle_group_field(cmd: GroupFieldCommands) -> anyhow::Result<()> {
                 );
             }
             Ok(())
-        }
+        },
         GroupFieldCommands::Add {
             registry: path,
             group: group_id,
@@ -363,7 +354,7 @@ pub fn handle_group_field(cmd: GroupFieldCommands) -> anyhow::Result<()> {
             save_registry_for_group(&path, &registry)?;
             println!("Added field '{name}' to group '{group_id}'");
             Ok(())
-        }
+        },
         GroupFieldCommands::Remove {
             registry: path,
             group: group_id,
@@ -384,6 +375,6 @@ pub fn handle_group_field(cmd: GroupFieldCommands) -> anyhow::Result<()> {
             save_registry_for_group(&path, &registry)?;
             println!("Removed field '{name}' from group '{group_id}'");
             Ok(())
-        }
+        },
     }
 }

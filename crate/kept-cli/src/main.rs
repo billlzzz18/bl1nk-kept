@@ -2,6 +2,7 @@ use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
 pub mod commands;
+pub mod completion;
 pub mod corpus;
 pub mod evidence;
 pub mod helpers;
@@ -84,7 +85,10 @@ pub enum Commands {
         cmd: GroupCommands,
     },
     /// Convert a document between supported offline formats.
-    Convert { input: PathBuf, output: PathBuf },
+    Convert {
+        input: PathBuf,
+        output: PathBuf,
+    },
     /// Create user config.yaml if missing and launch interactive setup workflow.
     Setup,
     /// View or modify user config.yaml and naming rules.
@@ -151,6 +155,11 @@ pub enum Commands {
     Mcp {
         #[arg(long, default_value = "stdio")]
         transport: String,
+    },
+    /// Manage external agent integrations.
+    Agent {
+        #[command(subcommand)]
+        action: Option<AgentSubcommand>,
     },
 }
 
@@ -228,6 +237,7 @@ async fn main() -> anyhow::Result<()> {
         Commands::Registry { cmd } => handle_registry(cmd).await?,
         Commands::Fs { cmd } => handle_fs(cmd)?,
         Commands::Doc { cmd } => handle_doc(cmd).await?,
+        Commands::Agent { action } => handle_agent(action)?,
         Commands::Tui => anyhow::bail!(
             "TUI ยังไม่เปิดใช้ใน kept CLI รุ่นนี้; ใช้คำสั่ง registry, fs หรือ doc convert แทน"
         ),
@@ -285,10 +295,7 @@ mod tests {
 
         let first = create_or_refresh_scan(&root, Some(snapshot_path.clone()), false)
             .expect("first scan must succeed");
-        assert!(
-            first.refresh.is_none(),
-            "first scan has no prior refresh delta"
-        );
+        assert!(first.refresh.is_none(), "first scan has no prior refresh delta");
 
         std::fs::write(root.join("second.txt"), "second")
             .expect("second fixture file must be written");
@@ -422,14 +429,10 @@ mod tests {
     fn task_first_find_uses_user_selected_portable_index() {
         use kept_core::{create_persistent_snapshot, scan_directory, ScanOptions};
 
-        let root = std::env::temp_dir().join(format!(
-            "kept-task-find-portable-root-{}",
-            std::process::id()
-        ));
-        let index_dir = std::env::temp_dir().join(format!(
-            "kept-task-find-portable-index-{}",
-            std::process::id()
-        ));
+        let root = std::env::temp_dir()
+            .join(format!("kept-task-find-portable-root-{}", std::process::id()));
+        let index_dir = std::env::temp_dir()
+            .join(format!("kept-task-find-portable-index-{}", std::process::id()));
         let snapshot_path = index_dir.join("portable.json");
         std::fs::create_dir_all(&root).expect("fixture root must be created");
         std::fs::create_dir_all(&index_dir).expect("fixture index dir must be created");
@@ -458,10 +461,7 @@ mod tests {
             json: true,
         });
 
-        assert!(
-            result.is_ok(),
-            "find must query the user-selected portable index"
-        );
+        assert!(result.is_ok(), "find must query the user-selected portable index");
         std::fs::remove_dir_all(root).expect("fixture root must be removed");
         std::fs::remove_dir_all(index_dir).expect("fixture index dir must be removed");
     }
@@ -492,10 +492,7 @@ mod tests {
 
         let result = handle_task_review(root.clone(), None, false);
 
-        assert!(
-            result.is_ok(),
-            "review must read the persistent index non-interactively"
-        );
+        assert!(result.is_ok(), "review must read the persistent index non-interactively");
         if let Some(bytes) = previous {
             std::fs::write(&snapshot_path, bytes).ok();
         } else {
@@ -506,14 +503,10 @@ mod tests {
 
     #[test]
     fn review_renders_read_only_naming_findings_from_existing_config_and_index() {
-        let root = std::env::temp_dir().join(format!(
-            "kept-task-review-naming-root-{}",
-            std::process::id()
-        ));
-        let config_path = std::env::temp_dir().join(format!(
-            "kept-review-naming-config-{}.yaml",
-            std::process::id()
-        ));
+        let root = std::env::temp_dir()
+            .join(format!("kept-task-review-naming-root-{}", std::process::id()));
+        let config_path = std::env::temp_dir()
+            .join(format!("kept-review-naming-config-{}.yaml", std::process::id()));
         std::fs::create_dir_all(&root).expect("fixture root must be created");
         let sample = root.join("My Documents Report.TXT");
         std::fs::write(&sample, "content").expect("fixture file must be written");
@@ -586,10 +579,7 @@ mod tests {
 
         let result = handle_task_duplicates(root.clone(), None, true, None, false);
 
-        assert!(
-            result.is_ok(),
-            "duplicates must read the persistent index and verify content"
-        );
+        assert!(result.is_ok(), "duplicates must read the persistent index and verify content");
         if let Some(bytes) = previous {
             std::fs::write(&snapshot_path, bytes).ok();
         } else {
@@ -665,10 +655,7 @@ mod tests {
             "export-plan",
             "--yes",
         ]);
-        assert!(
-            command.is_ok(),
-            "task-first duplicates command must parse with explicit action"
-        );
+        assert!(command.is_ok(), "task-first duplicates command must parse with explicit action");
     }
 
     #[test]
@@ -696,10 +683,7 @@ mod tests {
             "export-plan",
             "--yes",
         ]);
-        assert!(
-            command.is_ok(),
-            "duplicate scan with explicit yes must parse"
-        );
+        assert!(command.is_ok(), "duplicate scan with explicit yes must parse");
     }
 
     #[test]
@@ -771,43 +755,19 @@ mod tests {
 
     #[test]
     fn maps_scan_review_menu_choices() {
-        assert_eq!(
-            scan_review_action_from_selection("1"),
-            Some(ScanReviewAction::Space)
-        );
-        assert_eq!(
-            scan_review_action_from_selection("2"),
-            Some(ScanReviewAction::Find)
-        );
-        assert_eq!(
-            scan_review_action_from_selection("3"),
-            Some(ScanReviewAction::Duplicates)
-        );
-        assert_eq!(
-            scan_review_action_from_selection("4"),
-            Some(ScanReviewAction::Integrity)
-        );
-        assert_eq!(
-            scan_review_action_from_selection("5"),
-            Some(ScanReviewAction::Issues)
-        );
-        assert_eq!(
-            scan_review_action_from_selection("6"),
-            Some(ScanReviewAction::Naming)
-        );
+        assert_eq!(scan_review_action_from_selection("1"), Some(ScanReviewAction::Space));
+        assert_eq!(scan_review_action_from_selection("2"), Some(ScanReviewAction::Find));
+        assert_eq!(scan_review_action_from_selection("3"), Some(ScanReviewAction::Duplicates));
+        assert_eq!(scan_review_action_from_selection("4"), Some(ScanReviewAction::Integrity));
+        assert_eq!(scan_review_action_from_selection("5"), Some(ScanReviewAction::Issues));
+        assert_eq!(scan_review_action_from_selection("6"), Some(ScanReviewAction::Naming));
         assert_eq!(scan_review_action_from_selection("0"), None);
     }
 
     #[test]
     fn maps_numeric_duplicate_menu_choices() {
-        assert!(matches!(
-            duplicate_action_from_selection("1"),
-            Some(DuplicateAction::Show)
-        ));
-        assert!(matches!(
-            duplicate_action_from_selection("2"),
-            Some(DuplicateAction::ExportPlan)
-        ));
+        assert!(matches!(duplicate_action_from_selection("1"), Some(DuplicateAction::Show)));
+        assert!(matches!(duplicate_action_from_selection("2"), Some(DuplicateAction::ExportPlan)));
         assert_eq!(duplicate_action_from_selection("0"), None);
     }
 
@@ -898,56 +858,20 @@ mod tests {
         assert_eq!(config_field_default_value("case", &naming), "lower");
         assert_eq!(config_field_default_value("separator", &naming), "kebab");
         assert_eq!(config_field_default_value("extensions", &naming), "md,txt");
-        assert_eq!(
-            config_field_default_value("flagControlCharacters", &naming),
-            "true"
-        );
-        assert_eq!(
-            config_field_default_value("numbers.allow", &naming),
-            "false"
-        );
-        assert_eq!(
-            config_field_default_value("numbers.maxDigitsPerToken", &naming),
-            "4"
-        );
+        assert_eq!(config_field_default_value("flagControlCharacters", &naming), "true");
+        assert_eq!(config_field_default_value("numbers.allow", &naming), "false");
+        assert_eq!(config_field_default_value("numbers.maxDigitsPerToken", &naming), "4");
         assert_eq!(config_field_default_value("words.min", &naming), "2");
         assert_eq!(config_field_default_value("length.stem.max", &naming), "64");
-        assert_eq!(
-            config_field_default_value("whitespace.trim", &naming),
-            "true"
-        );
-        assert_eq!(
-            config_field_default_value("prefix.required", &naming),
-            "DOC-"
-        );
-        assert_eq!(
-            config_field_default_value("prefix.allow", &naming),
-            "DOC-,NOTE-"
-        );
-        assert_eq!(
-            config_field_default_value("similarity.name.threshold", &naming),
-            "0.95"
-        );
-        assert_eq!(
-            config_field_default_value("similarity.name.caseSensitive", &naming),
-            "true"
-        );
-        assert_eq!(
-            config_field_default_value("stemRegex", &naming),
-            r"^draft-.*"
-        );
-        assert_eq!(
-            config_field_default_value("aliases.doc", &naming),
-            "document"
-        );
-        assert_eq!(
-            config_field_default_value("shortcuts.wip", &naming),
-            "work-in-progress"
-        );
-        assert_eq!(
-            config_field_default_value("variables.year", &naming),
-            "2026"
-        );
+        assert_eq!(config_field_default_value("whitespace.trim", &naming), "true");
+        assert_eq!(config_field_default_value("prefix.required", &naming), "DOC-");
+        assert_eq!(config_field_default_value("prefix.allow", &naming), "DOC-,NOTE-");
+        assert_eq!(config_field_default_value("similarity.name.threshold", &naming), "0.95");
+        assert_eq!(config_field_default_value("similarity.name.caseSensitive", &naming), "true");
+        assert_eq!(config_field_default_value("stemRegex", &naming), r"^draft-.*");
+        assert_eq!(config_field_default_value("aliases.doc", &naming), "document");
+        assert_eq!(config_field_default_value("shortcuts.wip", &naming), "work-in-progress");
+        assert_eq!(config_field_default_value("variables.year", &naming), "2026");
 
         unset_profile_field(&mut naming, "unicode").expect("unicode must unset");
         unset_profile_field(&mut naming, "numbers.maxDigitsPerToken")
@@ -955,19 +879,13 @@ mod tests {
         unset_profile_field(&mut naming, "aliases.doc").expect("alias must unset");
 
         assert_eq!(config_field_default_value("unicode", &naming), "");
-        assert_eq!(
-            config_field_default_value("numbers.maxDigitsPerToken", &naming),
-            ""
-        );
+        assert_eq!(config_field_default_value("numbers.maxDigitsPerToken", &naming), "");
         assert_eq!(config_field_default_value("aliases.doc", &naming), "");
     }
 
     #[test]
     fn maps_interactive_setup_choices_without_implicit_config_mutation() {
-        assert_eq!(
-            setup_action_from_selection(0),
-            Some(SetupAction::EditConfig)
-        );
+        assert_eq!(setup_action_from_selection(0), Some(SetupAction::EditConfig));
         assert_eq!(setup_action_from_selection(1), Some(SetupAction::Exit));
     }
 
@@ -993,12 +911,9 @@ mod tests {
         kept_core::create_user_config_if_missing(&config_path)
             .expect("starter config must be created");
 
-        let result = run_doctor_at(
-            &config_path,
-            false,
-            Some("/path/to/definitely/missing/editor".into()),
-        )
-        .expect("doctor run must complete");
+        let result =
+            run_doctor_at(&config_path, false, Some("/path/to/definitely/missing/editor".into()))
+                .expect("doctor run must complete");
 
         assert!(result
             .report
@@ -1058,10 +973,8 @@ mod tests {
 
     #[test]
     fn doctor_fix_backs_up_an_invalid_config_before_restoring_a_valid_starter() {
-        let directory = std::env::temp_dir().join(format!(
-            "kept-doctor-backup-invalid-test-{}",
-            std::process::id()
-        ));
+        let directory = std::env::temp_dir()
+            .join(format!("kept-doctor-backup-invalid-test-{}", std::process::id()));
         let config_path = directory.join("config.yaml");
         std::fs::create_dir_all(&directory).expect("temporary directory must be created");
         std::fs::write(&config_path, "invalid: yaml: content: [unclosed\n")
@@ -1107,10 +1020,7 @@ mod tests {
     #[test]
     fn parses_doctor_fix_command() {
         let command = Cli::try_parse_from(["kept", "doctor", "--fix"]);
-        assert!(
-            command.is_ok(),
-            "doctor --fix must be a user-facing command"
-        );
+        assert!(command.is_ok(), "doctor --fix must be a user-facing command");
     }
 
     #[test]
@@ -1137,14 +1047,8 @@ mod tests {
         ] {
             assert!(help.contains(command), "root help must show {command}");
         }
-        assert!(
-            !help.contains("\n  fs"),
-            "root help must hide legacy fs hierarchy"
-        );
-        assert!(
-            !help.contains("\n  registry"),
-            "root help must hide legacy registry hierarchy"
-        );
+        assert!(!help.contains("\n  fs"), "root help must hide legacy fs hierarchy");
+        assert!(!help.contains("\n  registry"), "root help must hide legacy registry hierarchy");
         assert!(
             !help
                 .lines()
@@ -1183,10 +1087,7 @@ mod release_metadata_tests {
 
     #[test]
     fn cli_metadata_uses_foundation_release_version() {
-        assert_eq!(
-            super::Cli::command().get_version().unwrap_or_default(),
-            "0.3.1"
-        );
+        assert_eq!(super::Cli::command().get_version().unwrap_or_default(), "0.3.1");
     }
 }
 
@@ -1341,10 +1242,7 @@ mod search_policy_command_tests {
             },
         )
         .await;
-        assert!(
-            result.is_err(),
-            "invalid search policy must be rejected before searching"
-        );
+        assert!(result.is_err(), "invalid search policy must be rejected before searching");
         let error_message = result.unwrap_err().to_string();
         assert!(
             error_message.contains("fuzzyMinSimilarity")

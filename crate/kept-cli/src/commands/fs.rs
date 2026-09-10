@@ -55,11 +55,7 @@ pub fn handle_fs(cmd: FsCommands) -> anyhow::Result<()> {
 
     match cmd {
         FsCommands::Duplicates { cmd } => handle_duplicate_scan(cmd)?,
-        FsCommands::Index {
-            root,
-            output,
-            include_hidden,
-        } => {
+        FsCommands::Index { root, output, include_hidden } => {
             let index = scan_directory(
                 &root,
                 &ScanOptions {
@@ -69,7 +65,7 @@ pub fn handle_fs(cmd: FsCommands) -> anyhow::Result<()> {
             )?;
             std::fs::write(output, serde_json::to_string_pretty(&index)?)?;
             println!("Indexed {} files.", index.files.len());
-        }
+        },
         FsCommands::Treemap { index, json } => {
             let index_data: kept_core::ScanIndex =
                 serde_json::from_str(&std::fs::read_to_string(index)?)?;
@@ -83,7 +79,7 @@ pub fn handle_fs(cmd: FsCommands) -> anyhow::Result<()> {
                     tree.children.len()
                 );
             }
-        }
+        },
         FsCommands::Filter {
             index,
             all_filters,
@@ -114,13 +110,9 @@ pub fn handle_fs(cmd: FsCommands) -> anyhow::Result<()> {
                 for record in &records {
                     println!("{}\t{}\t{}", record.size, record.modified_unix, record.path);
                 }
-                println!(
-                    "Matched {} of {} file(s).",
-                    records.len(),
-                    index_data.files.len()
-                );
+                println!("Matched {} of {} file(s).", records.len(), index_data.files.len());
             }
-        }
+        },
     }
     Ok(())
 }
@@ -131,12 +123,7 @@ pub fn handle_duplicate_scan(cmd: DuplicateCommands) -> anyhow::Result<()> {
     };
     use std::io::{self, IsTerminal};
 
-    let DuplicateCommands::Scan {
-        root,
-        json,
-        action,
-        yes,
-    } = cmd;
+    let DuplicateCommands::Scan { root, json, action, yes } = cmd;
     let index = scan_directory(&root, &ScanOptions::default())?;
     let (groups, stats) = find_content_duplicates(&index, &ContentDuplicateOptions::default())?;
     let report = serde_json::json!({
@@ -150,12 +137,7 @@ pub fn handle_duplicate_scan(cmd: DuplicateCommands) -> anyhow::Result<()> {
     } else {
         println!("Verified content scan: {} duplicate group(s)", groups.len());
         for (position, group) in groups.iter().enumerate() {
-            println!(
-                "{}. {} ({} file(s))",
-                position + 1,
-                group.kind,
-                group.items.len()
-            );
+            println!("{}. {} ({} file(s))", position + 1, group.kind, group.items.len());
             for item in &group.items {
                 println!("   - {item}");
             }
@@ -199,18 +181,14 @@ pub fn parse_file_filter(raw: &str) -> anyhow::Result<kept_core::FileFilter> {
         ("kind", "eq") => Ok(FileFilter::Kind(value.to_string())),
         ("size", "ge") => Ok(FileFilter::MinSize(parse_human_size(value)?)),
         ("size", "le") => Ok(FileFilter::MaxSize(parse_human_size(value)?)),
-        ("size", "gt") => Ok(FileFilter::MinSize(
-            parse_human_size(value)?.saturating_add(1),
-        )),
-        ("size", "lt") => Ok(FileFilter::MaxSize(
-            parse_human_size(value)?.saturating_sub(1),
-        )),
-        ("modified", "after" | "ge") => Ok(FileFilter::ModifiedAfter(parse_filter_number(
-            field, value,
-        )?)),
-        ("modified", "before" | "le") => Ok(FileFilter::ModifiedBefore(parse_filter_number(
-            field, value,
-        )?)),
+        ("size", "gt") => Ok(FileFilter::MinSize(parse_human_size(value)?.saturating_add(1))),
+        ("size", "lt") => Ok(FileFilter::MaxSize(parse_human_size(value)?.saturating_sub(1))),
+        ("modified", "after" | "ge") => {
+            Ok(FileFilter::ModifiedAfter(parse_filter_number(field, value)?))
+        },
+        ("modified", "before" | "le") => {
+            Ok(FileFilter::ModifiedBefore(parse_filter_number(field, value)?))
+        },
         _ => anyhow::bail!("คู่ field:operator ไม่รองรับ '{field}:{operator}'"),
     }
 }

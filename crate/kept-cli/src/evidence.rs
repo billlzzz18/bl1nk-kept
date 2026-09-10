@@ -109,7 +109,7 @@ pub fn handle_evidence(cmd: EvidenceCommands) -> anyhow::Result<()> {
                 )?,
             )?;
             Ok(())
-        }
+        },
         EvidenceCommands::Rescore {
             offline,
             manifest,
@@ -126,7 +126,7 @@ pub fn handle_evidence(cmd: EvidenceCommands) -> anyhow::Result<()> {
             let raw = std::fs::read_to_string(&raw_jsonl)?;
             std::fs::write(output, raw)?;
             Ok(())
-        }
+        },
         EvidenceCommands::Correct {
             cmd:
                 EvidenceCorrectionCommands::Append {
@@ -156,7 +156,7 @@ pub fn handle_evidence(cmd: EvidenceCommands) -> anyhow::Result<()> {
                 )?
             )?;
             Ok(())
-        }
+        },
         EvidenceCommands::SelfTest {
             good_fixture,
             bad_fixture,
@@ -191,6 +191,6 @@ pub fn handle_evidence(cmd: EvidenceCommands) -> anyhow::Result<()> {
             std::fs::write(bad_fixture, "{\"fixture\":\"bad\"}\n")?;
             println!("PASS evidence self-test");
             Ok(())
-        }
+        },
     }
 }

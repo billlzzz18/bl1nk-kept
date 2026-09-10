@@ -190,10 +190,7 @@ pub fn run_doctor_at(
     };
 
     let final_report = with_editor_diagnostic(doctor_config_at(path), explicit_editor);
-    Ok(DoctorRunResult {
-        report: final_report,
-        fixed,
-    })
+    Ok(DoctorRunResult { report: final_report, fixed })
 }
 
 pub fn handle_doctor(fix: bool) -> anyhow::Result<()> {

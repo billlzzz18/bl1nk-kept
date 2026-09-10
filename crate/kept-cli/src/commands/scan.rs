@@ -102,9 +102,7 @@ pub fn create_or_refresh_scan(
     let index = scan_directory(root, &options)?;
     let output = output.unwrap_or_else(|| default_scan_snapshot_path(&index.root));
     let previous = if output.is_file() {
-        Some(serde_json::from_str::<PersistentScanSnapshot>(
-            &std::fs::read_to_string(&output)?,
-        )?)
+        Some(serde_json::from_str::<PersistentScanSnapshot>(&std::fs::read_to_string(&output)?)?)
     } else {
         None
     };
@@ -174,11 +172,7 @@ pub fn handle_task_find(request: FindRequest) -> anyhow::Result<()> {
             for record in &records {
                 println!("{}\t{}\t{}", record.size, record.modified_unix, record.path);
             }
-            println!(
-                "Matched {} of {} file(s).",
-                records.len(),
-                snapshot.index.files.len()
-            );
+            println!("Matched {} of {} file(s).", records.len(), snapshot.index.files.len());
         }
         return Ok(());
     }
@@ -236,11 +230,7 @@ pub fn handle_task_find(request: FindRequest) -> anyhow::Result<()> {
         for record in &records {
             println!("{}\t{}\t{}", record.size, record.modified_unix, record.path);
         }
-        println!(
-            "Matched {} of {} file(s).",
-            records.len(),
-            snapshot.index.files.len()
-        );
+        println!("Matched {} of {} file(s).", records.len(), snapshot.index.files.len());
     }
     Ok(())
 }
@@ -310,7 +300,7 @@ pub fn handle_task_review(
                 {
                     println!("{size}\t{path}");
                 }
-            }
+            },
             ScanReviewAction::Find => run_interactive_find(canonical_root.clone())?,
             ScanReviewAction::Duplicates => handle_task_duplicates(
                 canonical_root.clone(),
@@ -332,7 +322,7 @@ pub fn handle_task_review(
                         bad.path, bad.detected_extension, bad.actual_extension
                     );
                 }
-            }
+            },
             ScanReviewAction::Issues => println!("{}", scan_review_summary(&snapshot.index)),
             ScanReviewAction::Naming => println!("{}", naming_review_summary(&snapshot.index)),
         }
@@ -391,10 +381,7 @@ pub fn naming_review_summary(index: &kept_core::ScanIndex) -> String {
 
 pub fn naming_review_summary_at(index: &kept_core::ScanIndex, config_path: &Path) -> String {
     if !config_path.is_file() {
-        return format!(
-            "Naming policy: no config at '{}'; run kept setup",
-            config_path.display()
-        );
+        return format!("Naming policy: no config at '{}'; run kept setup", config_path.display());
     }
     let config = match kept_core::load_user_config(config_path) {
         Ok(config) => config,
@@ -403,7 +390,7 @@ pub fn naming_review_summary_at(index: &kept_core::ScanIndex, config_path: &Path
                 "Naming policy: config error at '{}': {error}; run kept doctor",
                 config_path.display()
             )
-        }
+        },
     };
     let findings = match kept_core::analyze_index_naming(index, &config) {
         Ok(findings) => findings,
@@ -417,10 +404,10 @@ pub fn naming_review_summary_at(index: &kept_core::ScanIndex, config_path: &Path
             .map(|issue| issue.message.as_str())
             .collect::<Vec<_>>()
             .join("; ");
-        let target = finding.proposed_target.as_deref().map_or_else(
-            || "no target".to_string(),
-            |name| format!("proposed: {name}"),
-        );
+        let target = finding
+            .proposed_target
+            .as_deref()
+            .map_or_else(|| "no target".to_string(), |name| format!("proposed: {name}"));
         let blocked = if finding.blocked { " [BLOCKED]" } else { "" };
         lines.push(format!(
             "- {} [{}]: {}; {}{}",

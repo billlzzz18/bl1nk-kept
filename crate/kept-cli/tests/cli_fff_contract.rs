@@ -93,52 +93,25 @@ fn test_cli_scan_and_find_fff_contract() {
 
     // Run `kept scan <root> --output <index_path> --json`
     let output = Command::new(bin_path)
-        .args([
-            "scan",
-            root.to_str().unwrap(),
-            "--output",
-            index_path.to_str().unwrap(),
-            "--json",
-        ])
+        .args(["scan", root.to_str().unwrap(), "--output", index_path.to_str().unwrap(), "--json"])
         .output()
         .expect("failed to execute kept scan");
 
     assert!(output.status.success(), "kept scan must succeed");
     let scan_stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(
-        scan_stdout.contains("fileCount"),
-        "scan output should contain fileCount"
-    );
-    assert!(
-        scan_stdout.contains("totalSize"),
-        "scan output should contain totalSize"
-    );
+    assert!(scan_stdout.contains("fileCount"), "scan output should contain fileCount");
+    assert!(scan_stdout.contains("totalSize"), "scan output should contain totalSize");
     assert!(index_path.exists(), "Snapshot file must be created");
 
     // 3. Run `kept find <root> --index <index_path> --json`
     let output_find = Command::new(bin_path)
-        .args([
-            "find",
-            root.to_str().unwrap(),
-            "--index",
-            index_path.to_str().unwrap(),
-            "--json",
-        ])
+        .args(["find", root.to_str().unwrap(), "--index", index_path.to_str().unwrap(), "--json"])
         .output()
         .expect("failed to execute kept find");
 
     assert!(output_find.status.success(), "kept find must succeed");
     let find_stdout = String::from_utf8_lossy(&output_find.stdout);
-    assert!(
-        find_stdout.contains("src/main.rs"),
-        "find output should contain src/main.rs"
-    );
-    assert!(
-        find_stdout.contains("docs/readme.md"),
-        "find output should contain docs/readme.md"
-    );
-    assert!(
-        !find_stdout.contains("ignored.txt"),
-        "find output must not contain ignored.txt"
-    );
+    assert!(find_stdout.contains("src/main.rs"), "find output should contain src/main.rs");
+    assert!(find_stdout.contains("docs/readme.md"), "find output should contain docs/readme.md");
+    assert!(!find_stdout.contains("ignored.txt"), "find output must not contain ignored.txt");
 }

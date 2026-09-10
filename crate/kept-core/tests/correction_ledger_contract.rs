@@ -54,10 +54,7 @@ fn superseding_correction_preserves_history_and_replaces_active_record() {
     let mut expected_original = original.clone();
     expected_original.status = CorrectionStatus::Superseded;
 
-    assert_eq!(
-        ledger.active_for(&original.subject).unwrap(),
-        vec![expected_replacement.clone()]
-    );
+    assert_eq!(ledger.active_for(&original.subject).unwrap(), vec![expected_replacement.clone()]);
     assert_eq!(
         ledger.history_for(&original.subject).unwrap(),
         vec![expected_original, expected_replacement]

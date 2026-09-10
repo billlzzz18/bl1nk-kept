@@ -65,10 +65,7 @@ fn test_fff_look_and_view_acquisition() {
 
     assert_eq!(view_obs.source.target.to_string(), "file://src/main.rs");
     assert!(view_obs.content.is_some());
-    assert_eq!(
-        view_obs.content.as_deref(),
-        Some("fn main() {\n    println!(\"hello\");\n}\n")
-    );
+    assert_eq!(view_obs.content.as_deref(), Some("fn main() {\n    println!(\"hello\");\n}\n"));
 
     // 3. Binary file view: view on binary should retain is_binary=true and omit utf-8 content or encode safely
     let bin_obs = scanner

@@ -62,12 +62,8 @@ impl NotionClient {
     pub async fn trash(&self, resource: Resource, id: &str) -> Result<Value> {
         let path = resource.path(id);
         if resource.supports_restore() {
-            self.request(
-                reqwest::Method::PATCH,
-                &path,
-                Some(&json!({ "in_trash": true })),
-            )
-            .await
+            self.request(reqwest::Method::PATCH, &path, Some(&json!({ "in_trash": true })))
+                .await
         } else {
             self.request(reqwest::Method::DELETE, &path, None::<&()>)
                 .await

@@ -13,10 +13,7 @@ fn starter_config_is_broad_user_owned_and_has_no_guessed_scope() {
     assert!(config.profiles.contains_key("images-media"));
     assert!(config.profiles.contains_key("archives"));
     assert!(config.scopes.is_empty());
-    assert_eq!(
-        resolve_naming_rule(&config, Path::new("/work/report.pdf")).unwrap(),
-        None
-    );
+    assert_eq!(resolve_naming_rule(&config, Path::new("/work/report.pdf")).unwrap(), None);
 }
 
 #[test]
@@ -188,17 +185,10 @@ scopes:
 
     let findings = analyze_index_naming(&index, &config).expect("index analysis must succeed");
 
-    assert_eq!(
-        findings.len(),
-        1,
-        "unscoped file must not receive a guessed rule"
-    );
+    assert_eq!(findings.len(), 1, "unscoped file must not receive a guessed rule");
     assert_eq!(findings[0].source, Path::new("/work/reports/Q1_Report.pdf"));
     assert_eq!(findings[0].proposed_target, Some("q1-report.pdf".into()));
-    assert!(
-        findings[0].blocked,
-        "existing target must block a future rename plan"
-    );
+    assert!(findings[0].blocked, "existing target must block a future rename plan");
     assert!(findings[0]
         .issues
         .iter()
@@ -289,8 +279,5 @@ scopes:
 
     let finding = analyze_naming(path, &rule, &[]).expect("analysis");
 
-    assert_eq!(
-        finding.proposed_target,
-        Some("kept-report-draft-2026.pdf".into())
-    );
+    assert_eq!(finding.proposed_target, Some("kept-report-draft-2026.pdf".into()));
 }

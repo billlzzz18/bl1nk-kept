@@ -140,8 +140,5 @@ fn dogfood_parse_real_workspace_python_tool() {
     }
     let content = std::fs::read_to_string(&tool_path).unwrap_or_default();
     let index = IndexBuilder::parse_file(&tool_path, &content);
-    assert!(
-        !index.definitions.is_empty(),
-        "python tool must yield definitions"
-    );
+    assert!(!index.definitions.is_empty(), "python tool must yield definitions");
 }

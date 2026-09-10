@@ -50,15 +50,15 @@ impl AgentSetup for Antigravity {
     }
 
     fn install(&self) -> Result<String> {
-        let _path = config_path()
-            .ok_or_else(|| anyhow::anyhow!("Could not determine home directory"))?;
+        let _path =
+            config_path().ok_or_else(|| anyhow::anyhow!("Could not determine home directory"))?;
         // TODO: agy-specific setup logic
         Ok("Antigravity agent registered".to_string())
     }
 
     fn uninstall(&self) -> Result<String> {
-        let _path = config_path()
-            .ok_or_else(|| anyhow::anyhow!("Could not determine home directory"))?;
+        let _path =
+            config_path().ok_or_else(|| anyhow::anyhow!("Could not determine home directory"))?;
         // TODO: agy-specific cleanup logic
         Ok("Antigravity agent removed".to_string())
     }
@@ -95,10 +95,7 @@ mod tests {
     #[test]
     fn check_returns_installed_or_not() {
         let status = Antigravity::new().check().unwrap();
-        assert!(matches!(
-            status,
-            StatusCheck::Installed | StatusCheck::NotInstalled
-        ));
+        assert!(matches!(status, StatusCheck::Installed | StatusCheck::NotInstalled));
     }
 
     #[test]

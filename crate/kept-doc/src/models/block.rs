@@ -107,7 +107,9 @@ pub enum BlockType {
     CodeBlock { code: CodeBlockContent },
     /// A link to a page.
     #[serde(rename = "link_to_page")]
-    LinkToPage { link_to_page: LinkToPageContent },
+    LinkToPage {
+        link_to_page: LinkToPageContent,
+    },
     /// A horizontal divider line.
     #[serde(rename = "divider")]
     Divider {},
@@ -125,13 +127,17 @@ pub enum BlockType {
     Column {},
     /// A link preview block.
     #[serde(rename = "link_preview")]
-    LinkPreview { link_preview: LinkPreviewContent },
+    LinkPreview {
+        link_preview: LinkPreviewContent,
+    },
     /// A template block for reusable content.
     #[serde(rename = "template")]
     Template { template: TemplateContent },
     /// A synced block that mirrors another block.
     #[serde(rename = "synced_block")]
-    SyncedBlock { synced_block: SyncedBlockContent },
+    SyncedBlock {
+        synced_block: SyncedBlockContent,
+    },
     /// A table block.
     #[serde(rename = "table")]
     Table { table: TableContent },

@@ -126,10 +126,10 @@ fn matches_filter(record: &FileRecord, filter: &FileFilter) -> bool {
             .eq_ignore_ascii_case(value.trim_start_matches('.')),
         FileFilter::PathContains(value) => {
             record.path.to_lowercase().contains(&value.to_lowercase())
-        }
+        },
         FileFilter::NameContains(value) => {
             record.name.to_lowercase().contains(&value.to_lowercase())
-        }
+        },
         FileFilter::MinSize(value) => record.size >= *value,
         FileFilter::MaxSize(value) => record.size <= *value,
         FileFilter::ModifiedAfter(value) => record.modified_unix >= *value,

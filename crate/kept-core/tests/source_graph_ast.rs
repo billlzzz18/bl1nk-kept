@@ -15,10 +15,7 @@ fn string_literal_must_not_produce_definition() {
     "#;
     let index = IndexBuilder::parse_rust_file(Path::new("a.rs"), code);
     let defs = index.find_definitions("fake");
-    assert!(
-        defs.is_empty(),
-        "fake from string literal must not be a definition"
-    );
+    assert!(defs.is_empty(), "fake from string literal must not be a definition");
     assert_eq!(index.find_definitions("real_function").len(), 1);
 }
 
@@ -49,11 +46,7 @@ fn multiline_signature_captured_once() {
     "#;
     let index = IndexBuilder::parse_rust_file(Path::new("a.rs"), code);
     let defs = index.find_definitions("compute_value");
-    assert_eq!(
-        defs.len(),
-        1,
-        "multi-line signature must yield exactly one definition"
-    );
+    assert_eq!(defs.len(), 1, "multi-line signature must yield exactly one definition");
     assert_eq!(defs[0].kind, DefinitionKind::Function);
     assert_eq!(defs[0].line, 2);
 }
@@ -95,10 +88,7 @@ fn impl_generic_trait_for_type() {
     "#;
     let index = IndexBuilder::parse_rust_file(Path::new("a.rs"), code);
     assert_eq!(index.implementations.len(), 2);
-    assert_eq!(
-        index.implementations[0].trait_name,
-        Some("Visitor".to_string())
-    );
+    assert_eq!(index.implementations[0].trait_name, Some("Visitor".to_string()));
     assert_eq!(index.implementations[0].target_type, "Container");
     assert_eq!(index.implementations[1].trait_name, None);
     assert_eq!(index.implementations[1].target_type, "Container");
@@ -126,9 +116,6 @@ fn call_expression_produces_call_reference() {
     "#;
     let index = IndexBuilder::parse_rust_file(Path::new("a.rs"), code);
     let refs = index.find_references("helper");
-    assert!(
-        refs.len() >= 2,
-        "helper calls must be recorded as references"
-    );
+    assert!(refs.len() >= 2, "helper calls must be recorded as references");
     assert!(refs.iter().any(|r| r.kind == ReferenceKind::Call));
 }

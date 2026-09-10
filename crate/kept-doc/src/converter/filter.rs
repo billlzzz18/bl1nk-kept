@@ -66,20 +66,20 @@ impl ThaiSanitizationFilter {
         match block {
             Paragraph { content, .. } | Heading { content, .. } => {
                 self.process_inline(content);
-            }
+            },
             BulletList { items, .. } | OrderedList { items, .. } => {
                 for item in items {
                     for b in &mut item.content {
                         self.process_block(b);
                     }
                 }
-            }
+            },
             Quote { content, .. } | Callout { content, .. } | Toggle { content, .. } => {
                 for b in content {
                     self.process_block(b);
                 }
-            }
-            _ => {}
+            },
+            _ => {},
         }
     }
 
@@ -135,10 +135,8 @@ impl MarkdownAlertFilter {
     fn detect_alert(
         content: &[crate::ir::UniversalBlock],
     ) -> Option<(&'static str, &'static str, crate::ir::UniversalBlock)> {
-        if let Some(crate::ir::UniversalBlock::Paragraph {
-            content: inlines,
-            style,
-        }) = content.first()
+        if let Some(crate::ir::UniversalBlock::Paragraph { content: inlines, style }) =
+            content.first()
         {
             if let Some(crate::ir::inline::InlineElement::TextRun {
                 content: text_str,
@@ -208,13 +206,7 @@ mod tests {
         filter.apply(&mut doc).unwrap();
 
         assert_eq!(doc.blocks.len(), 1);
-        if let UniversalBlock::Callout {
-            icon,
-            color,
-            content,
-            ..
-        } = &doc.blocks[0]
-        {
+        if let UniversalBlock::Callout { icon, color, content, .. } = &doc.blocks[0] {
             assert_eq!(icon.as_deref(), Some("💡"));
             assert_eq!(color.as_deref(), Some("blue"));
             assert_eq!(content.len(), 1);

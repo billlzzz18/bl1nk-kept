@@ -12,14 +12,7 @@ pub fn scan_directory(root: impl AsRef<Path>, options: &ScanOptions) -> std::io:
         // Fallback or explicit traversal when hidden files/internal directories (like .git in tests) are explicitly requested
         let mut f_list = Vec::new();
         let mut i_list = Vec::new();
-        visit_dir_all(
-            &root_canonical,
-            &root_canonical,
-            0,
-            options,
-            &mut f_list,
-            &mut i_list,
-        );
+        visit_dir_all(&root_canonical, &root_canonical, 0, options, &mut f_list, &mut i_list);
         (f_list, i_list)
     } else {
         let mut scanner = FffScanner::new(&root_canonical)
@@ -77,7 +70,7 @@ fn visit_dir_all(
                 error.to_string(),
             ));
             return;
-        }
+        },
     };
 
     for item in entries {
@@ -90,7 +83,7 @@ fn visit_dir_all(
                     error.to_string(),
                 ));
                 continue;
-            }
+            },
         };
         let path = item.path();
         let name = item.file_name().to_string_lossy().to_string();
@@ -107,7 +100,7 @@ fn visit_dir_all(
                     error.to_string(),
                 ));
                 continue;
-            }
+            },
         };
 
         if metadata.is_dir() {
@@ -132,7 +125,7 @@ fn visit_dir_all(
                     error.to_string(),
                 ));
                 0
-            }
+            },
         };
 
         let mut buf = [0u8; 1024];

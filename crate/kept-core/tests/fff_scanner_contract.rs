@@ -152,10 +152,7 @@ fn fff_scanner_contract_ignores_and_metadata() {
             .ok();
 
         // Modify tracked file
-        fixture.write_file(
-            "src/main.rs",
-            b"fn main() {\n    println!(\"hello modified\");\n}\n",
-        );
+        fixture.write_file("src/main.rs", b"fn main() {\n    println!(\"hello modified\");\n}\n");
 
         // Untracked file is data/text.txt & data/binary.bin
     }
@@ -174,10 +171,7 @@ fn fff_scanner_contract_ignores_and_metadata() {
     // Verify deterministic sorting (relative paths must be sorted ascending)
     let mut sorted_paths = paths.clone();
     sorted_paths.sort();
-    assert_eq!(
-        paths, sorted_paths,
-        "File paths returned by scan must be deterministically sorted"
-    );
+    assert_eq!(paths, sorted_paths, "File paths returned by scan must be deterministically sorted");
 
     // Verify FFF Ignore Semantics:
     // MUST NOT contain ignored directories / files
@@ -185,14 +179,8 @@ fn fff_scanner_contract_ignores_and_metadata() {
         !paths.iter().any(|p| p.contains("node_modules")),
         "node_modules should be ignored by FFF semantics"
     );
-    assert!(
-        !paths.iter().any(|p| p.contains("venv")),
-        "venv should be ignored by FFF semantics"
-    );
-    assert!(
-        !paths.iter().any(|p| p.contains(".venv")),
-        ".venv should be ignored by FFF semantics"
-    );
+    assert!(!paths.iter().any(|p| p.contains("venv")), "venv should be ignored by FFF semantics");
+    assert!(!paths.iter().any(|p| p.contains(".venv")), ".venv should be ignored by FFF semantics");
     assert!(
         !paths.iter().any(|p| p.contains("__pycache__")),
         "__pycache__ should be ignored by FFF semantics"
@@ -225,22 +213,10 @@ fn fff_scanner_contract_ignores_and_metadata() {
     );
 
     // MUST contain standard allowed files
-    assert!(
-        paths.contains(&"src/main.rs".to_string()),
-        "src/main.rs must be included"
-    );
-    assert!(
-        paths.contains(&"docs/readme.md".to_string()),
-        "docs/readme.md must be included"
-    );
-    assert!(
-        paths.contains(&"data/binary.bin".to_string()),
-        "data/binary.bin must be included"
-    );
-    assert!(
-        paths.contains(&"data/text.txt".to_string()),
-        "data/text.txt must be included"
-    );
+    assert!(paths.contains(&"src/main.rs".to_string()), "src/main.rs must be included");
+    assert!(paths.contains(&"docs/readme.md".to_string()), "docs/readme.md must be included");
+    assert!(paths.contains(&"data/binary.bin".to_string()), "data/binary.bin must be included");
+    assert!(paths.contains(&"data/text.txt".to_string()), "data/text.txt must be included");
 
     // Verify metadata requirements: path, name, extension, size, modified time, is_binary, git_status
     let main_record = index
@@ -257,14 +233,8 @@ fn fff_scanner_contract_ignores_and_metadata() {
     // Test extended fields: is_binary and git_status
     // Serialized JSON contract check for FileRecord
     let json_val = serde_json::to_value(main_record).expect("must serialize to json");
-    assert!(
-        json_val.get("isBinary").is_some(),
-        "FileRecord must include 'isBinary' field"
-    );
-    assert!(
-        json_val.get("gitStatus").is_some(),
-        "FileRecord must include 'gitStatus' field"
-    );
+    assert!(json_val.get("isBinary").is_some(), "FileRecord must include 'isBinary' field");
+    assert!(json_val.get("gitStatus").is_some(), "FileRecord must include 'gitStatus' field");
 
     // Check binary detection
     let binary_record = index

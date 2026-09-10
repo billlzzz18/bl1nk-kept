@@ -27,11 +27,9 @@ async fn main() -> anyhow::Result<()> {
 
     let embed = semantic::embed_texts(&resolved, &["probe".to_string()]).await;
     match embed {
-        Ok(vectors) => println!(
-            "embeddings=ok dimensions={} count={}",
-            vectors[0].len(),
-            vectors.len()
-        ),
+        Ok(vectors) => {
+            println!("embeddings=ok dimensions={} count={}", vectors[0].len(), vectors.len())
+        },
         Err(error) => println!("embeddings=unavailable ({error})"),
     }
 

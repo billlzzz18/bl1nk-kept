@@ -1,32 +1,33 @@
-// Rust tree-sitter query rules for kept source graph parsing
+; Rust tree-sitter query rules for kept source graph parsing
 (function_item
-  name: (identifier) @definition.function) @scope
+  name: (identifier) @definition.function)
+
+; Method signature inside trait (no body)
+(function_signature_item
+  name: (identifier) @definition.function)
 
 (struct_item
-  name: (type_identifier) @definition.struct) @scope
+  name: (type_identifier) @definition.struct)
 
 (enum_item
-  name: (type_identifier) @definition.enum) @scope
+  name: (type_identifier) @definition.enum)
 
 (trait_item
-  name: (type_identifier) @definition.trait) @scope
+  name: (type_identifier) @definition.trait)
 
 (type_item
-  name: (type_identifier) @definition.type_alias) @scope
+  name: (type_identifier) @definition.type_alias)
 
-(impl_item
-  trait: (type_identifier)? @implementation.trait
-  type: (type_identifier) @implementation.target) @scope
+; macro_rules! definition
+(macro_definition
+  name: (identifier) @definition.macro)
 
-(use_declaration
-  argument: [
-    (identifier) @import.name
-    (scoped_identifier) @import.scoped
-    (use_as_clause
-      path: [(identifier) (scoped_identifier)] @import.source
-      alias: (identifier) @import.alias)
-    (use_wildcard) @import.wildcard
-  ])
+; impl block — capture entire node, extract info from text
+(impl_item) @implementation.block
+
+; NOTE: Capture entire use_declaration as @import.statement
+; The code will extract path, alias, and wildcard from the node text
+(use_declaration) @import.statement
 
 (call_expression
   function: [

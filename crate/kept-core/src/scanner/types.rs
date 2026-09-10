@@ -191,7 +191,7 @@ pub fn plan_incremental_refresh(
             None => plan.added.push((*path).to_string()),
             Some(previous_file) if file_changed(previous_file, file) => {
                 plan.modified.push((*path).to_string())
-            }
+            },
             Some(_) => plan.unchanged.push((*path).to_string()),
         }
     }
@@ -305,10 +305,8 @@ mod tests {
     #[test]
     fn incremental_refresh_detects_added_files() {
         let previous = make_index("/root", vec![make_record("a.txt", 10, 100)]);
-        let current = make_index(
-            "/root",
-            vec![make_record("a.txt", 10, 100), make_record("b.txt", 20, 200)],
-        );
+        let current =
+            make_index("/root", vec![make_record("a.txt", 10, 100), make_record("b.txt", 20, 200)]);
         let plan = plan_incremental_refresh(&previous, &current).unwrap();
         assert_eq!(plan.added, vec!["b.txt"]);
         assert!(plan.modified.is_empty());
@@ -327,10 +325,8 @@ mod tests {
 
     #[test]
     fn incremental_refresh_detects_removed_files() {
-        let previous = make_index(
-            "/root",
-            vec![make_record("a.txt", 10, 100), make_record("b.txt", 20, 200)],
-        );
+        let previous =
+            make_index("/root", vec![make_record("a.txt", 10, 100), make_record("b.txt", 20, 200)]);
         let current = make_index("/root", vec![make_record("a.txt", 10, 100)]);
         let plan = plan_incremental_refresh(&previous, &current).unwrap();
         assert!(plan.added.is_empty());
@@ -367,10 +363,7 @@ mod tests {
             index: make_index("/root", vec![]),
         };
         let migrated = migrate_snapshot(snapshot.clone()).unwrap();
-        assert_eq!(
-            migrated.schema_version,
-            CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION
-        );
+        assert_eq!(migrated.schema_version, CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION);
         assert_eq!(migrated.root_fingerprint, "abc");
     }
 
@@ -385,14 +378,8 @@ mod tests {
             index: make_index("/root", vec![]),
         };
         let migrated = migrate_snapshot(snapshot).unwrap();
-        assert_eq!(
-            migrated.schema_version,
-            CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION
-        );
-        assert!(
-            !migrated.root_fingerprint.is_empty(),
-            "fingerprint must be computed"
-        );
+        assert_eq!(migrated.schema_version, CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION);
+        assert!(!migrated.root_fingerprint.is_empty(), "fingerprint must be computed");
     }
 
     #[test]

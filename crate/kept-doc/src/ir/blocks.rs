@@ -179,7 +179,10 @@ pub enum MediaSource {
         expiry_time: Option<String>,
     },
     /// Base64 encoded data (for embedding)
-    Base64 { data: String, mime_type: String },
+    Base64 {
+        data: String,
+        mime_type: String,
+    },
 }
 
 /// Embed provider for oEmbed-style embeds

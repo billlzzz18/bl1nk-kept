@@ -1,1 +1,35 @@
-msrv = "1.82"
+# clippy — cargo clippy --all-targets --all-features -- -D warnings -W clippy::pedantic -W clippy::nursery
+#
+# Thresholds (stricter reminders for style / complexity / formatting habits)
+
+# Complexity
+cognitive-complexity-threshold = 20
+type-complexity-threshold = 250
+too-many-arguments-threshold = 7
+too-many-lines-threshold = 120
+
+# Booleans & parameters
+max-fn-params-bools = 2
+max-struct-bools = 4
+
+# Size / allocation hints
+trivial-copy-size-limit = 16
+pass-by-value-size-limit = 256
+array-size-threshold = 32
+enum-variant-size-threshold = 200
+vec-box-size-threshold = 4096
+large-error-threshold = 128
+future-size-threshold = 16384
+stack-size-threshold = 524288
+
+# Naming / literals
+single-char-binding-names-threshold = 5
+literal-representation-threshold = 16
+enum-variant-name-threshold = 3
+
+# Docs / readability
+missing-docs-in-crate-items = true
+allow-expect-in-tests = true
+allow-unwrap-in-tests = true
+allow-dbg-in-tests = true
+allow-print-in-tests = true

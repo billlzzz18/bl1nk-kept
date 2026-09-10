@@ -557,7 +557,7 @@ pub fn coalesce_file_events(events: &[FileEvent]) -> Vec<FileEvent> {
         match ev.kind {
             FileEventKind::Created => {
                 map.insert(ev.path.clone(), FileEventKind::Created);
-            }
+            },
             FileEventKind::Modified => {
                 map.entry(ev.path.clone())
                     .and_modify(|k| {
@@ -566,14 +566,14 @@ pub fn coalesce_file_events(events: &[FileEvent]) -> Vec<FileEvent> {
                         }
                     })
                     .or_insert(FileEventKind::Modified);
-            }
+            },
             FileEventKind::Deleted => {
                 if let Some(FileEventKind::Created) = map.get(&ev.path) {
                     map.remove(&ev.path);
                 } else {
                     map.insert(ev.path.clone(), FileEventKind::Deleted);
                 }
-            }
+            },
         }
     }
 
@@ -630,7 +630,7 @@ impl IndexManager {
             match event.kind {
                 FileEventKind::Deleted => {
                     guard.remove_file(&path_str);
-                }
+                },
                 FileEventKind::Created | FileEventKind::Modified => {
                     guard.remove_file(&path_str);
                     if event.path.is_file() {
@@ -654,7 +654,7 @@ impl IndexManager {
                             guard.indexed_files.extend(file_idx.indexed_files);
                         }
                     }
-                }
+                },
             }
         }
         guard.compact();
@@ -715,10 +715,7 @@ mod tests {
         assert_eq!(index.imports.len(), 2);
         assert_eq!(index.implementations.len(), 1);
         assert_eq!(index.implementations[0].target_type, "UserProfile");
-        assert_eq!(
-            index.implementations[0].trait_name,
-            Some("AuthProvider".to_string())
-        );
+        assert_eq!(index.implementations[0].trait_name, Some("AuthProvider".to_string()));
     }
 
     #[test]
@@ -758,10 +755,7 @@ mod tests {
         assert_eq!(coalesced.len(), 1);
         assert_eq!(coalesced[0].kind, FileEventKind::Created);
 
-        let events_del = vec![
-            FileEvent::created(path.clone()),
-            FileEvent::deleted(path.clone()),
-        ];
+        let events_del = vec![FileEvent::created(path.clone()), FileEvent::deleted(path.clone())];
         let coalesced_del = coalesce_file_events(&events_del);
         assert_eq!(coalesced_del.len(), 0);
     }

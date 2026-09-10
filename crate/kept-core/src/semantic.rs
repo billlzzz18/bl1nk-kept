@@ -19,7 +19,10 @@ pub enum SemanticError {
     #[error(
         "cannot reach the {provider} provider at {endpoint}: is it installed and running? for ollama run `ollama serve`, or point KEPT_SEMANTIC_ENDPOINT at another supported provider (supported: ollama, jina)"
     )]
-    ProviderUnavailable { provider: String, endpoint: String },
+    ProviderUnavailable {
+        provider: String,
+        endpoint: String,
+    },
     #[error(
         "jina provider requires an API key: set the JINA_API_KEY environment variable or `defaults.semantic.apiKey` in config.yaml"
     )]
@@ -153,11 +156,8 @@ pub fn embeddings_request_body(
     model_id: &str,
     inputs: &[String],
 ) -> Result<serde_json::Value, SemanticError> {
-    serde_json::to_value(EmbeddingsRequestBody {
-        model: model_id,
-        input: inputs,
-    })
-    .map_err(|e| SemanticError::Serialization(e.to_string()))
+    serde_json::to_value(EmbeddingsRequestBody { model: model_id, input: inputs })
+        .map_err(|e| SemanticError::Serialization(e.to_string()))
 }
 
 #[derive(Deserialize)]
@@ -518,10 +518,7 @@ mod tests {
                 case.tags
             );
         }
-        assert_eq!(
-            ollama_origin("http://127.0.0.1:11434/v1"),
-            "http://127.0.0.1:11434"
-        );
+        assert_eq!(ollama_origin("http://127.0.0.1:11434/v1"), "http://127.0.0.1:11434");
     }
 
     #[test]

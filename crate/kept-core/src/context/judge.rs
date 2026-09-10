@@ -33,7 +33,10 @@ pub enum AdmissionDecision {
     /// Low-value or noise observation; drop completely from context.
     Drop { target: String, reason: String },
     /// Safety or loop detection warning attached to context.
-    Warn { target: String, warning: String },
+    Warn {
+        target: String,
+        warning: String,
+    },
     /// Dangerous operation or violation blocked.
     Block { target: String, reason: String },
     /// Ambiguous term or intent detected; return structured choices to caller instead of
@@ -278,9 +281,9 @@ impl Judge {
                         confidence: 1.0,
                         rationale: "Correction ledger guard: acquisition blocked to prevent re-introducing a corrected fact".to_string(),
                     };
-                }
-                Ok(None) => {}
-                Err(_) => {}
+                },
+                Ok(None) => {},
+                Err(_) => {},
             }
         }
 
@@ -298,13 +301,7 @@ impl Judge {
     ) -> AdmissionEvaluation {
         if value_produced == 0 && text.chars().count() > 120 {
             // Check for self-commentary / failure excuses
-            let failure_markers = [
-                "รอบนี้ผลจริง",
-                "คุณค่าตอนนี้ติดลบ",
-                "ความผิดพลาด",
-                "ล้มเหลว",
-                "เสียเวลา",
-            ];
+            let failure_markers = ["รอบนี้ผลจริง", "คุณค่าตอนนี้ติดลบ", "ความผิดพลาด", "ล้มเหลว", "เสียเวลา"];
             let contains_excuses = failure_markers.iter().any(|m| text.contains(m));
             if contains_excuses || text.len() > 200 {
                 return AdmissionEvaluation {
@@ -374,12 +371,8 @@ impl Judge {
         }
 
         // Detect narrative extrapolation keywords
-        let extrapolation_keywords = [
-            "extrapolate",
-            "assume",
-            "conclude that the team",
-            "cultural dysfunction",
-        ];
+        let extrapolation_keywords =
+            ["extrapolate", "assume", "conclude that the team", "cultural dysfunction"];
         let has_extrapolation = extrapolation_keywords
             .iter()
             .any(|kw| text.to_lowercase().contains(kw));

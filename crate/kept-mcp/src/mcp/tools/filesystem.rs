@@ -81,6 +81,8 @@ struct RootState {
     scanner: FffScanner,
     records: Vec<FileRecord>,
     judge: Judge,
+    /// Allowed root directories for boundary enforcement
+    allowed_roots: Vec<PathBuf>,
 }
 
 /// Long-running FFF Manager caching FFF instances per canonical root.
@@ -107,12 +109,33 @@ impl FffManager {
     fn canonicalize_root(root: &str) -> Result<PathBuf, McpError> {
         let p = Path::new(root);
         if !p.exists() {
-            return Err(McpError::validation(format!(
-                "Root directory does not exist: {root}"
-            )));
+            return Err(McpError::validation(format!("Root directory does not exist: {root}")));
         }
         p.canonicalize()
             .map_err(|e| McpError::validation(format!("Failed to canonicalize root '{root}': {e}")))
+    }
+
+    /// Check if a file path is within workspace boundaries
+    fn is_within_workspace(path: &Path, root: &Path, allowed_roots: &[PathBuf]) -> bool {
+        if path.starts_with(root) {
+            return true;
+        }
+        allowed_roots
+            .iter()
+            .any(|allowed| path.starts_with(allowed))
+    }
+
+    /// Set allowed root directories for a workspace
+    pub async fn set_allowed_roots(
+        &self,
+        root: &str,
+        allowed_roots: Vec<PathBuf>,
+    ) -> Result<(), McpError> {
+        let canonical = Self::canonicalize_root(root)?;
+        let state_arc = self.get_or_create(&canonical).await?;
+        let mut state = state_arc.write().await;
+        state.allowed_roots = allowed_roots;
+        Ok(())
     }
 
     /// Get or initialize an FffScanner instance and its initial inventory for the given root.
@@ -150,6 +173,7 @@ impl FffManager {
             scanner,
             records,
             judge: Judge::new(),
+            allowed_roots: Vec::new(),
         }));
         map.insert(canonical_root.to_path_buf(), state_arc.clone());
         Ok(state_arc)
@@ -182,6 +206,11 @@ impl FffManager {
             .records
             .iter()
             .filter(|r| r.path.to_lowercase().contains(&q_lower))
+            // Workspace boundary check
+            .filter(|r| {
+                let full_path = canonical.join(&r.path);
+                Self::is_within_workspace(&full_path, &canonical, &state.allowed_roots)
+            })
             .map(|r| FindMatch {
                 path: r.path.clone(),
                 name: r.name.clone(),
@@ -215,6 +244,11 @@ impl FffManager {
             if r.is_binary.unwrap_or(false) {
                 continue;
             }
+            // Workspace boundary check
+            let full_path = canonical.join(&r.path);
+            if !Self::is_within_workspace(&full_path, &canonical, &state.allowed_roots) {
+                continue;
+            }
             if let Ok(obs) = state.scanner.acquire(&r.path, FffAcquisitionMode::View) {
                 // Pass through Judge admission evaluation
                 let eval = state.judge.evaluate_with_confidence(obs.clone());
@@ -234,7 +268,7 @@ impl FffManager {
                                 }
                             }
                         }
-                    }
+                    },
                     kept_core::context::AdmissionDecision::Reference {
                         target: _,
                         hash: _,
@@ -255,12 +289,12 @@ impl FffManager {
                                 }
                             }
                         }
-                    }
+                    },
                     kept_core::context::AdmissionDecision::Block { target, reason } => {
                         tracing::warn!("Acquisition blocked by Judge for {}: {}", target, reason);
                         break;
-                    }
-                    _ => {}
+                    },
+                    _ => {},
                 }
             }
         }
@@ -287,6 +321,11 @@ impl FffManager {
 
         for r in records {
             if r.is_binary.unwrap_or(false) {
+                continue;
+            }
+            // Workspace boundary check
+            let full_path = canonical.join(&r.path);
+            if !Self::is_within_workspace(&full_path, &canonical, &state.allowed_roots) {
                 continue;
             }
             if let Ok(obs) = state.scanner.acquire(&r.path, FffAcquisitionMode::View) {
@@ -362,11 +401,11 @@ impl FffManager {
                         match plan {
                             Ok(ref p) => {
                                 apply_refresh_plan(&mut state.records, p, &new_records);
-                            }
+                            },
                             Err(_) => {
                                 // NOTE-003: fallback — replace ทั้งหมดถ้า plan ล้มเหลว
                                 state.records = new_records;
-                            }
+                            },
                         }
                     }
                 }

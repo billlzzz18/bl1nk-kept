@@ -364,7 +364,7 @@ fn validate_field(
                     message: format!("Invalid regex pattern for field '{}'", name),
                     field: Some(name.into()),
                 }),
-                _ => {}
+                _ => {},
             }
         }
         if let Some(values) = &schema.values {
@@ -537,10 +537,7 @@ mod tests {
     #[test]
     fn validates_legacy_valid_entry() {
         assert!(Validator::new(registry())
-            .validate_entry(
-                "g",
-                &json!({"id":"x","aliases":["xx"],"description":"valid"})
-            )
+            .validate_entry("g", &json!({"id":"x","aliases":["xx"],"description":"valid"}))
             .is_ok());
     }
 

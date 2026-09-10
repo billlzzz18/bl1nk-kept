@@ -53,10 +53,7 @@ fn validate_accepts_lower_upper_preserve_case() {
     for case_val in &["lower", "upper", "preserve"] {
         let mut config = starter_config();
         config.defaults.naming.case = Some(case_val.to_string());
-        assert!(
-            config.validate().is_ok(),
-            "case value '{case_val}' should be accepted"
-        );
+        assert!(config.validate().is_ok(), "case value '{case_val}' should be accepted");
     }
 }
 
@@ -77,10 +74,7 @@ fn validate_accepts_kebab_snake_preserve_separator() {
     for sep in &["kebab", "snake", "preserve"] {
         let mut config = starter_config();
         config.defaults.naming.separator = Some(sep.to_string());
-        assert!(
-            config.validate().is_ok(),
-            "separator value '{sep}' should be accepted"
-        );
+        assert!(config.validate().is_ok(), "separator value '{sep}' should be accepted");
     }
 }
 
@@ -109,10 +103,7 @@ fn validate_rejects_negative_similarity_threshold() {
 fn validate_rejects_length_stem_min_exceeds_max() {
     let mut config = starter_config();
     config.defaults.naming.length = kept_core::LengthSettings {
-        stem: Some(kept_core::RangeLimit {
-            min: Some(200),
-            max: Some(100),
-        }),
+        stem: Some(kept_core::RangeLimit { min: Some(200), max: Some(100) }),
     };
     let err = config.validate().unwrap_err();
     assert!(err
@@ -123,10 +114,7 @@ fn validate_rejects_length_stem_min_exceeds_max() {
 #[test]
 fn validate_rejects_words_min_exceeds_max() {
     let mut config = starter_config();
-    config.defaults.naming.words = kept_core::WordSettings {
-        min: Some(20),
-        max: Some(5),
-    };
+    config.defaults.naming.words = kept_core::WordSettings { min: Some(20), max: Some(5) };
     let err = config.validate().unwrap_err();
     assert!(err.to_string().contains("words min cannot exceed max"));
 }
@@ -513,10 +501,7 @@ fn analyze_stem_length_too_long() {
         "test",
         NamingSettings {
             length: kept_core::LengthSettings {
-                stem: Some(kept_core::RangeLimit {
-                    min: None,
-                    max: Some(5),
-                }),
+                stem: Some(kept_core::RangeLimit { min: None, max: Some(5) }),
             },
             ..NamingSettings::default()
         },
@@ -534,10 +519,7 @@ fn analyze_stem_length_too_short() {
         "test",
         NamingSettings {
             length: kept_core::LengthSettings {
-                stem: Some(kept_core::RangeLimit {
-                    min: Some(10),
-                    max: None,
-                }),
+                stem: Some(kept_core::RangeLimit { min: Some(10), max: None }),
             },
             ..NamingSettings::default()
         },
@@ -554,10 +536,7 @@ fn analyze_word_count_violation() {
     let rule = simple_rule(
         "test",
         NamingSettings {
-            words: kept_core::WordSettings {
-                min: Some(3),
-                max: None,
-            },
+            words: kept_core::WordSettings { min: Some(3), max: None },
             ..NamingSettings::default()
         },
     );

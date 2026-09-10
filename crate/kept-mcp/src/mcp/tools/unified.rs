@@ -204,8 +204,8 @@ fn base64_decode(value: &str) -> Option<Vec<u8>> {
                     bits -= 8;
                     buffer.push((accumulator >> bits) as u8);
                 }
-            }
-            b'=' | b'\r' | b'\n' | b' ' => {}
+            },
+            b'=' | b'\r' | b'\n' | b' ' => {},
             _ => return None,
         }
     }
@@ -246,7 +246,7 @@ impl ToolHandler for ConvertDocumentTool {
         let mut doc = match src_plat.as_str() {
             "markdown" | "md" | "github" | "obsidian" => {
                 MarkdownConverter::from_platform(input.source_content).map_err(internal)?
-            }
+            },
             "notion" | "notion_blocks" => {
                 // Parse JSON notion blocks if provided as JSON string
                 let blocks: Vec<UniversalBlock> = serde_json::from_str(&input.source_content)
@@ -256,20 +256,20 @@ impl ToolHandler for ConvertDocumentTool {
                     blocks,
                     styles: kept_doc::ir::StyleSheet::default(),
                 }
-            }
+            },
             "pdf" => {
                 let bytes = decode_binary_source(&input)?;
                 kept_doc::converter::pdf::PdfAdapter::read_bytes(&bytes).map_err(internal)?
-            }
+            },
             "docx" | "word" => {
                 let bytes = decode_binary_source(&input)?;
                 kept_doc::converter::docx::DocxAdapter::read_bytes(&bytes).map_err(internal)?
-            }
+            },
             other => {
                 return Err(McpError::invalid_params(format!(
                     "Unsupported source document platform: {other}"
                 )));
-            }
+            },
         };
 
         // 2. Optional Thai sanitization filter
@@ -285,10 +285,10 @@ impl ToolHandler for ConvertDocumentTool {
             "markdown" | "md" | "github" | "obsidian" => {
                 let md = MarkdownConverter::from_universal(&doc).map_err(internal)?;
                 json!({ "markdown": md })
-            }
+            },
             "notion" | "notion_blocks" => {
                 json!({ "blocks": doc.blocks })
-            }
+            },
             "docx" | "word" => {
                 let bytes =
                     kept_doc::converter::docx::DocxAdapter::write_bytes(&doc).map_err(internal)?;
@@ -297,15 +297,15 @@ impl ToolHandler for ConvertDocumentTool {
                     "docx_bytes_len": bytes.len(),
                     "status": "docx_generated_successfully"
                 })
-            }
+            },
             "ir" | "universal_ir" => {
                 json!({ "document": doc })
-            }
+            },
             other => {
                 return Err(McpError::invalid_params(format!(
                     "Unsupported target document platform: {other}"
                 )));
-            }
+            },
         };
 
         Ok(json!({
@@ -325,10 +325,7 @@ impl ToolHandler for ConvertDocumentTool {
                     .to_string(),
             ),
             SchemaBuilder::new()
-                .param(
-                    "source_platform",
-                    "Source platform: markdown, notion, obsidian",
-                )
+                .param("source_platform", "Source platform: markdown, notion, obsidian")
                 .param("source_content", "Source text or JSON block content")
                 .param("target_platform", "Target platform: markdown, notion, ir")
                 .optional_bool_param("sanitize_thai", "Apply Thai text sanitization filter")
@@ -373,15 +370,15 @@ impl ToolHandler for ConvertTableTool {
         let doc = match src_plat.as_str() {
             "obsidian_base" | "obsidian" | "markdown_table" | "md_table" => {
                 ObsidianBaseAdapter::from_platform(input.source_data).map_err(internal)?
-            }
+            },
             "csv" | "sheets" | "lark_sheets" | "lark" => {
                 LarkSheetAdapter::from_platform(input.source_data).map_err(internal)?
-            }
+            },
             other => {
                 return Err(McpError::invalid_params(format!(
                     "Unsupported source table platform: {other}"
                 )));
-            }
+            },
         };
 
         let row_count = doc
@@ -398,19 +395,19 @@ impl ToolHandler for ConvertTableTool {
             "obsidian_base" | "obsidian" | "markdown_table" | "md_table" => {
                 let md_table = ObsidianBaseAdapter::from_universal(&doc).map_err(internal)?;
                 json!({ "table": md_table })
-            }
+            },
             "csv" | "sheets" | "lark_sheets" | "lark" => {
                 let csv = LarkSheetAdapter::from_universal(&doc).map_err(internal)?;
                 json!({ "csv": csv })
-            }
+            },
             "ir" | "universal_ir" => {
                 json!({ "document": doc })
-            }
+            },
             other => {
                 return Err(McpError::invalid_params(format!(
                     "Unsupported target table platform: {other}"
                 )));
-            }
+            },
         };
 
         Ok(json!({
@@ -468,23 +465,15 @@ impl ToolHandler for DiffDocumentTool {
         let left_doc = match left_plat.as_str() {
             "markdown" | "md" | "github" | "obsidian" => {
                 MarkdownConverter::from_platform(input.left_content).map_err(internal)?
-            }
-            _ => {
-                return Err(McpError::invalid_params(
-                    "Unsupported left document platform",
-                ))
-            }
+            },
+            _ => return Err(McpError::invalid_params("Unsupported left document platform")),
         };
 
         let right_doc = match right_plat.as_str() {
             "markdown" | "md" | "github" | "obsidian" => {
                 MarkdownConverter::from_platform(input.right_content).map_err(internal)?
-            }
-            _ => {
-                return Err(McpError::invalid_params(
-                    "Unsupported right document platform",
-                ))
-            }
+            },
+            _ => return Err(McpError::invalid_params("Unsupported right document platform")),
         };
 
         let changeset = Reconciler::diff(&left_doc, &right_doc).map_err(internal)?;
@@ -503,18 +492,9 @@ impl ToolHandler for DiffDocumentTool {
             Some("Structural diff & ChangeSet generator between two prose documents".to_string()),
             SchemaBuilder::new()
                 .param("left_content", "Original/Local document content")
-                .param(
-                    "right_content",
-                    "Target/Remote document content to compare against",
-                )
-                .optional_param(
-                    "left_platform",
-                    "Left document platform (default: markdown)",
-                )
-                .optional_param(
-                    "right_platform",
-                    "Right document platform (default: markdown)",
-                )
+                .param("right_content", "Target/Remote document content to compare against")
+                .optional_param("left_platform", "Left document platform (default: markdown)")
+                .optional_param("right_platform", "Right document platform (default: markdown)")
                 .build(),
         ))
     }
@@ -529,20 +509,10 @@ pub struct DiffTableTool;
 
 #[derive(Deserialize)]
 struct DiffTableInput {
-    #[serde(
-        alias = "original_table",
-        alias = "original",
-        alias = "left",
-        alias = "base_table"
-    )]
+    #[serde(alias = "original_table", alias = "original", alias = "left", alias = "base_table")]
     left_table: String,
     left_platform: Option<String>,
-    #[serde(
-        alias = "modified_table",
-        alias = "modified",
-        alias = "right",
-        alias = "target_table"
-    )]
+    #[serde(alias = "modified_table", alias = "modified", alias = "right", alias = "target_table")]
     right_table: String,
     right_platform: Option<String>,
 }
@@ -563,20 +533,20 @@ impl ToolHandler for DiffTableTool {
         let left_doc = match left_plat.as_str() {
             "obsidian_base" | "obsidian" | "markdown_table" => {
                 ObsidianBaseAdapter::from_platform(input.left_table).map_err(internal)?
-            }
+            },
             "csv" | "sheets" | "lark" => {
                 LarkSheetAdapter::from_platform(input.left_table).map_err(internal)?
-            }
+            },
             _ => return Err(McpError::invalid_params("Unsupported left table platform")),
         };
 
         let right_doc = match right_plat.as_str() {
             "obsidian_base" | "obsidian" | "markdown_table" => {
                 ObsidianBaseAdapter::from_platform(input.right_table).map_err(internal)?
-            }
+            },
             "csv" | "sheets" | "lark" => {
                 LarkSheetAdapter::from_platform(input.right_table).map_err(internal)?
-            }
+            },
             _ => return Err(McpError::invalid_params("Unsupported right table platform")),
         };
 

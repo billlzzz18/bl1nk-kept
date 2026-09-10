@@ -243,7 +243,7 @@ pub struct ResolvedNamingRule {
     pub naming: NamingSettings,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum NamingIssueKind {
     Unicode,
     Case,
@@ -259,7 +259,7 @@ pub enum NamingIssueKind {
     Collision,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NamingIssue {
     pub kind: NamingIssueKind,
     pub message: String,
@@ -288,15 +288,9 @@ impl UserConfig {
                 allow: Some(true),
                 max_digits_per_token: Some(8),
             },
-            words: WordSettings {
-                min: Some(1),
-                max: Some(12),
-            },
+            words: WordSettings { min: Some(1), max: Some(12) },
             length: LengthSettings {
-                stem: Some(RangeLimit {
-                    min: Some(1),
-                    max: Some(120),
-                }),
+                stem: Some(RangeLimit { min: Some(1), max: Some(120) }),
             },
             whitespace: WhitespaceSettings {
                 trim: Some(true),
@@ -436,23 +430,17 @@ impl UserConfig {
 fn validate_naming_settings(naming: &NamingSettings) -> Result<(), PolicyError> {
     if let Some(value) = &naming.unicode {
         if value != "nfc" {
-            return Err(PolicyError::InvalidConfig(format!(
-                "unsupported unicode value {value}"
-            )));
+            return Err(PolicyError::InvalidConfig(format!("unsupported unicode value {value}")));
         }
     }
     if let Some(value) = &naming.case {
         if !matches!(value.as_str(), "lower" | "upper" | "preserve") {
-            return Err(PolicyError::InvalidConfig(format!(
-                "unsupported case value {value}"
-            )));
+            return Err(PolicyError::InvalidConfig(format!("unsupported case value {value}")));
         }
     }
     if let Some(value) = &naming.separator {
         if !matches!(value.as_str(), "kebab" | "snake" | "preserve") {
-            return Err(PolicyError::InvalidConfig(format!(
-                "unsupported separator value {value}"
-            )));
+            return Err(PolicyError::InvalidConfig(format!("unsupported separator value {value}")));
         }
     }
     if let Some(rule) = &naming.similarity.name {
@@ -478,9 +466,7 @@ fn validate_naming_settings(naming: &NamingSettings) -> Result<(), PolicyError> 
         .min
         .is_some_and(|min| naming.words.max.is_some_and(|max| min > max))
     {
-        return Err(PolicyError::InvalidConfig(
-            "words min cannot exceed max".to_string(),
-        ));
+        return Err(PolicyError::InvalidConfig("words min cannot exceed max".to_string()));
     }
     if let Some(pattern) = &naming.stem_regex {
         Regex::new(pattern).map_err(|error| {
@@ -765,10 +751,7 @@ pub fn analyze_naming(
     if rule.naming.flag_control_characters.unwrap_or(false)
         && target_stem.chars().any(char::is_control)
     {
-        issues.push(issue(
-            NamingIssueKind::ControlCharacter,
-            "stem contains a control character",
-        ));
+        issues.push(issue(NamingIssueKind::ControlCharacter, "stem contains a control character"));
         target_stem.retain(|character| !character.is_control());
     }
     if rule
@@ -801,38 +784,30 @@ pub fn analyze_naming(
                 issues.push(issue(NamingIssueKind::Case, "stem must be lowercase"));
                 target_stem = lower;
             }
-        }
+        },
         Some("upper") => {
             let upper = target_stem.to_uppercase();
             if upper != target_stem {
                 issues.push(issue(NamingIssueKind::Case, "stem must be uppercase"));
                 target_stem = upper;
             }
-        }
-        Some("preserve") | None => {}
+        },
+        Some("preserve") | None => {},
         Some(value) => {
-            return Err(PolicyError::InvalidConfig(format!(
-                "unsupported case value {value}"
-            )))
-        }
+            return Err(PolicyError::InvalidConfig(format!("unsupported case value {value}")))
+        },
     }
 
     if rule.naming.separator.as_deref() == Some("kebab") {
         let kebab = normalize_separator(&target_stem, '-');
         if kebab != target_stem {
-            issues.push(issue(
-                NamingIssueKind::Separator,
-                "stem must use kebab separator",
-            ));
+            issues.push(issue(NamingIssueKind::Separator, "stem must use kebab separator"));
             target_stem = kebab;
         }
     } else if rule.naming.separator.as_deref() == Some("snake") {
         let snake = normalize_separator(&target_stem, '_');
         if snake != target_stem {
-            issues.push(issue(
-                NamingIssueKind::Separator,
-                "stem must use snake separator",
-            ));
+            issues.push(issue(NamingIssueKind::Separator, "stem must use snake separator"));
             target_stem = snake;
         }
     }
@@ -850,10 +825,7 @@ pub fn analyze_naming(
             .iter()
             .any(|occupied| occupied != source && occupied == &target_path);
     if blocked {
-        issues.push(issue(
-            NamingIssueKind::Collision,
-            "proposed target already exists",
-        ));
+        issues.push(issue(NamingIssueKind::Collision, "proposed target already exists"));
     }
 
     Ok(NamingFinding {
@@ -1099,10 +1071,7 @@ fn append_constraint_issues(
             PolicyError::InvalidConfig(format!("invalid stemRegex {regex}: {error}"))
         })?;
         if !compiled.is_match(stem) {
-            issues.push(issue(
-                NamingIssueKind::StemRegex,
-                "stem does not match stemRegex",
-            ));
+            issues.push(issue(NamingIssueKind::StemRegex, "stem does not match stemRegex"));
         }
     }
     if let Some(limit) = &naming.length.stem {
@@ -1110,20 +1079,14 @@ fn append_constraint_issues(
         if limit.min.is_some_and(|minimum| count < minimum)
             || limit.max.is_some_and(|maximum| count > maximum)
         {
-            issues.push(issue(
-                NamingIssueKind::Length,
-                "stem length is outside configured range",
-            ));
+            issues.push(issue(NamingIssueKind::Length, "stem length is outside configured range"));
         }
     }
     let words = split_tokens(stem).len();
     if naming.words.min.is_some_and(|minimum| words < minimum)
         || naming.words.max.is_some_and(|maximum| words > maximum)
     {
-        issues.push(issue(
-            NamingIssueKind::WordCount,
-            "word count is outside configured range",
-        ));
+        issues.push(issue(NamingIssueKind::WordCount, "word count is outside configured range"));
     }
     if naming.numbers.allow == Some(false)
         && stem.chars().any(|character| character.is_ascii_digit())
@@ -1135,10 +1098,7 @@ fn append_constraint_issues(
             .iter()
             .any(|token| token.chars().filter(char::is_ascii_digit).count() > maximum)
         {
-            issues.push(issue(
-                NamingIssueKind::Number,
-                "a number token exceeds maxDigitsPerToken",
-            ));
+            issues.push(issue(NamingIssueKind::Number, "a number token exceeds maxDigitsPerToken"));
         }
     }
     if naming.flag_portability_conflicts.unwrap_or(false) && contains_portability_conflict(stem) {
@@ -1152,14 +1112,11 @@ fn append_constraint_issues(
 
 fn contains_portability_conflict(stem: &str) -> bool {
     const RESERVED: &[&str] = &["con", "prn", "aux", "nul", "com1", "lpt1"];
-    stem.chars().any(|character| {
-        matches!(
-            character,
-            '<' | '>' | ':' | '"' | '/' | '\\' | '|' | '?' | '*'
-        )
-    }) || RESERVED
-        .iter()
-        .any(|value| stem.eq_ignore_ascii_case(value))
+    stem.chars()
+        .any(|character| matches!(character, '<' | '>' | ':' | '"' | '/' | '\\' | '|' | '?' | '*'))
+        || RESERVED
+            .iter()
+            .any(|value| stem.eq_ignore_ascii_case(value))
 }
 
 fn normalize_separator(value: &str, separator: char) -> String {

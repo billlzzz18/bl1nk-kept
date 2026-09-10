@@ -130,23 +130,17 @@ profiles:
 pub fn validate_naming_settings(naming: &NamingSettings) -> Result<(), PolicyError> {
     if let Some(value) = &naming.unicode {
         if value != "nfc" {
-            return Err(PolicyError::InvalidConfig(format!(
-                "unsupported unicode value {value}"
-            )));
+            return Err(PolicyError::InvalidConfig(format!("unsupported unicode value {value}")));
         }
     }
     if let Some(value) = &naming.case {
         if !matches!(value.as_str(), "lower" | "upper" | "preserve") {
-            return Err(PolicyError::InvalidConfig(format!(
-                "unsupported case value {value}"
-            )));
+            return Err(PolicyError::InvalidConfig(format!("unsupported case value {value}")));
         }
     }
     if let Some(value) = &naming.separator {
         if !matches!(value.as_str(), "kebab" | "snake" | "preserve") {
-            return Err(PolicyError::InvalidConfig(format!(
-                "unsupported separator value {value}"
-            )));
+            return Err(PolicyError::InvalidConfig(format!("unsupported separator value {value}")));
         }
     }
     if let Some(rule) = &naming.similarity.name {
@@ -172,9 +166,7 @@ pub fn validate_naming_settings(naming: &NamingSettings) -> Result<(), PolicyErr
         .min
         .is_some_and(|min| naming.words.max.is_some_and(|max| min > max))
     {
-        return Err(PolicyError::InvalidConfig(
-            "words min cannot exceed max".to_string(),
-        ));
+        return Err(PolicyError::InvalidConfig("words min cannot exceed max".to_string()));
     }
     if let Some(pattern) = &naming.stem_regex {
         Regex::new(pattern).map_err(|error| {

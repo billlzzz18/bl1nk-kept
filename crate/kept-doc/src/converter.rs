@@ -23,7 +23,10 @@ pub enum ConvertError {
     #[error("IO error: {0}")]
     IoError(String),
     #[error("Platform error from {platform}: {message}")]
-    PlatformError { platform: String, message: String },
+    PlatformError {
+        platform: String,
+        message: String,
+    },
 }
 
 // NOTE-002: M2 - Reader/Writer Traits (Synchronous, Total functions over bytes)

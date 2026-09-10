@@ -36,10 +36,7 @@ fn tighten_public_schema(schema: &mut serde_json::Value) -> Result<(), SchemaErr
     if !required.iter().any(|field| field == "foundation") {
         required.push(serde_json::Value::String("foundation".to_string()));
     }
-    root.insert(
-        "additionalProperties".to_string(),
-        serde_json::Value::Bool(false),
-    );
+    root.insert("additionalProperties".to_string(), serde_json::Value::Bool(false));
 
     let properties = root
         .get_mut("properties")
@@ -85,10 +82,7 @@ fn tighten_public_schema(schema: &mut serde_json::Value) -> Result<(), SchemaErr
             .ok_or_else(|| {
                 SchemaError::Structure(format!("generated definition '{name}' must exist"))
             })?
-            .insert(
-                "additionalProperties".to_string(),
-                serde_json::Value::Bool(false),
-            );
+            .insert("additionalProperties".to_string(), serde_json::Value::Bool(false));
     }
 
     definitions
@@ -131,11 +125,7 @@ pub struct KeywordRegistry {
     pub synonym_sets: Vec<SynonymSet>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub index: Option<RegistryIndex>,
-    #[serde(
-        default,
-        rename = "searchPolicy",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(default, rename = "searchPolicy", skip_serializing_if = "Option::is_none")]
     pub search_policy: Option<SearchPolicy>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub foundation: Option<FoundationProfile>,
@@ -148,31 +138,15 @@ pub struct FoundationProfile {
     #[serde(rename = "schemaVersion")]
     pub schema_version: String,
     pub normalization: NormalizationProfile,
-    #[serde(
-        default,
-        rename = "glossaryTerms",
-        skip_serializing_if = "Vec::is_empty"
-    )]
+    #[serde(default, rename = "glossaryTerms", skip_serializing_if = "Vec::is_empty")]
     pub glossary_terms: Vec<GlossaryTerm>,
-    #[serde(
-        default,
-        rename = "provenanceRecords",
-        skip_serializing_if = "Vec::is_empty"
-    )]
+    #[serde(default, rename = "provenanceRecords", skip_serializing_if = "Vec::is_empty")]
     pub provenance_records: Vec<ProvenanceRecord>,
     #[serde(default, rename = "regexRules", skip_serializing_if = "Vec::is_empty")]
     pub regex_rules: Vec<RegexRule>,
-    #[serde(
-        default,
-        rename = "classificationPolicy",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(default, rename = "classificationPolicy", skip_serializing_if = "Option::is_none")]
     pub classification_policy: Option<ClassificationPolicy>,
-    #[serde(
-        default,
-        rename = "corpusManifest",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(default, rename = "corpusManifest", skip_serializing_if = "Option::is_none")]
     pub corpus_manifest: Option<CorpusManifest>,
     #[serde(rename = "createdAt")]
     pub created_at: String,
@@ -214,19 +188,13 @@ pub struct SearchPolicy {
     #[serde(rename = "fuzzyMinSimilarity")]
     #[schemars(range(min = 0.0, max = 1.0))]
     pub fuzzy_min_similarity: f64,
-    #[serde(
-        default = "default_fuzzy_candidate_limit",
-        rename = "fuzzyCandidateLimit"
-    )]
+    #[serde(default = "default_fuzzy_candidate_limit", rename = "fuzzyCandidateLimit")]
     #[schemars(range(min = 1))]
     pub fuzzy_candidate_limit: usize,
     #[serde(default = "default_fuzzy_ngram_size", rename = "fuzzyNgramSize")]
     #[schemars(range(min = 1))]
     pub fuzzy_ngram_size: usize,
-    #[serde(
-        default = "default_max_fuzzy_ngram_postings",
-        rename = "maxFuzzyNgramPostings"
-    )]
+    #[serde(default = "default_max_fuzzy_ngram_postings", rename = "maxFuzzyNgramPostings")]
     #[schemars(range(min = 1))]
     pub max_fuzzy_ngram_postings: usize,
 }
@@ -294,11 +262,7 @@ pub struct Metadata {
     pub owner: String,
     #[serde(default, rename = "totalSize", skip_serializing_if = "Option::is_none")]
     pub total_size: Option<u64>,
-    #[serde(
-        default,
-        rename = "entryCount",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(default, rename = "entryCount", skip_serializing_if = "Option::is_none")]
     pub entry_count: Option<usize>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stats: Option<HashMap<String, serde_json::Value>>,
@@ -317,11 +281,7 @@ pub struct KeywordGroup {
     #[serde(rename = "customFieldAllowed")]
     pub custom_field_allowed: CustomFieldConfig,
     pub entries: Vec<serde_json::Value>,
-    #[serde(
-        default,
-        rename = "groupStats",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(default, rename = "groupStats", skip_serializing_if = "Option::is_none")]
     pub group_stats: Option<GroupStats>,
 }
 
@@ -364,11 +324,7 @@ pub struct CustomFieldConfig {
     pub description: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub examples: Option<Vec<serde_json::Value>>,
-    #[serde(
-        default,
-        rename = "customFieldSchema",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(default, rename = "customFieldSchema", skip_serializing_if = "Option::is_none")]
     pub custom_field_schema: Option<FieldSchema>,
 }
 
@@ -633,11 +589,8 @@ mod schema_export_tests {
                 .expect("clock must be after Unix epoch")
                 .as_nanos()
         ));
-        fs::write(
-            &path,
-            serde_json::to_vec(&instance).expect("fixture must encode as JSON"),
-        )
-        .expect("fixture must be written");
+        fs::write(&path, serde_json::to_vec(&instance).expect("fixture must encode as JSON"))
+            .expect("fixture must be written");
         let loaded = load_registry(&path).expect("runtime loader must accept the same fixture");
         fs::remove_file(&path).expect("fixture must be removed");
         assert!(Validator::new(loaded).validate_registry().is_ok());

@@ -14,19 +14,13 @@ pub struct PropertyBuilder {
 impl PropertyBuilder {
     /// Creates a new builder based on a provided schema.
     pub fn new(schema: HashMap<String, PropertySchema>) -> Self {
-        Self {
-            schema,
-            values: HashMap::new(),
-        }
+        Self { schema, values: HashMap::new() }
     }
 
     pub fn date(mut self, name: &str, value: &str) -> Result<Self> {
         // basic validation format YYYY-MM-DD
         if !value.chars().all(|c| c.is_ascii_digit() || c == '-') || value.len() != 10 {
-            return Err(SyncError::InvalidFormat(format!(
-                "Date must be YYYY-MM-DD: {}",
-                value
-            )));
+            return Err(SyncError::InvalidFormat(format!("Date must be YYYY-MM-DD: {}", value)));
         }
         self.values.insert(
             name.to_string(),
@@ -39,10 +33,7 @@ impl PropertyBuilder {
 
     pub fn date_time(mut self, name: &str, start: &str, end: Option<&str>) -> Result<Self> {
         if !start.contains('T') {
-            return Err(SyncError::InvalidFormat(format!(
-                "datetime must be ISO 8601: {}",
-                start
-            )));
+            return Err(SyncError::InvalidFormat(format!("datetime must be ISO 8601: {}", start)));
         }
         let mut val = json!({ "start": start });
         if let Some(end) = end {

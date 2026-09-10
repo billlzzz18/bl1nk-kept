@@ -84,36 +84,11 @@ pub fn build() -> Result<Server, Box<dyn std::error::Error>> {
         };
         let client = Arc::new(NotionClient::new(token)?);
         builder = builder
-            .tool(
-                "get_notion_page_blocks",
-                GetPageBlocksTool {
-                    client: client.clone(),
-                },
-            )
-            .tool(
-                "notion_search",
-                SearchTool {
-                    client: client.clone(),
-                },
-            )
-            .tool(
-                "notion_get_page",
-                GetPageTool {
-                    client: client.clone(),
-                },
-            )
-            .tool(
-                "notion_create_page",
-                CreatePageTool {
-                    client: client.clone(),
-                },
-            )
-            .tool(
-                "notion_get_block_children",
-                GetBlocksTool {
-                    client: client.clone(),
-                },
-            )
+            .tool("get_notion_page_blocks", GetPageBlocksTool { client: client.clone() })
+            .tool("notion_search", SearchTool { client: client.clone() })
+            .tool("notion_get_page", GetPageTool { client: client.clone() })
+            .tool("notion_create_page", CreatePageTool { client: client.clone() })
+            .tool("notion_get_block_children", GetBlocksTool { client: client.clone() })
             .tool("notion_trash", TrashTool { client });
     }
 

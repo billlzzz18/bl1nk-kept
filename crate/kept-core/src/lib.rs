@@ -2,10 +2,13 @@ pub mod analyzer;
 pub mod content_router;
 pub mod context;
 pub mod error;
+pub mod factory;
 pub mod foundation;
+pub mod judgment;
 pub mod keyboard;
 pub mod migration;
 pub mod observation;
+pub mod operation;
 pub mod policy;
 pub mod regret_tracker;
 pub mod scanner;
@@ -18,6 +21,7 @@ pub mod validator;
 
 pub use analyzer::RegistryAnalyzer;
 pub use error::ValidationError;
+pub use factory::{FactoryError, OperationFactory, UserIntent};
 pub use foundation::{
     classify_evidence, decode_utf8, import_anonymized_jsonl, normalize_text,
     select_default_candidate, summarize_measurements, validate_corpus_manifest,
@@ -27,7 +31,12 @@ pub use foundation::{
     EvidenceRecord, FoundationError, GlossaryTerm, ImportRejection, ImportReport, ProvenanceRecord,
     RegexRule, RegexScope, RegexTestVector, RuleSeverity, RunMeasurement, SelectionConstraints,
 };
+pub use judgment::{AgentJudgment, JudgmentError, JudgmentResult};
 pub use migration::{migrate_registry, MigrationError, CURRENT_REGISTRY_VERSION};
+pub use operation::{
+    ExpectedEffect, MoveChange, NamingIssueItem, ObservedState, OperationContract, RenameChange,
+    ValidationError as OperationValidationError,
+};
 pub use policy::{
     analyze_index_naming, analyze_naming, create_user_config_if_missing, default_user_config_path,
     load_user_config, resolve_naming_rule, save_user_config, ConfigDefaults, LengthSettings,
@@ -253,16 +262,10 @@ pub fn generate_markdown(registry: &KeywordRegistry) -> String {
     let mut md = String::new();
     md.push_str(&format!("# {}\n\n", registry.metadata.description));
     md.push_str(&format!("**Owner:** {}\n", registry.metadata.owner));
-    md.push_str(&format!(
-        "**Last Updated:** {}\n\n",
-        registry.metadata.last_updated
-    ));
+    md.push_str(&format!("**Last Updated:** {}\n\n", registry.metadata.last_updated));
 
     for group in &registry.groups {
-        md.push_str(&format!(
-            "## Group: {} ({})\n",
-            group.group_name, group.group_id
-        ));
+        md.push_str(&format!("## Group: {} ({})\n", group.group_name, group.group_id));
         md.push_str(&format!("{}\n\n", group.description));
 
         md.push_str("| ID | Description | Aliases |\n");

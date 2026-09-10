@@ -33,7 +33,7 @@ pub fn migrate_registry(mut registry: KeywordRegistry) -> Result<KeywordRegistry
                 updated_at: timestamp,
             });
             Ok(registry)
-        }
+        },
         CURRENT_REGISTRY_VERSION => {
             if registry.foundation.is_none() {
                 return Err(MigrationError::MissingFoundationProfile(
@@ -41,10 +41,10 @@ pub fn migrate_registry(mut registry: KeywordRegistry) -> Result<KeywordRegistry
                 ));
             }
             Ok(registry)
-        }
-        version if version_is_future(version) => Err(MigrationError::UnsupportedFutureVersion(
-            version.to_string(),
-        )),
+        },
+        version if version_is_future(version) => {
+            Err(MigrationError::UnsupportedFutureVersion(version.to_string()))
+        },
         version => Err(MigrationError::UnsupportedVersion(version.to_string())),
     }
 }

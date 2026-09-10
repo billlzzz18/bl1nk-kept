@@ -95,9 +95,7 @@ pub fn compile_query(query: &str) -> Result<(FilterSet, QueryPlan), String> {
             filter_set
                 .all
                 .push(FileFilter::Extension(clean_ext.clone()));
-            clauses.push(QueryClause::Extension {
-                value: clean_ext.clone(),
-            });
+            clauses.push(QueryClause::Extension { value: clean_ext.clone() });
             explanation.push(format!("Filter by extension matching '.{}'", clean_ext));
             continue;
         }
@@ -106,9 +104,7 @@ pub fn compile_query(query: &str) -> Result<(FilterSet, QueryPlan), String> {
             filter_set
                 .all
                 .push(FileFilter::NameContains(name.to_string()));
-            clauses.push(QueryClause::NameContains {
-                value: name.to_string(),
-            });
+            clauses.push(QueryClause::NameContains { value: name.to_string() });
             explanation.push(format!("Filter by file name containing '{}'", name));
             continue;
         }
@@ -117,18 +113,14 @@ pub fn compile_query(query: &str) -> Result<(FilterSet, QueryPlan), String> {
             filter_set
                 .all
                 .push(FileFilter::PathContains(path.to_string()));
-            clauses.push(QueryClause::PathContains {
-                value: path.to_string(),
-            });
+            clauses.push(QueryClause::PathContains { value: path.to_string() });
             explanation.push(format!("Filter by path containing '{}'", path));
             continue;
         }
 
         if let Some(kind) = token.strip_prefix("kind:") {
             filter_set.all.push(FileFilter::Kind(kind.to_string()));
-            clauses.push(QueryClause::Kind {
-                value: kind.to_string(),
-            });
+            clauses.push(QueryClause::Kind { value: kind.to_string() });
             explanation.push(format!("Filter by file kind '{}'", kind));
             continue;
         }
@@ -138,17 +130,17 @@ pub fn compile_query(query: &str) -> Result<(FilterSet, QueryPlan), String> {
                 "content" | "exact" => {
                     clauses.push(QueryClause::DuplicateContent);
                     explanation.push("Filter files that have exact content duplicates".to_string());
-                }
+                },
                 "name" | "same_name" => {
                     clauses.push(QueryClause::DuplicateName);
                     explanation.push("Filter files that have matching names".to_string());
-                }
+                },
                 _ => {
                     return Err(format!(
                         "Unknown duplicate filter type: 'dup:{}' (valid: content, name)",
                         dup_type
                     ))
-                }
+                },
             }
             continue;
         }
@@ -157,10 +149,7 @@ pub fn compile_query(query: &str) -> Result<(FilterSet, QueryPlan), String> {
             let bytes = parse_size_to_bytes(size_str)?;
             filter_set.all.push(FileFilter::MinSize(bytes));
             clauses.push(QueryClause::MinSize { bytes });
-            explanation.push(format!(
-                "Filter files with size >= {} bytes ({})",
-                bytes, size_str
-            ));
+            explanation.push(format!("Filter files with size >= {} bytes ({})", bytes, size_str));
             continue;
         }
 
@@ -168,10 +157,7 @@ pub fn compile_query(query: &str) -> Result<(FilterSet, QueryPlan), String> {
             let bytes = parse_size_to_bytes(size_str)?;
             filter_set.all.push(FileFilter::MinSize(bytes));
             clauses.push(QueryClause::MinSize { bytes });
-            explanation.push(format!(
-                "Filter files with size >= {} bytes ({})",
-                bytes, size_str
-            ));
+            explanation.push(format!("Filter files with size >= {} bytes ({})", bytes, size_str));
             continue;
         }
 
@@ -179,10 +165,7 @@ pub fn compile_query(query: &str) -> Result<(FilterSet, QueryPlan), String> {
             let bytes = parse_size_to_bytes(size_str)?;
             filter_set.all.push(FileFilter::MaxSize(bytes));
             clauses.push(QueryClause::MaxSize { bytes });
-            explanation.push(format!(
-                "Filter files with size <= {} bytes ({})",
-                bytes, size_str
-            ));
+            explanation.push(format!("Filter files with size <= {} bytes ({})", bytes, size_str));
             continue;
         }
 
@@ -190,10 +173,7 @@ pub fn compile_query(query: &str) -> Result<(FilterSet, QueryPlan), String> {
             let bytes = parse_size_to_bytes(size_str)?;
             filter_set.all.push(FileFilter::MaxSize(bytes));
             clauses.push(QueryClause::MaxSize { bytes });
-            explanation.push(format!(
-                "Filter files with size <= {} bytes ({})",
-                bytes, size_str
-            ));
+            explanation.push(format!("Filter files with size <= {} bytes ({})", bytes, size_str));
             continue;
         }
 
@@ -221,9 +201,7 @@ pub fn compile_query(query: &str) -> Result<(FilterSet, QueryPlan), String> {
         filter_set
             .all
             .push(FileFilter::NameContains(token.to_string()));
-        clauses.push(QueryClause::NameContains {
-            value: token.to_string(),
-        });
+        clauses.push(QueryClause::NameContains { value: token.to_string() });
         explanation.push(format!("Filter files containing '{}' in name", token));
     }
 
@@ -253,9 +231,6 @@ mod tests {
         assert_eq!(parse_size_to_bytes("1024").unwrap(), 1024);
         assert_eq!(parse_size_to_bytes("1KB").unwrap(), 1024);
         assert_eq!(parse_size_to_bytes("50MB").unwrap(), 50 * 1024 * 1024);
-        assert_eq!(
-            parse_size_to_bytes("1.5GB").unwrap(),
-            (1.5 * 1024.0 * 1024.0 * 1024.0) as u64
-        );
+        assert_eq!(parse_size_to_bytes("1.5GB").unwrap(), (1.5 * 1024.0 * 1024.0 * 1024.0) as u64);
     }
 }

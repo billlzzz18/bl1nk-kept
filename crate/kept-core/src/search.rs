@@ -127,7 +127,7 @@ impl Bm25Index {
                             index.doc_freqs.push(0);
                             index.postings.push(Vec::new());
                             term_id
-                        }
+                        },
                     };
                     *token_frequencies.entry(term_id).or_insert(0) += 1;
                 }
@@ -540,14 +540,8 @@ mod tests {
     fn search_returns_thai_bm25_match() {
         let search = KeywordSearch::new(mock_registry());
         let results = search.search("สวัสด", None);
-        assert_eq!(
-            results.first().map(|result| result.id.as_str()),
-            Some("hello")
-        );
-        assert_eq!(
-            results.first().map(|result| result.match_type.as_str()),
-            Some("bm25")
-        );
+        assert_eq!(results.first().map(|result| result.id.as_str()), Some("hello"));
+        assert_eq!(results.first().map(|result| result.match_type.as_str()), Some("bm25"));
     }
 
     #[test]
@@ -559,14 +553,8 @@ mod tests {
         assert_eq!(candidates, vec![1]);
 
         let results = search.search("rport", None);
-        assert_eq!(
-            results.first().map(|result| result.id.as_str()),
-            Some("report")
-        );
-        assert_eq!(
-            results.first().map(|result| result.match_type.as_str()),
-            Some("fuzzy")
-        );
+        assert_eq!(results.first().map(|result| result.id.as_str()), Some("report"));
+        assert_eq!(results.first().map(|result| result.match_type.as_str()), Some("fuzzy"));
     }
 
     #[test]
@@ -595,14 +583,8 @@ mod tests {
         });
 
         let results = KeywordSearch::new(registry).search("greeting-lookup", None);
-        assert_eq!(
-            results.first().map(|result| result.id.as_str()),
-            Some("hello")
-        );
-        assert_eq!(
-            results.first().map(|result| result.match_type.as_str()),
-            Some("synonym")
-        );
+        assert_eq!(results.first().map(|result| result.id.as_str()), Some("hello"));
+        assert_eq!(results.first().map(|result| result.match_type.as_str()), Some("synonym"));
     }
 
     #[test]
@@ -658,38 +640,23 @@ mod tests {
     fn thai_english_mix_tokenization() {
         // ไทยปนอังกฤษ: "โค้ด Python" → bigrams สำหรับไทย, whole word สำหรับอังกฤษ
         let tokens = tokenize("โค้ด Python");
-        assert!(
-            tokens.contains(&"Python".to_string()),
-            "English word must be preserved as token"
-        );
-        assert!(
-            tokens.iter().any(|t| is_thai_bigram(t)),
-            "Thai part must produce bigrams"
-        );
+        assert!(tokens.contains(&"Python".to_string()), "English word must be preserved as token");
+        assert!(tokens.iter().any(|t| is_thai_bigram(t)), "Thai part must produce bigrams");
     }
 
     #[test]
     fn thai_acronym_preserves_english() {
         // Acronym: "API ของระบบ" → API 保留, Thai bigrams
         let tokens = tokenize("API ของระบบ");
-        assert!(
-            tokens.contains(&"API".to_string()),
-            "English acronym must be whole token"
-        );
-        assert!(
-            tokens.iter().any(|t| is_thai_bigram(t)),
-            "Thai word must produce bigrams"
-        );
+        assert!(tokens.contains(&"API".to_string()), "English acronym must be whole token");
+        assert!(tokens.iter().any(|t| is_thai_bigram(t)), "Thai word must produce bigrams");
     }
 
     #[test]
     fn thai_numeral混合() {
         // Numeral: "รายงาน 2567 ฉบับ" → 2567 preserved, Thai bigrams
         let tokens = tokenize("รายงาน 2567 ฉบับ");
-        assert!(
-            tokens.contains(&"2567".to_string()),
-            "Numeral must be whole token"
-        );
+        assert!(tokens.contains(&"2567".to_string()), "Numeral must be whole token");
         assert!(
             tokens.iter().filter(|t| is_thai_bigram(t)).count() >= 2,
             "Thai words must produce bigrams"
@@ -702,10 +669,7 @@ mod tests {
         let tokens = tokenize("โฟลเดอร์/docs/file.txt");
         assert!(!tokens.is_empty(), "path-like text must produce tokens");
         // Thai chars in the path trigger bigram mode for the whole token
-        assert!(
-            tokens.iter().any(|t| is_thai_bigram(t)),
-            "Thai path segment must produce bigrams"
-        );
+        assert!(tokens.iter().any(|t| is_thai_bigram(t)), "Thai path segment must produce bigrams");
     }
 
     #[test]
@@ -716,36 +680,23 @@ mod tests {
             tokens.iter().any(|t| is_thai_bigram(t)),
             "Thai word before URL must produce bigrams"
         );
-        assert!(
-            tokens.iter().any(|t| t.contains("https")),
-            "URL must be preserved as token"
-        );
+        assert!(tokens.iter().any(|t| t.contains("https")), "URL must be preserved as token");
     }
 
     #[test]
     fn thai_emoji_punctuation() {
         // Emoji + punctuation: "สวัสดี! 🎉" → whitespace splits into ["สวัสดี!", "🎉"]
         let tokens = tokenize("สวัสดี! 🎉");
-        assert!(
-            tokens.iter().any(|t| is_thai_bigram(t)),
-            "Thai word must produce bigrams"
-        );
+        assert!(tokens.iter().any(|t| is_thai_bigram(t)), "Thai word must produce bigrams");
         // ! is attached to Thai word (no whitespace), 🎉 is separate token
-        assert!(
-            tokens.iter().any(|t| t.contains("!")),
-            "punctuation must be present in tokens"
-        );
+        assert!(tokens.iter().any(|t| t.contains("!")), "punctuation must be present in tokens");
     }
 
     #[test]
     fn thai_single_char_not_bigrammed() {
         // Single Thai char: "ก" → not bigrammed (chars.len() == 1)
         let tokens = tokenize("ก");
-        assert_eq!(
-            tokens,
-            vec!["ก".to_string()],
-            "single Thai char must not be bigrammed"
-        );
+        assert_eq!(tokens, vec!["ก".to_string()], "single Thai char must not be bigrammed");
     }
 
     #[test]
@@ -782,10 +733,7 @@ mod tests {
 
         let search = KeywordSearch::new(registry);
         let results = search.search("Python คู่มือ", None);
-        assert!(
-            !results.is_empty(),
-            "mixed Thai-English query must find results"
-        );
+        assert!(!results.is_empty(), "mixed Thai-English query must find results");
     }
 
     #[test]

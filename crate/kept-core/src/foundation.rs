@@ -11,7 +11,10 @@ pub enum FoundationError {
     #[error("Input bytes are not valid UTF-8 at offset {offset}")]
     InvalidEncoding { offset: usize },
     #[error("Regex rule '{rule_id}' is invalid: {message}")]
-    InvalidRegexRule { rule_id: String, message: String },
+    InvalidRegexRule {
+        rule_id: String,
+        message: String,
+    },
     #[error("Regex rule '{rule_id}' must contain accepted and rejected test vectors")]
     MissingRegexVectors { rule_id: String },
     #[error("Regex rule '{rule_id}' did not match vector '{value}' as expected={accepted}")]
@@ -23,7 +26,10 @@ pub enum FoundationError {
     #[error("Evidence '{evidence_id}' must be verified before classification")]
     UnverifiedEvidence { evidence_id: String },
     #[error("Evidence '{evidence_id}' has an invalid weight {weight}")]
-    InvalidEvidenceWeight { evidence_id: String, weight: String },
+    InvalidEvidenceWeight {
+        evidence_id: String,
+        weight: String,
+    },
     #[error("Classification policy thresholds are invalid")]
     InvalidClassificationPolicy,
     #[error("Glossary term '{term_id}' does not match the active normalization policy")]
@@ -36,7 +42,10 @@ pub enum FoundationError {
     #[error("Provenance '{provenance_id}' is incomplete or has an invalid SHA-256 checksum")]
     InvalidProvenance { provenance_id: String },
     #[error("Glossary term '{term_id}' has invalid confidence {confidence}")]
-    InvalidGlossaryConfidence { term_id: String, confidence: String },
+    InvalidGlossaryConfidence {
+        term_id: String,
+        confidence: String,
+    },
     #[error("Corpus manifest entry '{entry_id}' is incomplete, duplicated, or has invalid checksum/split")]
     InvalidCorpusManifestEntry { entry_id: String },
     #[error("Experiment summary requires at least one measurement")]
@@ -88,9 +97,7 @@ pub fn validate_regex_rule(rule: &RegexRule) -> Result<(), FoundationError> {
     let has_accepted = rule.test_vectors.iter().any(|vector| vector.accepted);
     let has_rejected = rule.test_vectors.iter().any(|vector| !vector.accepted);
     if !has_accepted || !has_rejected {
-        return Err(FoundationError::MissingRegexVectors {
-            rule_id: rule.id.clone(),
-        });
+        return Err(FoundationError::MissingRegexVectors { rule_id: rule.id.clone() });
     }
     for vector in &rule.test_vectors {
         if regex.is_match(&vector.value) != vector.accepted {
@@ -217,9 +224,7 @@ pub fn validate_glossary_term(
         });
     }
     if normalize_text(&term.term)? != term.normalized {
-        return Err(FoundationError::GlossaryNormalizationMismatch {
-            term_id: term.id.clone(),
-        });
+        return Err(FoundationError::GlossaryNormalizationMismatch { term_id: term.id.clone() });
     }
     let Some(source) = provenance
         .iter()
@@ -299,7 +304,7 @@ pub fn import_anonymized_jsonl(input: &str) -> ImportReport {
                     message: error.to_string(),
                 });
                 continue;
-            }
+            },
         };
         let (
             Some(raw_text),
@@ -307,13 +312,7 @@ pub fn import_anonymized_jsonl(input: &str) -> ImportReport {
             Some(observed_at),
             Some(language),
             Some(source_kind),
-        ) = (
-            row.raw_text,
-            row.source_ref,
-            row.observed_at,
-            row.language,
-            row.source_kind,
-        )
+        ) = (row.raw_text, row.source_ref, row.observed_at, row.language, row.source_kind)
         else {
             report.rejected.push(ImportRejection {
                 line: line_number,
@@ -348,7 +347,7 @@ pub fn import_anonymized_jsonl(input: &str) -> ImportReport {
                     message: error.to_string(),
                 });
                 continue;
-            }
+            },
         };
         report.accepted.push(AnonymizedEvidence {
             raw_text,
@@ -419,9 +418,7 @@ pub fn validate_corpus_manifest(manifest: &CorpusManifest) -> Result<(), Foundat
             || !valid_split
             || !identifiers.insert(entry.id.as_str())
         {
-            return Err(FoundationError::InvalidCorpusManifestEntry {
-                entry_id: entry.id.clone(),
-            });
+            return Err(FoundationError::InvalidCorpusManifestEntry { entry_id: entry.id.clone() });
         }
     }
     Ok(())
@@ -633,9 +630,7 @@ pub fn classify_evidence(
     let mut reason_ids = Vec::with_capacity(evidence.len());
     for record in evidence {
         if !record.verified {
-            return Err(FoundationError::UnverifiedEvidence {
-                evidence_id: record.id.clone(),
-            });
+            return Err(FoundationError::UnverifiedEvidence { evidence_id: record.id.clone() });
         }
         if !(0.0..=1.0).contains(&record.weight) {
             return Err(FoundationError::InvalidEvidenceWeight {
@@ -646,19 +641,19 @@ pub fn classify_evidence(
         match record.kind {
             EvidenceKind::EncodingValid => {
                 scores.encoding_quality = scores.encoding_quality.max(record.weight)
-            }
+            },
             EvidenceKind::LexicalValid => {
                 scores.lexical_quality = scores.lexical_quality.max(record.weight)
-            }
+            },
             EvidenceKind::GlossaryExact => {
                 scores.glossary_support = scores.glossary_support.max(record.weight)
-            }
+            },
             EvidenceKind::ProvenanceComplete => {
                 scores.provenance_quality = scores.provenance_quality.max(record.weight)
-            }
+            },
             EvidenceKind::PatternRisk => {
                 scores.pattern_risk = scores.pattern_risk.max(record.weight)
-            }
+            },
         }
         reason_ids.push(record.id.clone());
     }
@@ -691,9 +686,8 @@ pub fn classify_evidence(
 
 // NOTE-010: ปฏิเสธ bytes ที่ decode ไม่ได้ก่อนแปลงข้อความเป็น evidence หรือ keyword
 pub fn decode_utf8(input: &[u8]) -> Result<&str, FoundationError> {
-    std::str::from_utf8(input).map_err(|error| FoundationError::InvalidEncoding {
-        offset: error.valid_up_to(),
-    })
+    std::str::from_utf8(input)
+        .map_err(|error| FoundationError::InvalidEncoding { offset: error.valid_up_to() })
 }
 
 // NOTE-011: normalization ต้อง deterministic เพื่อให้ index, validator และ experiment ใช้ข้อความฐานเดียวกัน

@@ -63,14 +63,14 @@ fn parse_scales() -> Result<Vec<usize>, Box<dyn Error>> {
                     return Err("--objects ต้องมากกว่า 0".into());
                 }
                 scales.push(count);
-            }
+            },
             "--help" | "-h" => {
                 println!("Usage: cargo run -p kept-core --example benchmark --release -- [--objects COUNT]...");
                 println!(
                     "When no scale is supplied, the benchmark runs 10,000 and 100,000 objects."
                 );
                 std::process::exit(0);
-            }
+            },
             _ => return Err(format!("ไม่รู้จัก option '{argument}'").into()),
         }
     }

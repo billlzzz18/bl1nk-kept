@@ -42,13 +42,13 @@ fn render_gfm_block(block: &UniversalBlock, indent: usize, out: &mut String) {
         UniversalBlock::Paragraph { content, .. } => {
             out.push_str(&tabs);
             render_gfm_inline(content, out);
-        }
+        },
         UniversalBlock::Heading { level, content, .. } => {
             out.push_str(&tabs);
             out.push_str(&"#".repeat(*level as usize));
             out.push(' ');
             render_gfm_inline(content, out);
-        }
+        },
         UniversalBlock::Callout { content, .. } => {
             // GFM Alert syntax: > [!NOTE]
             out.push_str(&tabs);
@@ -59,7 +59,7 @@ fn render_gfm_block(block: &UniversalBlock, indent: usize, out: &mut String) {
                 render_gfm_block(b, 0, out);
                 out.push('\n');
             }
-        }
+        },
         UniversalBlock::TaskList { items, .. } => {
             for item in items {
                 out.push_str(&tabs);
@@ -74,10 +74,10 @@ fn render_gfm_block(block: &UniversalBlock, indent: usize, out: &mut String) {
                 }
                 out.push('\n');
             }
-        }
+        },
         _ => {
             // Placeholder for other blocks
-        }
+        },
     }
 }
 

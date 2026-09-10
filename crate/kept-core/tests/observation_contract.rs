@@ -11,10 +11,7 @@ fn test_target_uri_parsing_and_formatting() {
     // symbol target
     let symbol_target =
         Target::parse("symbol://crate/kept-core/src/policy.rs#Policy").expect("parse symbol uri");
-    assert_eq!(
-        symbol_target.to_string(),
-        "symbol://crate/kept-core/src/policy.rs#Policy"
-    );
+    assert_eq!(symbol_target.to_string(), "symbol://crate/kept-core/src/policy.rs#Policy");
     assert_eq!(symbol_target.scheme(), "symbol");
     assert_eq!(symbol_target.path(), "crate/kept-core/src/policy.rs#Policy");
 

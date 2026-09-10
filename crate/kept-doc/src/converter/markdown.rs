@@ -147,11 +147,7 @@ fn bridge_notion_block_to_universal(block: crate::models::block::Block) -> Unive
                     } else {
                         TableRowType::Body
                     };
-                    TableRow {
-                        cells,
-                        row_type,
-                        style: None,
-                    }
+                    TableRow { cells, row_type, style: None }
                 })
                 .collect();
             UniversalBlock::Table {
@@ -159,7 +155,7 @@ fn bridge_notion_block_to_universal(block: crate::models::block::Block) -> Unive
                 header: None,
                 style: None,
             }
-        }
+        },
         _ => UniversalBlock::Raw {
             platform: Platform::Notion,
             data: serde_json::to_value(block).unwrap_or(serde_json::Value::Null),
@@ -173,9 +169,7 @@ fn bridge_rich_text_to_inline(
     rich_texts
         .into_iter()
         .map(|rt| match rt {
-            crate::models::common::RichText::Text {
-                text, annotations, ..
-            } => {
+            crate::models::common::RichText::Text { text, annotations, .. } => {
                 let mut style = TextStyle::default();
                 if let Some(ann) = annotations {
                     style.bold = Some(ann.bold);
@@ -193,7 +187,7 @@ fn bridge_rich_text_to_inline(
                     content: text.content,
                     style: Some(style),
                 }
-            }
+            },
             _ => InlineElement::TextRun {
                 content: "[Unsupported RichText]".to_string(),
                 style: Some(TextStyle::default()),
@@ -208,12 +202,12 @@ fn render_universal_block(block: &UniversalBlock, indent: usize, out: &mut Strin
         UniversalBlock::Paragraph { content, .. } => {
             out.push_str(&tabs);
             render_inline(content, out);
-        }
+        },
         UniversalBlock::Heading { level, content, .. } => {
             let mut line = format!("{} {} ", tabs, "#".repeat(*level as usize));
             render_inline(content, &mut line);
             out.push_str(line.trim_start());
-        }
+        },
         UniversalBlock::Quote { content, .. } => {
             for b in content {
                 out.push_str(&tabs);
@@ -224,7 +218,7 @@ fn render_universal_block(block: &UniversalBlock, indent: usize, out: &mut Strin
             if !content.is_empty() {
                 out.truncate(out.len() - 1); // remove last newline
             }
-        }
+        },
         UniversalBlock::BulletList { items, .. } => {
             for item in items {
                 for (i, b) in item.content.iter().enumerate() {
@@ -241,14 +235,14 @@ fn render_universal_block(block: &UniversalBlock, indent: usize, out: &mut Strin
             if !items.is_empty() {
                 out.truncate(out.len() - 1);
             }
-        }
+        },
         UniversalBlock::Table { rows, header, .. } => {
             render_table(rows, header.as_deref(), &tabs, out);
-        }
+        },
         _ => {
             out.push_str(&tabs);
             out.push_str("<!-- Unsupported UniversalBlock -->");
-        }
+        },
     }
 }
 
@@ -314,14 +308,12 @@ fn render_table(rows: &[TableRow], header: Option<&[TableCell]>, tabs: &str, out
     out.push('|');
     for c in 0..ncols {
         out.push(' ');
-        out.push_str(
-            match header_cells.get(c).and_then(|cell| cell.align.as_ref()) {
-                Some(CellAlignment::Left) => ":---",
-                Some(CellAlignment::Center) => ":---:",
-                Some(CellAlignment::Right) => "---:",
-                None => "---",
-            },
-        );
+        out.push_str(match header_cells.get(c).and_then(|cell| cell.align.as_ref()) {
+            Some(CellAlignment::Left) => ":---",
+            Some(CellAlignment::Center) => ":---:",
+            Some(CellAlignment::Right) => "---:",
+            None => "---",
+        });
         out.push_str(" |");
     }
 
@@ -394,15 +386,12 @@ mod tests {
         match &doc.blocks[1] {
             UniversalBlock::Paragraph { content, .. } => {
                 assert_eq!(content.len(), 2);
-                if let InlineElement::TextRun {
-                    style: Some(style), ..
-                } = &content[1]
-                {
+                if let InlineElement::TextRun { style: Some(style), .. } = &content[1] {
                     assert_eq!(style.bold, Some(true));
                 } else {
                     panic!("Expected text run with bold style");
                 }
-            }
+            },
             _ => panic!("Expected paragraph"),
         }
     }

@@ -1,13 +1,16 @@
 //! Tree-sitter AST symbol extraction สำหรับ Rust source
-//! NOTE-P1.1: แทน regex string matching ใน `parse_rust_file` เพื่อความถูกต้อง
-//! (ไม่หลอกด้วย string literal/comment, รองรับ multi-line signature, generics, macro)
+//! NOTE-P1.2: parse_rust_ast ย้ายไปใช้ Query API + rust.scm แทน node-walk
+//! parse_rust_outline ยังคง node-walk เพราะต้องการ parent-child tree structure
 
 use super::{
     DefinitionKind, ImplementationRecord, ImportRecord, ReferenceKind, ScopeGraphIndex,
     SymbolDefinition, SymbolReference,
 };
 use crate::observation::StructureOutlineItem;
-use tree_sitter::{Node, Parser, Tree, TreeCursor};
+use streaming_iterator::StreamingIterator;
+use tree_sitter::{Node, Parser, Query, QueryCursor, Tree, TreeCursor};
+
+const RUST_QUERY: &str = include_str!("../parsers/rust.scm");
 
 /// สร้าง parser สำหรับ Rust (คืน None ถ้า set language ไม่สำเร็จ)
 fn rust_parser() -> Option<Parser> {
@@ -19,26 +22,287 @@ fn rust_parser() -> Option<Parser> {
     Some(parser)
 }
 
-/// Parse Rust source เป็น AST แล้ว extract symbols ลง index
-/// คืน None ถ้า parser ใช้ไม่ได้ (caller ต้อง fallback)
+/// Parse Rust source เป็น AST แล้ว extract symbols ลง index ด้วย Query API
+/// คืน None ถ้า parser หรือ query ใช้ไม่ได้
 pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> {
     let mut parser = rust_parser()?;
     let tree = parser.parse(content, None)?;
+    let lang = tree_sitter_rust::LANGUAGE.into();
+    let query = match Query::new(&lang, RUST_QUERY) {
+        Ok(q) => q,
+        Err(e) => {
+            eprintln!("Query::new failed: {:?}", e);
+            return None;
+        },
+    };
+    eprintln!("DEBUG: parse_rust_ast, capture_names = {:?}", query.capture_names());
+
     let mut index = ScopeGraphIndex::new();
     index.indexed_files.insert(path_str.to_string());
 
-    let mut cursor = tree.walk();
-    walk_node(&mut cursor, content, path_str, &mut index);
+    let mut cursor = QueryCursor::new();
+    let source_bytes = content.as_bytes();
+
+    // NOTE-023: tree-sitter 0.25 QueryMatches ใช้ StreamingIterator ไม่ใช่ std::Iterator
+    let mut matches = cursor.matches(&query, tree.root_node(), source_bytes);
+    while let Some(mat) = {
+        matches.advance();
+        matches.get()
+    } {
+        for capture in mat.captures {
+            let capture_name = &query.capture_names()[capture.index as usize];
+            let node = capture.node;
+            eprintln!(
+                "DEBUG: capture = {:?}, node.kind = {:?}, node.text = {:?}",
+                capture_name,
+                node.kind(),
+                &source_bytes[node.start_byte()..node.end_byte()]
+            );
+
+            match &**capture_name {
+                "definition.function" => {
+                    if let Some(name) = extract_name(node, source_bytes) {
+                        index.definitions.push(SymbolDefinition {
+                            name,
+                            kind: DefinitionKind::Function,
+                            file_path: path_str.to_string(),
+                            line: node.start_position().row + 1,
+                            column: node.start_position().column + 1,
+                            doc: preceding_doc_bytes(node, source_bytes),
+                        });
+                    }
+                },
+                "definition.struct" => {
+                    if let Some(name) = extract_name(node, source_bytes) {
+                        index.definitions.push(SymbolDefinition {
+                            name,
+                            kind: DefinitionKind::Struct,
+                            file_path: path_str.to_string(),
+                            line: node.start_position().row + 1,
+                            column: node.start_position().column + 1,
+                            doc: preceding_doc_bytes(node, source_bytes),
+                        });
+                    }
+                },
+                "definition.enum" => {
+                    if let Some(name) = extract_name(node, source_bytes) {
+                        index.definitions.push(SymbolDefinition {
+                            name,
+                            kind: DefinitionKind::Enum,
+                            file_path: path_str.to_string(),
+                            line: node.start_position().row + 1,
+                            column: node.start_position().column + 1,
+                            doc: preceding_doc_bytes(node, source_bytes),
+                        });
+                    }
+                },
+                "definition.trait" => {
+                    if let Some(name) = extract_name(node, source_bytes) {
+                        index.definitions.push(SymbolDefinition {
+                            name,
+                            kind: DefinitionKind::Trait,
+                            file_path: path_str.to_string(),
+                            line: node.start_position().row + 1,
+                            column: node.start_position().column + 1,
+                            doc: preceding_doc_bytes(node, source_bytes),
+                        });
+                    }
+                },
+                "definition.type_alias" => {
+                    if let Some(name) = extract_name(node, source_bytes) {
+                        index.definitions.push(SymbolDefinition {
+                            name,
+                            kind: DefinitionKind::TypeAlias,
+                            file_path: path_str.to_string(),
+                            line: node.start_position().row + 1,
+                            column: node.start_position().column + 1,
+                            doc: preceding_doc_bytes(node, source_bytes),
+                        });
+                    }
+                },
+                "definition.macro" => {
+                    if let Some(name) = extract_name(node, source_bytes) {
+                        index.definitions.push(SymbolDefinition {
+                            name,
+                            kind: DefinitionKind::Other("macro".to_string()),
+                            file_path: path_str.to_string(),
+                            line: node.start_position().row + 1,
+                            column: node.start_position().column + 1,
+                            doc: preceding_doc_bytes(node, source_bytes),
+                        });
+                    }
+                },
+                "implementation.block" => {
+                    // Parse the entire impl block text to extract trait and target type
+                    let text = node_text_bytes(node, source_bytes);
+                    eprintln!("DEBUG: impl text = {:?}", text);
+                    // Format: "impl<T: Clone> Visitor<'static> for Container<T>" or "impl Container<u8>"
+                    let body = text.strip_prefix("impl").unwrap_or(text).trim();
+                    eprintln!("DEBUG: impl body = {:?}", body);
+                    // Find " for " to separate trait and target
+                    if let Some(for_idx) = body.find(" for ") {
+                        let trait_part = body[..for_idx].trim();
+                        let target_part = body[for_idx + 5..].trim();
+                        eprintln!("DEBUG: trait_part = {:?}", trait_part);
+                        eprintln!("DEBUG: target_part = {:?}", target_part);
+                        // Extract trait name: find the identifier after the generic parameters
+                        // e.g., "<T: Clone> Visitor<'static>" → "Visitor"
+                        // The generic parameters end at the first '>' that's not inside another '<>'
+                        let trait_name = if trait_part.starts_with('<') {
+                            // Find the matching '>' for the opening '<'
+                            let mut depth = 0;
+                            let mut end_of_generics = 0;
+                            for (i, c) in trait_part.char_indices() {
+                                match c {
+                                    '<' => depth += 1,
+                                    '>' => {
+                                        depth -= 1;
+                                        if depth == 0 {
+                                            end_of_generics = i + 1;
+                                            break;
+                                        }
+                                    }
+                                    _ => {}
+                                }
+                            }
+                            let after_generics = trait_part[end_of_generics..].trim();
+                            eprintln!("DEBUG: after_generics = {:?}", after_generics);
+                            after_generics
+                                .split('<')
+                                .next()
+                                .unwrap_or(after_generics)
+                                .trim()
+                                .to_string()
+                        } else {
+                            // No generics — the whole thing is the trait name
+                            trait_part
+                                .split('<')
+                                .next()
+                                .unwrap_or(trait_part)
+                                .trim()
+                                .to_string()
+                        };
+                        eprintln!("DEBUG: trait_name = {:?}", trait_name);
+                        let target_type = target_part
+                            .split('<')
+                            .next()
+                            .unwrap_or(target_part)
+                            .split('{')
+                            .next()
+                            .unwrap_or(target_part)
+                            .trim()
+                            .to_string();
+                        if !target_type.is_empty() {
+                            index.implementations.push(ImplementationRecord {
+                                trait_name: Some(trait_name),
+                                target_type,
+                                file_path: path_str.to_string(),
+                                line: node.start_position().row + 1,
+                            });
+                        }
+                    } else {
+                        // No " for " — this is an inherent impl
+                        let target_type = body
+                            .split('<')
+                            .next()
+                            .unwrap_or(body)
+                            .split('{')
+                            .next()
+                            .unwrap_or(body)
+                            .trim()
+                            .to_string();
+                        if !target_type.is_empty() {
+                            index.implementations.push(ImplementationRecord {
+                                trait_name: None,
+                                target_type,
+                                file_path: path_str.to_string(),
+                                line: node.start_position().row + 1,
+                            });
+                        }
+                    }
+                },
+                "import.statement" => {
+                    // Parse the entire use_declaration node text
+                    // Format: "use path::to::module;" or "use path::to::module as alias;" or "use path::to::*;"
+                    let raw = node_text_bytes(node, source_bytes);
+                    let stripped = raw
+                        .strip_prefix("use ")
+                        .unwrap_or(raw)
+                        .trim_end_matches(';')
+                        .trim();
+                    let is_wildcard = stripped.ends_with("::*");
+                    let (path_part, alias) = match stripped.find(" as ") {
+                        Some(idx) => (
+                            stripped[..idx].trim().to_string(),
+                            Some(stripped[idx + 4..].trim().to_string()),
+                        ),
+                        None => (stripped.to_string(), None),
+                    };
+                    index.imports.push(ImportRecord {
+                        path: path_part,
+                        alias,
+                        file_path: path_str.to_string(),
+                        line: node.start_position().row + 1,
+                        is_wildcard,
+                    });
+                },
+                "reference.call" => {
+                    let text = node_text_bytes(node, source_bytes);
+                    let name = text.rsplit([':', '.']).next().unwrap_or(text).trim();
+                    if !name.is_empty() {
+                        index.references.push(SymbolReference {
+                            symbol_name: name.to_string(),
+                            kind: ReferenceKind::Call,
+                            file_path: path_str.to_string(),
+                            line: node.start_position().row + 1,
+                            column: node.start_position().column + 1,
+                        });
+                    }
+                },
+                "reference.type" => {
+                    let name = node_text_bytes(node, source_bytes).to_string();
+                    if !name.is_empty() {
+                        index.references.push(SymbolReference {
+                            symbol_name: name,
+                            kind: ReferenceKind::TypeUsage,
+                            file_path: path_str.to_string(),
+                            line: node.start_position().row + 1,
+                            column: node.start_position().column + 1,
+                        });
+                    }
+                },
+                "scope" => {}, // ใช้สำหรับ boundary เท่านั้น ไม่จำเป็นต้อง capture
+                _ => {},
+            }
+        }
+    }
+
     Some(index)
 }
 
 /// Parse Rust source เป็น structural outline (สำหรับ `StructurePayload` ของ Observation)
-/// คืน None ถ้า parser ใช้ไม่ได้
+/// คืน None ถ้า parser ใช้ไม่ได้ — ยังคงใช้ node-walk เพราะ outline ต้องการ tree structure
 pub fn parse_rust_outline(content: &str) -> Option<Vec<StructureOutlineItem>> {
     let mut parser = rust_parser()?;
     let tree: Tree = parser.parse(content, None)?;
     let mut cursor = tree.walk();
     Some(collect_outline(&mut cursor, content))
+}
+
+/// ข้อความ UTF-8 จาก node (byte slice)
+fn node_text_bytes<'a>(node: Node<'a>, source_bytes: &'a [u8]) -> &'a str {
+    std::str::from_utf8(&source_bytes[node.start_byte()..node.end_byte()]).unwrap_or("")
+}
+
+/// ชื่อ definition จาก field \"name\" ของ item node (byte API)
+fn extract_name(node: Node, source_bytes: &[u8]) -> Option<String> {
+    // node ใน query จะชี้ที่ identifier node โดยตรง (ไม่ใช่ parent item)
+    let text = node_text_bytes(node, source_bytes).trim().to_string();
+    if text.is_empty() {
+        None
+    } else {
+        Some(text)
+    }
 }
 
 /// ข้อความของ node จาก source
@@ -69,196 +333,20 @@ fn outline_name(node: Node, content: &str) -> Option<String> {
     })
 }
 
-/// doc comment (`///`) ของ item จาก named sibling ก่อนหน้า
-fn preceding_doc(node: Node, content: &str) -> Option<String> {
+/// doc comment (`///`) ของ item จาก named sibling ก่อนหน้า (byte version สำหรับ Query API)
+fn preceding_doc_bytes(node: Node, source_bytes: &[u8]) -> Option<String> {
     let mut sibling = node;
     while let Some(prev) = sibling.prev_named_sibling() {
         if prev.kind() != "line_comment" {
             return None;
         }
-        let text = node_text(prev, content);
+        let text = node_text_bytes(prev, source_bytes);
         if text.starts_with("///") {
             return Some(text.trim_start_matches('/').trim().to_string());
         }
         sibling = prev;
     }
     None
-}
-
-/// บันทึก definition ลง index
-fn push_definition(
-    index: &mut ScopeGraphIndex,
-    node: Node,
-    name: String,
-    kind: DefinitionKind,
-    path_str: &str,
-    content: &str,
-) {
-    let position = node
-        .child_by_field_name("name")
-        .unwrap_or(node)
-        .start_position();
-    index.definitions.push(SymbolDefinition {
-        name,
-        kind,
-        file_path: path_str.to_string(),
-        line: position.row + 1,
-        column: position.column + 1,
-        doc: preceding_doc(node, content),
-    });
-}
-
-/// walk ทุก node แบบ recursive — เก็บ definitions, imports, impls, references
-fn walk_node(cursor: &mut TreeCursor, content: &str, path_str: &str, index: &mut ScopeGraphIndex) {
-    loop {
-        let node = cursor.node();
-        match node.kind() {
-            // NOTE-010: tree-sitter-rust ใช้ kind "function_item" (มี body)
-            // และ "function_signature_item" (method ใน trait ที่ไม่มี body)
-            "function_item" | "function_signature_item" => {
-                if let Some(name) = item_name(node, content) {
-                    push_definition(
-                        index,
-                        node,
-                        name,
-                        DefinitionKind::Function,
-                        path_str,
-                        content,
-                    );
-                }
-            }
-            "struct_item" => {
-                if let Some(name) = item_name(node, content) {
-                    push_definition(index, node, name, DefinitionKind::Struct, path_str, content);
-                }
-            }
-            "enum_item" => {
-                if let Some(name) = item_name(node, content) {
-                    push_definition(index, node, name, DefinitionKind::Enum, path_str, content);
-                }
-            }
-            "trait_item" => {
-                if let Some(name) = item_name(node, content) {
-                    push_definition(index, node, name, DefinitionKind::Trait, path_str, content);
-                }
-            }
-            "type_item" => {
-                if let Some(name) = item_name(node, content) {
-                    push_definition(
-                        index,
-                        node,
-                        name,
-                        DefinitionKind::TypeAlias,
-                        path_str,
-                        content,
-                    );
-                }
-            }
-            "mod_item" => {
-                if let Some(name) = item_name(node, content) {
-                    push_definition(index, node, name, DefinitionKind::Module, path_str, content);
-                }
-            }
-            "macro_definition" => {
-                if let Some(name) = item_name(node, content) {
-                    push_definition(
-                        index,
-                        node,
-                        name,
-                        DefinitionKind::Other("macro".to_string()),
-                        path_str,
-                        content,
-                    );
-                }
-            }
-            "impl_item" => {
-                // NOTE-004: impl Trait for Type หรือ impl Type — ใช้ base name ตัด generics
-                let trait_name = node
-                    .child_by_field_name("trait")
-                    .map(|t| base_type_name(node_text(t, content)));
-                let target_type = node
-                    .child_by_field_name("type")
-                    .map(|t| base_type_name(node_text(t, content)))
-                    .unwrap_or_default();
-                if !target_type.is_empty() {
-                    index.implementations.push(ImplementationRecord {
-                        trait_name,
-                        target_type,
-                        file_path: path_str.to_string(),
-                        line: node.start_position().row + 1,
-                    });
-                }
-            }
-            "use_declaration" => {
-                // NOTE-005: ตัด "use " หัว และ ";" ท้ายจาก raw text ของ declaration
-                let raw = node_text(node, content).trim();
-                let body = raw
-                    .strip_prefix("use ")
-                    .unwrap_or(raw)
-                    .trim_end_matches(';')
-                    .trim();
-                if !body.is_empty() {
-                    let is_wildcard = body.ends_with("::*");
-                    let (path_part, alias) = match body.find(" as ") {
-                        Some(idx) => (
-                            body[..idx].trim().to_string(),
-                            Some(body[idx + 4..].trim().to_string()),
-                        ),
-                        None => (body.to_string(), None),
-                    };
-                    index.imports.push(ImportRecord {
-                        path: path_part,
-                        alias,
-                        file_path: path_str.to_string(),
-                        line: node.start_position().row + 1,
-                        is_wildcard,
-                    });
-                }
-            }
-            "call_expression" => {
-                // เก็บชื่อ function ที่ถูกเรียกเป็น Call reference
-                if let Some(function) = node.child_by_field_name("function") {
-                    if matches!(
-                        function.kind(),
-                        "identifier" | "field_expression" | "scoped_identifier"
-                    ) {
-                        // scoped/field: ใช้ segment สุดท้ายเป็นชื่อ
-                        let text = node_text(function, content);
-                        let name = text.rsplit([':', '.']).next().unwrap_or(text).trim();
-                        if !name.is_empty() {
-                            index.references.push(SymbolReference {
-                                symbol_name: name.to_string(),
-                                kind: ReferenceKind::Call,
-                                file_path: path_str.to_string(),
-                                line: function.start_position().row + 1,
-                                column: function.start_position().column + 1,
-                            });
-                        }
-                    }
-                }
-            }
-            "type_identifier" => {
-                // NOTE-006: การอ้างอิง type ทุกจุด = TypeUsage reference
-                index.references.push(SymbolReference {
-                    symbol_name: node_text(node, content).to_string(),
-                    kind: ReferenceKind::TypeUsage,
-                    file_path: path_str.to_string(),
-                    line: node.start_position().row + 1,
-                    column: node.start_position().column + 1,
-                });
-            }
-            _ => {}
-        }
-
-        // NOTE-007: ลงลึก children เพื่อจับ nested items (method ใน impl/trait, fn ใน mod)
-        if cursor.goto_first_child() {
-            walk_node(cursor, content, path_str, index);
-            cursor.goto_parent();
-        }
-        if !cursor.goto_next_sibling() {
-            break;
-        }
-    }
 }
 
 /// สร้าง outline จาก items ใต้ cursor ปัจจุบัน (children = nested items)

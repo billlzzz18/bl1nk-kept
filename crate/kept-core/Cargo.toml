@@ -33,6 +33,9 @@ tree-sitter-python.workspace = true
 tree-sitter-javascript.workspace = true
 tree-sitter-typescript.workspace = true
 tree-sitter-go.workspace = true
+tree-sitter-html.workspace = true
+tree-sitter-md-025.workspace = true
+streaming-iterator.workspace = true
 tiktoken-rs = "0.12.0"
 
 [dev-dependencies]

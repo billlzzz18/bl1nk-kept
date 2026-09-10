@@ -112,10 +112,7 @@ mod tests {
         assert!(groups.iter().any(|group| {
             group.kind == "near_name"
                 && group.items
-                    == vec![
-                        "four/report-2025.md".to_string(),
-                        "three/report-2024.md".to_string(),
-                    ]
+                    == vec!["four/report-2025.md".to_string(), "three/report-2024.md".to_string()]
         }));
         assert!(stats.compared_pairs < stats.total_possible_pairs);
     }
@@ -149,10 +146,7 @@ mod tests {
         assert!(groups.iter().any(|group| {
             group.kind == "near_name"
                 && group.items
-                    == vec![
-                        "data/report-2024.md".to_string(),
-                        "data/report-2025.md".to_string(),
-                    ]
+                    == vec!["data/report-2024.md".to_string(), "data/report-2025.md".to_string()]
         }));
         assert!(stats.compared_pairs < stats.total_possible_pairs / 100);
         assert!(stats.skipped_high_frequency_postings > 0);
@@ -226,16 +220,10 @@ mod content_duplicate_tests {
     #[test]
     fn content_scan_groups_equal_bytes_and_rejects_equal_size_different_bytes() {
         let directory = temporary_directory("content-scan");
-        std::fs::write(
-            directory.join("report-a.txt"),
-            b"same payload for verified duplicate",
-        )
-        .expect("first fixture must be written");
-        std::fs::write(
-            directory.join("report-b.txt"),
-            b"same payload for verified duplicate",
-        )
-        .expect("second fixture must be written");
+        std::fs::write(directory.join("report-a.txt"), b"same payload for verified duplicate")
+            .expect("first fixture must be written");
+        std::fs::write(directory.join("report-b.txt"), b"same payload for verified duplicate")
+            .expect("second fixture must be written");
         std::fs::write(
             directory.join("same-size-other.txt"),
             vec![b'x'; b"same payload for verified duplicate".len()],
@@ -278,9 +266,7 @@ mod content_duplicate_tests {
             .expect("fixture directory must be indexed");
         let (groups, stats) = find_content_duplicates(
             &index,
-            &ContentDuplicateOptions {
-                partial_hash_bytes: 64 * 1024,
-            },
+            &ContentDuplicateOptions { partial_hash_bytes: 64 * 1024 },
         )
         .expect("content scan must complete");
 
@@ -802,11 +788,8 @@ mod mixed_content_duplicate_tests {
         std::fs::create_dir_all(&directory).expect("temporary directory must be created");
         std::fs::write(directory.join("source.txt"), b"same verified payload")
             .expect("source fixture must be written");
-        std::fs::hard_link(
-            directory.join("source.txt"),
-            directory.join("source-link.txt"),
-        )
-        .expect("hard link fixture must be created");
+        std::fs::hard_link(directory.join("source.txt"), directory.join("source-link.txt"))
+            .expect("hard link fixture must be created");
         std::fs::copy(directory.join("source.txt"), directory.join("copy.txt"))
             .expect("copy fixture must be created");
 
@@ -860,22 +843,14 @@ mod persistent_index_tests {
             root: "/fixture".to_string(),
             scanned_at_unix: 10,
             total_size: 3,
-            files: vec![
-                record("a.txt", 1, 1),
-                record("gone.txt", 1, 1),
-                record("same.txt", 1, 1),
-            ],
+            files: vec![record("a.txt", 1, 1), record("gone.txt", 1, 1), record("same.txt", 1, 1)],
             issues: Vec::new(),
         };
         let current = ScanIndex {
             root: "/fixture".to_string(),
             scanned_at_unix: 20,
             total_size: 4,
-            files: vec![
-                record("a.txt", 2, 2),
-                record("new.txt", 1, 1),
-                record("same.txt", 1, 1),
-            ],
+            files: vec![record("a.txt", 2, 2), record("new.txt", 1, 1), record("same.txt", 1, 1)],
             issues: Vec::new(),
         };
 

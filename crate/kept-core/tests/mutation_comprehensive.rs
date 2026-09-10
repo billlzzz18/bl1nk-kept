@@ -317,10 +317,7 @@ fn simulate_calculates_total_reclaimable() {
     };
     let index = make_index(
         "/work",
-        vec![
-            make_file("/work/b.txt", "b.txt", 100),
-            make_file("/work/d.txt", "d.txt", 200),
-        ],
+        vec![make_file("/work/b.txt", "b.txt", 100), make_file("/work/d.txt", "d.txt", 200)],
     );
     let policy = DuplicateMutationPolicy::default();
 
@@ -342,10 +339,7 @@ fn plan_then_simulate_roundtrip() {
     let groups = vec![DuplicateGroup {
         kind: "exact_name".to_string(),
         similarity: 1.0,
-        items: vec![
-            "/work/a/report.pdf".to_string(),
-            "/work/b/report.pdf".to_string(),
-        ],
+        items: vec!["/work/a/report.pdf".to_string(), "/work/b/report.pdf".to_string()],
         evidence: Some(DuplicateEvidence {
             size_bytes: 500,
             partial_sha256: "aaa".to_string(),

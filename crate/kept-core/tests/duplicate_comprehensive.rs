@@ -211,10 +211,7 @@ fn similarity_empty_strings_is_one() {
 #[test]
 fn similarity_completely_different_strings() {
     let sim = normalized_similarity("aaaa", "bbbb");
-    assert!(
-        sim < 0.5,
-        "completely different strings should have low similarity"
-    );
+    assert!(sim < 0.5, "completely different strings should have low similarity");
 }
 
 #[test]
@@ -285,10 +282,7 @@ fn find_duplicates_near_name_group() {
     };
     let groups = find_duplicates(&index, &opts);
     let near_name_groups: Vec<_> = groups.iter().filter(|g| g.kind == "near_name").collect();
-    assert!(
-        !near_name_groups.is_empty(),
-        "should detect near-name duplicates"
-    );
+    assert!(!near_name_groups.is_empty(), "should detect near-name duplicates");
 }
 
 #[test]
@@ -414,10 +408,6 @@ fn find_duplicates_sorted_items_within_group() {
     // Items should be sorted alphabetically
     assert_eq!(
         groups[0].items,
-        vec![
-            "/work/a/report.txt",
-            "/work/m/report.txt",
-            "/work/z/report.txt"
-        ]
+        vec!["/work/a/report.txt", "/work/m/report.txt", "/work/z/report.txt"]
     );
 }

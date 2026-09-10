@@ -89,10 +89,7 @@ fn test_scope_graph_index_contract_and_incremental_flow() {
     )
     .unwrap();
 
-    let events = vec![
-        FileEvent::modified(file_b.clone()),
-        FileEvent::modified(file_b.clone()),
-    ];
+    let events = vec![FileEvent::modified(file_b.clone()), FileEvent::modified(file_b.clone())];
     manager.apply_events(&events);
 
     let snap2 = manager.get_snapshot();

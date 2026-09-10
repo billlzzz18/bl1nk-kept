@@ -93,7 +93,7 @@ impl ToPlatform for LarkSheetAdapter {
                                 .map(|inline| match inline {
                                     crate::ir::InlineElement::TextRun { content, .. } => {
                                         content.clone()
-                                    }
+                                    },
                                     _ => String::new(),
                                 })
                                 .collect::<Vec<String>>()

@@ -224,9 +224,7 @@ impl CorrectionLedger {
             |row| row.get::<_, bool>(0),
         )?;
         if !exists {
-            return Err(CorrectionLedgerError::Sqlite(
-                rusqlite::Error::QueryReturnedNoRows,
-            ));
+            return Err(CorrectionLedgerError::Sqlite(rusqlite::Error::QueryReturnedNoRows));
         }
         transaction.execute(
             "INSERT INTO corrections (

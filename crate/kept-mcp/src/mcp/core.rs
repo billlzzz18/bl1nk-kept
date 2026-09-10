@@ -85,10 +85,8 @@ impl SchemaBuilder {
         required: bool,
     ) -> Self {
         let name = name.into();
-        self.properties.insert(
-            name.clone(),
-            json!({ "type": ty, "description": description.into() }),
-        );
+        self.properties
+            .insert(name.clone(), json!({ "type": ty, "description": description.into() }));
         if required {
             self.required.push(name);
         }

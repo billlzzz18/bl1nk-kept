@@ -35,6 +35,8 @@ pub enum FffAdapterError {
 pub struct FffScanner {
     root: PathBuf,
     picker: FilePicker,
+    /// Allowed root directories for boundary enforcement
+    allowed_roots: Vec<PathBuf>,
 }
 
 impl FffScanner {
@@ -59,7 +61,30 @@ impl FffScanner {
         Ok(Self {
             root: root_buf,
             picker,
+            allowed_roots: Vec::new(),
         })
+    }
+
+    /// Initialize with additional allowed root directories for boundary enforcement
+    pub fn with_allowed_roots(
+        root: impl AsRef<Path>,
+        allowed_roots: Vec<PathBuf>,
+    ) -> Result<Self, FffAdapterError> {
+        let mut scanner = Self::new(root)?;
+        scanner.allowed_roots = allowed_roots;
+        Ok(scanner)
+    }
+
+    /// Check if a path is within workspace boundaries
+    fn is_within_workspace(&self, path: &Path) -> bool {
+        // Check primary root
+        if path.starts_with(&self.root) {
+            return true;
+        }
+        // Check additional allowed roots
+        self.allowed_roots
+            .iter()
+            .any(|allowed| path.starts_with(allowed))
     }
 
     /// Acquire a single file as an Observation under Look or View mode
@@ -70,6 +95,14 @@ impl FffScanner {
     ) -> Result<Observation, FffAdapterError> {
         let normalized = relative_path.replace('\\', "/");
         let full_path = self.root.join(&normalized);
+
+        // Workspace boundary check
+        if !self.is_within_workspace(&full_path) {
+            return Err(FffAdapterError::FileNotFound(format!(
+                "Path '{}' is outside workspace boundaries",
+                normalized
+            )));
+        }
 
         if !full_path.exists() {
             return Err(FffAdapterError::FileNotFound(normalized));
@@ -115,7 +148,7 @@ impl FffScanner {
                 } else {
                     String::from_utf8(bytes).ok()
                 }
-            }
+            },
         };
 
         let timestamp = std::time::SystemTime::now()
@@ -168,17 +201,17 @@ impl FffScanner {
 
             // Filter out default ignored directories if not caught by FFF internal rules
             let norm_path = rel_path.replace('\\', "/");
-            let ignored_segments = [
-                "node_modules/",
-                "venv/",
-                ".venv/",
-                "__pycache__/",
-                "target/",
-            ];
+            let ignored_segments = ["node_modules/", "venv/", ".venv/", "__pycache__/", "target/"];
             if ignored_segments
                 .iter()
                 .any(|seg| norm_path.starts_with(seg) || norm_path.contains(&format!("/{seg}")))
             {
+                continue;
+            }
+
+            // Workspace boundary check — filter out files outside allowed roots
+            let full_path = self.root.join(&norm_path);
+            if !self.is_within_workspace(&full_path) {
                 continue;
             }
 

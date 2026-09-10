@@ -48,10 +48,7 @@ impl Drop for McpFixture {
 #[tokio::test]
 async fn test_mcp_server_registers_filesystem_tools() {
     let server = kept_mcp::mcp::server::build();
-    assert!(
-        server.is_ok(),
-        "Server build must succeed with filesystem tools registered"
-    );
+    assert!(server.is_ok(), "Server build must succeed with filesystem tools registered");
 }
 
 #[tokio::test]
@@ -59,10 +56,7 @@ async fn test_fff_manager_lifecycle_and_tools() {
     use kept_mcp::mcp::tools::filesystem::FffManager;
 
     let fixture = McpFixture::new("mcp-fff-test");
-    fixture.write_file(
-        "src/lib.rs",
-        b"pub fn add(a: i32, b: i32) -> i32 { a + b }\n",
-    );
+    fixture.write_file("src/lib.rs", b"pub fn add(a: i32, b: i32) -> i32 { a + b }\n");
     fixture.write_file("docs/readme.md", b"# Welcome to kept\n");
 
     let manager = FffManager::new();

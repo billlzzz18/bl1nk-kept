@@ -70,13 +70,7 @@ impl NotionClient {
         let mut cursor: Option<String> = None;
         for _ in 0..Self::SEARCH_ALL_MAX_PAGES {
             let page = self
-                .search(
-                    query.clone(),
-                    filter.clone(),
-                    sort.clone(),
-                    cursor.take(),
-                    Some(100),
-                )
+                .search(query.clone(), filter.clone(), sort.clone(), cursor.take(), Some(100))
                 .await?;
             all.extend(page.results);
             if !page.has_more {

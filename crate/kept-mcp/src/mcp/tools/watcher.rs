@@ -24,11 +24,7 @@ pub struct RootWatcher {
 
 impl RootWatcher {
     pub fn new(root: PathBuf, tx: mpsc::Sender<RootChangeEvent>) -> Self {
-        Self {
-            root,
-            tx,
-            _watcher: None,
-        }
+        Self { root, tx, _watcher: None }
     }
 
     /// Start watching. Spawns a blocking notify thread and a debounce task.

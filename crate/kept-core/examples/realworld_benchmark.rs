@@ -76,7 +76,7 @@ fn run_rg_search(dir: &Path, pattern: &str) -> (usize, f64) {
         Ok(out) => {
             let stdout = String::from_utf8_lossy(&out.stdout);
             stdout.lines().count()
-        }
+        },
         Err(_) => 0,
     };
 
@@ -118,10 +118,7 @@ fn main() {
 
     let target_dir = PathBuf::from(&target_str);
     if !target_dir.exists() {
-        eprintln!(
-            "Error: Target directory does not exist: {}",
-            target_dir.display()
-        );
+        eprintln!("Error: Target directory does not exist: {}", target_dir.display());
         std::process::exit(1);
     }
 
@@ -143,13 +140,9 @@ fn main() {
     let mut scanner = match FffScanner::new(&target_dir) {
         Ok(s) => s,
         Err(e) => {
-            eprintln!(
-                "Failed to initialize FffScanner on {}: {}",
-                target_dir.display(),
-                e
-            );
+            eprintln!("Failed to initialize FffScanner on {}: {}", target_dir.display(), e);
             std::process::exit(1);
-        }
+        },
     };
 
     let (inventory, _) = scanner.scan_inventory().expect("Scan inventory failed");
@@ -230,7 +223,7 @@ fn main() {
                 AdmissionDecision::Pass(boxed) => {
                     let c = boxed.content.as_deref().unwrap_or_default();
                     ("PASS", estimate_tokens(c))
-                }
+                },
                 AdmissionDecision::Reference { token_cost, .. } => ("REFERENCE", *token_cost),
                 AdmissionDecision::Delta { token_cost, .. } => ("DELTA", *token_cost),
                 AdmissionDecision::Warn { .. } => ("WARN (LOOP)", 20),
@@ -286,9 +279,6 @@ fn main() {
     fs::write(&out_file, json_text).expect("Write benchmark report failed");
 
     println!("\n============================================================");
-    println!(
-        "Benchmark Complete! Report written to: {}",
-        out_file.display()
-    );
+    println!("Benchmark Complete! Report written to: {}", out_file.display());
     println!("============================================================");
 }

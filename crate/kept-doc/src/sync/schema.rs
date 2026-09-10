@@ -96,13 +96,8 @@ impl DatabaseSchema {
     }
 
     pub fn relation(mut self, name: &str, linked_db_id: ObjectId, two_way: bool) -> Self {
-        self.properties.insert(
-            name.to_string(),
-            PropertySchema::Relation {
-                linked_db_id,
-                two_way,
-            },
-        );
+        self.properties
+            .insert(name.to_string(), PropertySchema::Relation { linked_db_id, two_way });
         self
     }
 
@@ -122,20 +117,20 @@ impl DatabaseSchema {
                     let opts: Vec<serde_json::Value> =
                         options.iter().map(|o| json!({"name": o})).collect();
                     json!({ "select": { "options": opts } })
-                }
+                },
                 PropertySchema::MultiSelect { options } => {
                     let opts: Vec<serde_json::Value> =
                         options.iter().map(|o| json!({"name": o})).collect();
                     json!({ "multi_select": { "options": opts } })
-                }
+                },
                 PropertySchema::Status { options } => {
                     let opts: Vec<serde_json::Value> =
                         options.iter().map(|o| json!({"name": o})).collect();
                     json!({ "status": { "options": opts } })
-                }
+                },
                 PropertySchema::Relation { linked_db_id, .. } => {
                     json!({ "relation": { "database_id": linked_db_id } })
-                }
+                },
             };
             properties.insert(name.clone(), prop);
         }
@@ -180,10 +175,7 @@ mod tests {
         let schema = DatabaseSchema::new("Tasks")
             .title("Name")
             .expect("first title property must be accepted");
-        assert!(matches!(
-            schema.properties.get("Name"),
-            Some(PropertySchema::Title)
-        ));
+        assert!(matches!(schema.properties.get("Name"), Some(PropertySchema::Title)));
     }
 
     #[test]

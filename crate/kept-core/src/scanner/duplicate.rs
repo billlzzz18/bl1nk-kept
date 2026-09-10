@@ -99,7 +99,7 @@ pub fn filter_allowed_duplicates(
         .collect()
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct DuplicateGroup {
     pub kind: String,
     pub similarity: f64,
@@ -108,7 +108,7 @@ pub struct DuplicateGroup {
     pub evidence: Option<DuplicateEvidence>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct DuplicateEvidence {
     #[serde(rename = "sizeBytes")]
     pub size_bytes: u64,
@@ -239,10 +239,7 @@ pub fn find_duplicates_with_stats(
         stats.compared_pairs += 1;
         let similarity = normalized_similarity(left_name, right_name);
         if similarity >= options.name_threshold {
-            let mut items = vec![
-                index.files[left].path.clone(),
-                index.files[right].path.clone(),
-            ];
+            let mut items = vec![index.files[left].path.clone(), index.files[right].path.clone()];
             items.sort();
             groups.push(DuplicateGroup {
                 kind: "near_name".to_string(),
@@ -288,7 +285,7 @@ pub fn find_content_duplicates(
                 Ok(hash) => {
                     stats.partial_hash_files += 1;
                     by_partial.entry((size, hash)).or_default().push(file_index);
-                }
+                },
                 Err(_) => stats.unreadable_files += 1,
             }
         }
@@ -306,7 +303,7 @@ pub fn find_content_duplicates(
                 Ok(hash) => {
                     stats.full_hash_files += 1;
                     by_full.entry(hash).or_default().push(file_index);
-                }
+                },
                 Err(_) => stats.unreadable_files += 1,
             }
         }

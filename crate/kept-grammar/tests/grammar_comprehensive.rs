@@ -52,10 +52,7 @@ fn validate_accepts_all_valid_case_values() {
             case: Some(case.to_string()),
             ..NamingSettings::default()
         };
-        assert!(
-            validate_naming_settings(&settings).is_ok(),
-            "case '{case}' should be valid"
-        );
+        assert!(validate_naming_settings(&settings).is_ok(), "case '{case}' should be valid");
     }
 }
 
@@ -75,10 +72,7 @@ fn validate_accepts_all_valid_separator_values() {
             separator: Some(sep.to_string()),
             ..NamingSettings::default()
         };
-        assert!(
-            validate_naming_settings(&settings).is_ok(),
-            "separator '{sep}' should be valid"
-        );
+        assert!(validate_naming_settings(&settings).is_ok(), "separator '{sep}' should be valid");
     }
 }
 
@@ -143,10 +137,7 @@ fn validate_accepts_boundary_similarity_thresholds() {
 fn validate_rejects_length_stem_min_greater_than_max() {
     let settings = NamingSettings {
         length: LengthSettings {
-            stem: Some(RangeLimit {
-                min: Some(200),
-                max: Some(100),
-            }),
+            stem: Some(RangeLimit { min: Some(200), max: Some(100) }),
         },
         ..NamingSettings::default()
     };
@@ -159,10 +150,7 @@ fn validate_rejects_length_stem_min_greater_than_max() {
 #[test]
 fn validate_rejects_words_min_greater_than_max() {
     let settings = NamingSettings {
-        words: WordSettings {
-            min: Some(20),
-            max: Some(5),
-        },
+        words: WordSettings { min: Some(20), max: Some(5) },
         ..NamingSettings::default()
     };
     let err = validate_naming_settings(&settings).unwrap_err();
@@ -253,10 +241,7 @@ fn starter_config_has_default_naming_settings() {
     let config: UserConfig = serde_yaml::from_str(yaml).unwrap();
     assert_eq!(config.defaults.naming.unicode.as_deref(), Some("nfc"));
     assert_eq!(config.defaults.naming.case.as_deref(), Some("preserve"));
-    assert_eq!(
-        config.defaults.naming.separator.as_deref(),
-        Some("preserve")
-    );
+    assert_eq!(config.defaults.naming.separator.as_deref(), Some("preserve"));
     assert_eq!(config.defaults.naming.flag_control_characters, Some(true));
     assert_eq!(config.defaults.naming.flag_trim_whitespace, Some(true));
 }

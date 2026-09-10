@@ -76,7 +76,7 @@ fn run_rg_search(dir: &Path, pattern: &str) -> (usize, f64) {
         Ok(out) => {
             let stdout = String::from_utf8_lossy(&out.stdout);
             stdout.lines().count()
-        },
+        }
         Err(_) => 0,
     };
 
@@ -142,7 +142,7 @@ fn main() {
         Err(e) => {
             eprintln!("Failed to initialize FffScanner on {}: {}", target_dir.display(), e);
             std::process::exit(1);
-        },
+        }
     };
 
     let (inventory, _) = scanner.scan_inventory().expect("Scan inventory failed");
@@ -223,7 +223,7 @@ fn main() {
                 AdmissionDecision::Pass(boxed) => {
                     let c = boxed.content.as_deref().unwrap_or_default();
                     ("PASS", estimate_tokens(c))
-                },
+                }
                 AdmissionDecision::Reference { token_cost, .. } => ("REFERENCE", *token_cost),
                 AdmissionDecision::Delta { token_cost, .. } => ("DELTA", *token_cost),
                 AdmissionDecision::Warn { .. } => ("WARN (LOOP)", 20),

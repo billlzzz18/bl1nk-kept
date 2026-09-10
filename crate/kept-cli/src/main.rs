@@ -1,8 +1,10 @@
-use clap::{Parser, Subcommand};
+use clap::{CommandFactory, Parser, Subcommand};
 use std::path::PathBuf;
 
+mod completion;
+use completion::{generate_completion, Shell};
+
 pub mod commands;
-pub mod completion;
 pub mod corpus;
 pub mod evidence;
 pub mod helpers;
@@ -161,6 +163,11 @@ pub enum Commands {
         #[command(subcommand)]
         action: Option<AgentSubcommand>,
     },
+    /// Generate shell completion scripts.
+    Completion {
+        #[arg(value_enum)]
+        shell: Shell,
+    },
 }
 
 #[tokio::main]
@@ -244,6 +251,10 @@ async fn main() -> anyhow::Result<()> {
         Commands::Mcp { transport } => anyhow::bail!(
             "MCP transport '{transport}' ยังไม่เปิดใช้ใน kept CLI รุ่นนี้; เปิด feature mcp ของ kept-doc เมื่อต้องการ server แยก"
         ),
+        Commands::Completion { shell } => {
+            let mut cmd = Cli::command();
+            generate_completion(&mut cmd, &shell);
+        },
     }
 
     Ok(())

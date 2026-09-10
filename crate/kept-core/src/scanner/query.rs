@@ -130,17 +130,17 @@ pub fn compile_query(query: &str) -> Result<(FilterSet, QueryPlan), String> {
                 "content" | "exact" => {
                     clauses.push(QueryClause::DuplicateContent);
                     explanation.push("Filter files that have exact content duplicates".to_string());
-                },
+                }
                 "name" | "same_name" => {
                     clauses.push(QueryClause::DuplicateName);
                     explanation.push("Filter files that have matching names".to_string());
-                },
+                }
                 _ => {
                     return Err(format!(
                         "Unknown duplicate filter type: 'dup:{}' (valid: content, name)",
                         dup_type
                     ))
-                },
+                }
             }
             continue;
         }

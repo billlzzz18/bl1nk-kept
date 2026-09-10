@@ -127,7 +127,7 @@ impl Bm25Index {
                             index.doc_freqs.push(0);
                             index.postings.push(Vec::new());
                             term_id
-                        },
+                        }
                     };
                     *token_frequencies.entry(term_id).or_insert(0) += 1;
                 }

@@ -33,7 +33,7 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
         Err(e) => {
             eprintln!("Query::new failed: {:?}", e);
             return None;
-        },
+        }
     };
 
     let mut index = ScopeGraphIndex::new();
@@ -64,7 +64,7 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
                             doc: preceding_doc_bytes(node, source_bytes),
                         });
                     }
-                },
+                }
                 "definition.struct" => {
                     if let Some(name) = extract_name(node, source_bytes) {
                         index.definitions.push(SymbolDefinition {
@@ -76,7 +76,7 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
                             doc: preceding_doc_bytes(node, source_bytes),
                         });
                     }
-                },
+                }
                 "definition.enum" => {
                     if let Some(name) = extract_name(node, source_bytes) {
                         index.definitions.push(SymbolDefinition {
@@ -88,7 +88,7 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
                             doc: preceding_doc_bytes(node, source_bytes),
                         });
                     }
-                },
+                }
                 "definition.trait" => {
                     if let Some(name) = extract_name(node, source_bytes) {
                         index.definitions.push(SymbolDefinition {
@@ -100,7 +100,7 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
                             doc: preceding_doc_bytes(node, source_bytes),
                         });
                     }
-                },
+                }
                 "definition.type_alias" => {
                     if let Some(name) = extract_name(node, source_bytes) {
                         index.definitions.push(SymbolDefinition {
@@ -112,7 +112,7 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
                             doc: preceding_doc_bytes(node, source_bytes),
                         });
                     }
-                },
+                }
                 "definition.macro" => {
                     if let Some(name) = extract_name(node, source_bytes) {
                         index.definitions.push(SymbolDefinition {
@@ -124,7 +124,7 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
                             doc: preceding_doc_bytes(node, source_bytes),
                         });
                     }
-                },
+                }
                 "implementation.block" => {
                     // Parse the entire impl block text to extract trait and target type
                     let text = node_text_bytes(node, source_bytes);
@@ -207,7 +207,7 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
                             });
                         }
                     }
-                },
+                }
                 "import.statement" => {
                     // Parse the entire use_declaration node text
                     // Format: "use path::to::module;" or "use path::to::module as alias;" or "use path::to::*;"
@@ -232,7 +232,7 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
                         line: node.start_position().row + 1,
                         is_wildcard,
                     });
-                },
+                }
                 "reference.call" => {
                     let text = node_text_bytes(node, source_bytes);
                     let name = text.rsplit([':', '.']).next().unwrap_or(text).trim();
@@ -245,7 +245,7 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
                             column: node.start_position().column + 1,
                         });
                     }
-                },
+                }
                 "reference.type" => {
                     let name = node_text_bytes(node, source_bytes).to_string();
                     if !name.is_empty() {
@@ -257,9 +257,9 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
                             column: node.start_position().column + 1,
                         });
                     }
-                },
-                "scope" => {}, // ใช้สำหรับ boundary เท่านั้น ไม่จำเป็นต้อง capture
-                _ => {},
+                }
+                "scope" => {} // ใช้สำหรับ boundary เท่านั้น ไม่จำเป็นต้อง capture
+                _ => {}
             }
         }
     }

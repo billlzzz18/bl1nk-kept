@@ -45,17 +45,17 @@ pub fn handle_agent(action: Option<AgentSubcommand>) -> Result<()> {
                 println!("{:<20} detected: {:<30} hooks: {}", agent.name(), detected, status_str);
             }
             Ok(())
-        },
+        }
         Some(AgentSubcommand::Install { name }) => {
             let agent = find_agent(&agents, &name)?;
             println!("{}", agent.install()?);
             Ok(())
-        },
+        }
         Some(AgentSubcommand::Uninstall { name }) => {
             let agent = find_agent(&agents, &name)?;
             println!("{}", agent.uninstall()?);
             Ok(())
-        },
+        }
         Some(AgentSubcommand::Check { name }) => {
             let agent = find_agent(&agents, &name)?;
             match agent.check()? {
@@ -64,7 +64,7 @@ pub fn handle_agent(action: Option<AgentSubcommand>) -> Result<()> {
                 StatusCheck::UpdateAvailable => println!("{}: update available", agent.name()),
             }
             Ok(())
-        },
+        }
     }
 }
 

@@ -137,7 +137,7 @@ impl ObsidianBaseAdapter {
                             .map(|elem| match elem {
                                 crate::ir::InlineElement::TextRun { content, .. } => {
                                     content.as_str()
-                                },
+                                }
                                 _ => "",
                             })
                             .collect::<Vec<&str>>()
@@ -181,13 +181,13 @@ impl ObsidianBaseAdapter {
                     let d = match align {
                         Some(CellAlignment::Left) => {
                             format!(":{:-<width$}", "", width = (*width).saturating_sub(1).max(2))
-                        },
+                        }
                         Some(CellAlignment::Center) => {
                             format!(":{:-<width$}:", "", width = (*width).saturating_sub(2).max(1))
-                        },
+                        }
                         Some(CellAlignment::Right) => {
                             format!("{:-<width$}:", "", width = (*width).saturating_sub(1).max(2))
-                        },
+                        }
                         None => format!("{:-<width$}", "", width = (*width).max(3)),
                     };
                     output.push_str(&format!(" {} |", d));

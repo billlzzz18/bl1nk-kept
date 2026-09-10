@@ -304,7 +304,7 @@ pub fn import_anonymized_jsonl(input: &str) -> ImportReport {
                     message: error.to_string(),
                 });
                 continue;
-            },
+            }
         };
         let (
             Some(raw_text),
@@ -347,7 +347,7 @@ pub fn import_anonymized_jsonl(input: &str) -> ImportReport {
                     message: error.to_string(),
                 });
                 continue;
-            },
+            }
         };
         report.accepted.push(AnonymizedEvidence {
             raw_text,
@@ -641,19 +641,19 @@ pub fn classify_evidence(
         match record.kind {
             EvidenceKind::EncodingValid => {
                 scores.encoding_quality = scores.encoding_quality.max(record.weight)
-            },
+            }
             EvidenceKind::LexicalValid => {
                 scores.lexical_quality = scores.lexical_quality.max(record.weight)
-            },
+            }
             EvidenceKind::GlossaryExact => {
                 scores.glossary_support = scores.glossary_support.max(record.weight)
-            },
+            }
             EvidenceKind::ProvenanceComplete => {
                 scores.provenance_quality = scores.provenance_quality.max(record.weight)
-            },
+            }
             EvidenceKind::PatternRisk => {
                 scores.pattern_risk = scores.pattern_risk.max(record.weight)
-            },
+            }
         }
         reason_ids.push(record.id.clone());
     }

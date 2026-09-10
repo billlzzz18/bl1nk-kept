@@ -7,6 +7,7 @@ use clap_complete::Generator;
 #[derive(Clone, Debug, clap::ValueEnum)]
 #[non_exhaustive]
 #[value(rename_all = "lower")]
+#[allow(clippy::enum_variant_names)]
 pub enum Shell {
     Bash,
     Fish,
@@ -34,8 +35,9 @@ impl Generator for Shell {
     }
 }
 
-pub(crate) fn main(cmd: &mut clap::Command, shell: &Shell) {
-    shell.generate(cmd, &mut std::io::stdout());
+pub(crate) fn generate_completion(cmd: &mut clap::Command, shell: &Shell) {
+    cmd.set_bin_name("kept");
+    clap_complete::generate(shell.clone(), cmd, "kept", &mut std::io::stdout());
 }
 
 #[cfg(test)]

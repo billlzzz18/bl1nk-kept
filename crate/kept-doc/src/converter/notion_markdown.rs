@@ -786,8 +786,8 @@ fn unescape_nfm(s: &str) -> String {
                         out.push(next);
                         chars.next();
                         continue;
-                    },
-                    _ => {},
+                    }
+                    _ => {}
                 }
             }
         }
@@ -803,7 +803,7 @@ pub fn escape_nfm(s: &str) -> String {
             '\\' | '*' | '~' | '`' | '$' | '[' | ']' | '<' | '>' | '{' | '}' | '|' | '^' => {
                 out.push('\\');
                 out.push(ch);
-            },
+            }
             _ => out.push(ch),
         }
     }
@@ -829,7 +829,7 @@ pub fn render_nfm_block(block: &UniversalBlock, indent_level: usize, out: &mut S
                 out.push_str(&format!(" {{color=\"{}\"}}", s.name));
             }
             out.push('\n');
-        },
+        }
         UniversalBlock::Heading { level, content, style } => {
             out.push_str(&indent);
             let h = match level {
@@ -844,7 +844,7 @@ pub fn render_nfm_block(block: &UniversalBlock, indent_level: usize, out: &mut S
                 out.push_str(&format!(" {{color=\"{}\"}}", s.name));
             }
             out.push('\n');
-        },
+        }
         UniversalBlock::CodeBlock { language, content, .. } => {
             out.push_str(&indent);
             out.push_str("```");
@@ -859,7 +859,7 @@ pub fn render_nfm_block(block: &UniversalBlock, indent_level: usize, out: &mut S
             }
             out.push_str(&indent);
             out.push_str("```\n");
-        },
+        }
         UniversalBlock::Quote { content, style } => {
             out.push_str(&indent);
             out.push_str("> ");
@@ -874,7 +874,7 @@ pub fn render_nfm_block(block: &UniversalBlock, indent_level: usize, out: &mut S
             for child in content.iter().skip(1) {
                 render_nfm_block(child, indent_level + 1, out);
             }
-        },
+        }
         UniversalBlock::BulletList { items, .. } => {
             for item in items {
                 out.push_str(&indent);
@@ -891,7 +891,7 @@ pub fn render_nfm_block(block: &UniversalBlock, indent_level: usize, out: &mut S
                     render_nfm_block(child, indent_level + 1, out);
                 }
             }
-        },
+        }
         UniversalBlock::OrderedList { items, .. } => {
             for (idx, item) in items.iter().enumerate() {
                 out.push_str(&indent);
@@ -908,7 +908,7 @@ pub fn render_nfm_block(block: &UniversalBlock, indent_level: usize, out: &mut S
                     render_nfm_block(child, indent_level + 1, out);
                 }
             }
-        },
+        }
         UniversalBlock::TaskList { items, .. } => {
             for item in items {
                 out.push_str(&indent);
@@ -929,7 +929,7 @@ pub fn render_nfm_block(block: &UniversalBlock, indent_level: usize, out: &mut S
                     render_nfm_block(child, indent_level + 1, out);
                 }
             }
-        },
+        }
         UniversalBlock::Callout { icon, color, content, .. } => {
             out.push_str(&indent);
             out.push_str("<callout");
@@ -947,7 +947,7 @@ pub fn render_nfm_block(block: &UniversalBlock, indent_level: usize, out: &mut S
 
             out.push_str(&indent);
             out.push_str("</callout>\n");
-        },
+        }
         UniversalBlock::Toggle { summary, content, style } => {
             out.push_str(&indent);
             out.push_str("<details");
@@ -966,7 +966,7 @@ pub fn render_nfm_block(block: &UniversalBlock, indent_level: usize, out: &mut S
 
             out.push_str(&indent);
             out.push_str("</details>\n");
-        },
+        }
         UniversalBlock::Columns { columns, .. } => {
             out.push_str(&indent);
             out.push_str("<columns>\n");
@@ -979,7 +979,7 @@ pub fn render_nfm_block(block: &UniversalBlock, indent_level: usize, out: &mut S
             }
             out.push_str(&indent);
             out.push_str("</columns>\n");
-        },
+        }
         UniversalBlock::Table { rows, .. } => {
             out.push_str(&indent);
             out.push_str("<table>\n");
@@ -994,10 +994,10 @@ pub fn render_nfm_block(block: &UniversalBlock, indent_level: usize, out: &mut S
             }
             out.push_str(&indent);
             out.push_str("</table>\n");
-        },
+        }
         UniversalBlock::PageBreak => {
             out.push_str(&format!("{}---\n", indent));
-        },
+        }
         UniversalBlock::TableOfContents { style, .. } => {
             out.push_str(&indent);
             out.push_str("<table_of_contents");
@@ -1005,7 +1005,7 @@ pub fn render_nfm_block(block: &UniversalBlock, indent_level: usize, out: &mut S
                 out.push_str(&format!(" color=\"{}\"", s.name));
             }
             out.push_str("/>\n");
-        },
+        }
         UniversalBlock::Mention { mention_type, target, .. } => {
             out.push_str(&indent);
             match mention_type {
@@ -1013,14 +1013,14 @@ pub fn render_nfm_block(block: &UniversalBlock, indent_level: usize, out: &mut S
                 MentionType::Page => out.push_str(&format!("<mention-page url=\"{}\"/>\n", target)),
                 MentionType::Database => {
                     out.push_str(&format!("<mention-database url=\"{}\"/>\n", target))
-                },
+                }
                 MentionType::Date => {
                     out.push_str(&format!("<mention-date start=\"{}\"/>\n", target))
-                },
+                }
                 _ => out.push_str(&format!("<mention-user url=\"{}\"/>\n", target)),
             }
-        },
-        _ => {},
+        }
+        _ => {}
     }
 }
 
@@ -1055,22 +1055,22 @@ pub fn render_inlines(inlines: &[InlineElement], out: &mut String) {
                 } else {
                     out.push_str(&escape_nfm(content));
                 }
-            },
+            }
             InlineElement::Equation { expression, .. } => {
                 out.push_str(&format!("$`{}`$", expression));
-            },
+            }
             InlineElement::HardBreak => {
                 out.push_str("<br>");
-            },
+            }
             InlineElement::SoftBreak => {
                 out.push(' ');
-            },
+            }
             InlineElement::Mention { mention_type, target, .. } => match mention_type {
                 MentionType::User => out.push_str(&format!("<mention-user url=\"{}\"/>", target)),
                 MentionType::Page => out.push_str(&format!("<mention-page url=\"{}\"/>", target)),
                 MentionType::Database => {
                     out.push_str(&format!("<mention-database url=\"{}\"/>", target))
-                },
+                }
                 MentionType::Date => out.push_str(&format!("<mention-date start=\"{}\"/>", target)),
                 _ => out.push_str(&format!("<mention-user url=\"{}\"/>", target)),
             },

@@ -136,7 +136,7 @@ impl OperationContract {
                     }
                 }
                 Ok(())
-            },
+            }
             ExpectedEffect::Rename { changes } => {
                 for change in changes {
                     let from_str = change.from.to_string_lossy();
@@ -153,7 +153,7 @@ impl OperationContract {
                     }
                 }
                 Ok(())
-            },
+            }
             ExpectedEffect::Move { changes } => {
                 for change in changes {
                     let source_str = change.source.to_string_lossy();
@@ -170,7 +170,7 @@ impl OperationContract {
                     }
                 }
                 Ok(())
-            },
+            }
             ExpectedEffect::NoOp { .. } => Ok(()),
         }
     }

@@ -26,7 +26,7 @@ pub async fn handle_doc(cmd: DocCommands) -> anyhow::Result<()> {
     match cmd {
         DocCommands::Sync { .. } => {
             anyhow::bail!("Live Notion sync is not available in offline kept build.");
-        },
+        }
         DocCommands::Convert { input, output } => {
             let content = std::fs::read_to_string(&input)?;
             let doc = MarkdownConverter::from_platform(content)
@@ -45,7 +45,7 @@ pub async fn handle_doc(cmd: DocCommands) -> anyhow::Result<()> {
                 .map_err(|e| anyhow::anyhow!("Failed to write markdown: {}", e))?;
             std::fs::write(output, md)?;
             println!("Converted successfully to Markdown!");
-        },
+        }
     }
     Ok(())
 }

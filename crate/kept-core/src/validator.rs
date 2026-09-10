@@ -364,7 +364,7 @@ fn validate_field(
                     message: format!("Invalid regex pattern for field '{}'", name),
                     field: Some(name.into()),
                 }),
-                _ => {},
+                _ => {}
             }
         }
         if let Some(values) = &schema.values {

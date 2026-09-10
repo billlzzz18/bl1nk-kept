@@ -300,7 +300,7 @@ pub fn handle_task_review(
                 {
                     println!("{size}\t{path}");
                 }
-            },
+            }
             ScanReviewAction::Find => run_interactive_find(canonical_root.clone())?,
             ScanReviewAction::Duplicates => handle_task_duplicates(
                 canonical_root.clone(),
@@ -322,7 +322,7 @@ pub fn handle_task_review(
                         bad.path, bad.detected_extension, bad.actual_extension
                     );
                 }
-            },
+            }
             ScanReviewAction::Issues => println!("{}", scan_review_summary(&snapshot.index)),
             ScanReviewAction::Naming => println!("{}", naming_review_summary(&snapshot.index)),
         }
@@ -390,7 +390,7 @@ pub fn naming_review_summary_at(index: &kept_core::ScanIndex, config_path: &Path
                 "Naming policy: config error at '{}': {error}; run kept doctor",
                 config_path.display()
             )
-        },
+        }
     };
     let findings = match kept_core::analyze_index_naming(index, &config) {
         Ok(findings) => findings,

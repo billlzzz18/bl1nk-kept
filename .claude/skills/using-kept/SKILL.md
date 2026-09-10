@@ -1,6 +1,18 @@
 ---
 name: using-kept
-description: Use when working in this repo — guides through kept setup and usage for filesystem indexing, search, duplicates, and document conversion
+description: Use when working in this repo — guides through kept setup and usage for filesystem indexing, search, duplicates, and document conversion.
+triggers:
+  - kept setup
+  - kept CLI
+  - kept scan
+  - kept find
+  - kept duplicates
+  - kept convert
+  - filesystem indexing
+  - document conversion
+role: kept CLI reference — setup, commands, MCP tools, gotchas
+scope: kept-cli, kept-mcp, and workspace tooling
+output-format: CLI commands and configuration steps
 ---
 
 ## Prerequisites
@@ -14,7 +26,7 @@ description: Use when working in this repo — guides through kept setup and usa
 
 ```powershell
 cargo build -p kept-cli        # creates target/debug/kept.exe
-$env:PATH += ";d:\01work\Active\workspace\bl1nk-kept\target\debug"
+$env:PATH += ";$PWD\target\debug"
 ```
 
 ### 2. Build MCP server (if using MCP tools)
@@ -80,7 +92,7 @@ kept doctor --fix              # verify environment, fix broken config
 
 Requires `bl1nk-kept-mcp` running as MCP server. Register with Claude Code:
 ```powershell
-claude mcp add -s user kept -- "d:\01work\Active\workspace\bl1nk-kept\target\debug\bl1nk-kept-mcp.exe"
+claude mcp add -s user kept -- "$PWD\target\debug\bl1nk-kept-mcp.exe"
 ```
 
 ### Filesystem Tools

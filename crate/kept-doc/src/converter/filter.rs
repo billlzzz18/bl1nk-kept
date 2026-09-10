@@ -66,20 +66,20 @@ impl ThaiSanitizationFilter {
         match block {
             Paragraph { content, .. } | Heading { content, .. } => {
                 self.process_inline(content);
-            },
+            }
             BulletList { items, .. } | OrderedList { items, .. } => {
                 for item in items {
                     for b in &mut item.content {
                         self.process_block(b);
                     }
                 }
-            },
+            }
             Quote { content, .. } | Callout { content, .. } | Toggle { content, .. } => {
                 for b in content {
                     self.process_block(b);
                 }
-            },
-            _ => {},
+            }
+            _ => {}
         }
     }
 

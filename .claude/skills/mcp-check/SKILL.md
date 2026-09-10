@@ -1,6 +1,6 @@
 ---
 name: mcp-check
-description: Use to verify MCP server status, tools, and connectivity. Invoke when MCP tools fail or before starting MCP-dependent work.
+description: Use when MCP tools fail, return errors, or before starting MCP-dependent work. Verifies server status, tool availability, and connectivity.
 triggers:
   - MCP
   - mcp server
@@ -49,14 +49,15 @@ Get-Process | Where-Object {$_.ProcessName -like "*bl1nk-kept*"}
 
 ### Check tool availability
 ```bash
-# List available MCP tools
-# Use ListMcpResourcesTool or check Claude Code settings
+# Use ListMcpResourcesTool to see registered tools
+# Or check .mcp.json for server configuration
+cat .mcp.json
 ```
 
 ### Test simple tool call
 ```bash
-# Try a simple read operation
-# If fails, server may be down
+# Try a simple operation with the MCP tool
+# If it fails, server may be down — check process first
 ```
 
 ## VSCode Integration

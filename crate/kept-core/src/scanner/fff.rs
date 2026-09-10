@@ -148,7 +148,7 @@ impl FffScanner {
                 } else {
                     String::from_utf8(bytes).ok()
                 }
-            },
+            }
         };
 
         let timestamp = std::time::SystemTime::now()

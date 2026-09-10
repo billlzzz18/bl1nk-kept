@@ -95,7 +95,7 @@ pub fn json_hook_uninstall(path: &Path, spec: &JsonHookUninstallSpec) -> Result<
                     .unwrap_or("parse error")
                     .to_string()
             });
-        },
+        }
     };
 
     let had_hooks = remove_workmux_hooks(&mut config, spec.remove_plugins);

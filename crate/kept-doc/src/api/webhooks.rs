@@ -276,7 +276,7 @@ mod tests {
                 assert_eq!(e.kind(), WebhookEventType::PageContentUpdated);
                 assert_eq!(e.entity.as_ref().unwrap().id, "page-1");
                 assert_eq!(e.id.as_deref(), Some("evt-1"));
-            },
+            }
             other => panic!("expected event, got {:?}", other),
         }
     }
@@ -287,7 +287,7 @@ mod tests {
         match parse_webhook_payload(body).unwrap() {
             WebhookPayload::Event(e) => {
                 assert_eq!(e.kind(), WebhookEventType::Other("page.future_thing".into()));
-            },
+            }
             other => panic!("expected event, got {:?}", other),
         }
     }

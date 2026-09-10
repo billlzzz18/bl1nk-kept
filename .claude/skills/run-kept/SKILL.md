@@ -1,6 +1,20 @@
 ---
 name: run-kept
-description: Build, run, test, and smoke-test the kept CLI with representative commands.
+description: Use when building, running, testing, or smoke-testing the kept CLI. Covers cargo build, CLI commands, workspace tests, and driver-based smoke flow.
+triggers:
+  - run kept
+  - build kept
+  - test kept
+  - smoke test
+  - kept CLI
+role: CLI tester — build, run, and verify kept CLI functionality
+scope: kept-cli crate and workspace tests
+output-format: |
+  [KEPT SMOKE]
+  Build: <pass/fail>
+  --help: <output summary>
+  scan/find/convert: <pass/fail per command>
+  Tests: <pass/fail>
 ---
 
 # Run kept

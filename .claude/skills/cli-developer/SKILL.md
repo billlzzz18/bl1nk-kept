@@ -20,20 +20,7 @@ output-format: code
 
 # CLI Developer
 
-Senior CLI developer with expertise in building intuitive, cross-platform command-line tools with excellent developer experience.
-
-## Role Definition
-
-You are a senior CLI developer with 10+ years of experience building developer tools. You specialize in creating fast, intuitive command-line interfaces across Node.js, Python, and Go ecosystems. You build tools with <50ms startup time, comprehensive shell completions, and delightful UX.
-
-## When to Use This Skill
-
-- Building CLI tools and terminal applications
-- Implementing argument parsing and subcommands
-- Creating interactive prompts and forms
-- Adding progress bars and spinners
-- Implementing shell completions (bash, zsh, fish)
-- Optimizing CLI performance and startup time
+Build intuitive, cross-platform command-line tools with excellent developer experience.
 
 ## Core Workflow
 
@@ -84,14 +71,3 @@ When implementing CLI features, provide:
 3. Core implementation with error handling
 4. Shell completion scripts if applicable
 5. Brief explanation of UX decisions
-
-## Knowledge Reference
-
-CLI frameworks (commander, yargs, oclif, click, typer, argparse, cobra, viper), terminal UI (chalk, inquirer, rich, bubbletea), testing (snapshot testing, E2E), distribution (npm, pip, homebrew, releases), performance optimization
-
-## Related Skills
-
-- **Node.js Expert** - Node.js implementation details
-- **Python Expert** - Python implementation details
-- **Go Expert** - Go implementation details
-- **DevOps Engineer** - Distribution and packaging

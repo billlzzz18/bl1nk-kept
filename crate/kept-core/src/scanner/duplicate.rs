@@ -285,7 +285,7 @@ pub fn find_content_duplicates(
                 Ok(hash) => {
                     stats.partial_hash_files += 1;
                     by_partial.entry((size, hash)).or_default().push(file_index);
-                },
+                }
                 Err(_) => stats.unreadable_files += 1,
             }
         }
@@ -303,7 +303,7 @@ pub fn find_content_duplicates(
                 Ok(hash) => {
                     stats.full_hash_files += 1;
                     by_full.entry(hash).or_default().push(file_index);
-                },
+                }
                 Err(_) => stats.unreadable_files += 1,
             }
         }

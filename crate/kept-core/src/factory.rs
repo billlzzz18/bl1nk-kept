@@ -52,7 +52,7 @@ impl OperationFactory {
                     expected: ExpectedEffect::DuplicateRemoval { groups },
                     policy: policy.clone(),
                 })
-            },
+            }
             UserIntent::AutoFix { .. } => {
                 // Agent judgment: ต้องตัดสินใจว่าแก้ไขอะไร
                 let judgment = AgentJudgment::evaluate(current_state, policy)?;
@@ -61,7 +61,7 @@ impl OperationFactory {
                     expected: judgment.effect,
                     policy: policy.clone(),
                 })
-            },
+            }
         }
     }
 }

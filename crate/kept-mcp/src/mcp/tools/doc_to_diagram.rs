@@ -76,7 +76,7 @@ impl DocumentToDiagramTool {
                 } else {
                     "flowchart"
                 }
-            },
+            }
             other => other,
         };
 
@@ -231,7 +231,7 @@ impl DocumentToDiagramTool {
                     out.push_str(&format!("  {}->>{}: {}\n", edge.from, edge.to, msg));
                 }
                 out
-            },
+            }
             "state" => {
                 let mut out = String::from("stateDiagram-v2\n");
                 if let Some(root) = &graph.root_node {
@@ -246,7 +246,7 @@ impl DocumentToDiagramTool {
                     out.push_str(&format!("  {} --> {}{}\n", edge.from, edge.to, label));
                 }
                 out
-            },
+            }
             _ => {
                 // Default Flowchart TD
                 let mut out = String::from("graph TD\n");
@@ -261,7 +261,7 @@ impl DocumentToDiagramTool {
                     }
                 }
                 out
-            },
+            }
         }
     }
 
@@ -322,10 +322,10 @@ impl ToolHandler for DocumentToDiagramTool {
             match mermaid_rs_renderer::render(&mermaid_markup) {
                 Ok(svg) => {
                     response["rendered_svg"] = json!(svg);
-                },
+                }
                 Err(e) => {
                     response["render_warning"] = json!(format!("SVG render fallback: {}", e));
-                },
+                }
             }
         }
 

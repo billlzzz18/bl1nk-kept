@@ -369,7 +369,7 @@ pub fn execute_duplicate_mutation(
                     backup_path: Some(backup_file.display().to_string()),
                     restored: false,
                 });
-            },
+            }
             DuplicateActionKind::Delete => {
                 fs::create_dir_all(&backup_dir)?;
                 let relative_target = target_full.strip_prefix(root_path).unwrap_or(&target_full);
@@ -385,7 +385,7 @@ pub fn execute_duplicate_mutation(
                     backup_path: Some(backup_file.display().to_string()),
                     restored: false,
                 });
-            },
+            }
             DuplicateActionKind::HardLink => {
                 // NOTE-004: S4 — ตรวจสอบ checksum ของ canonical ก่อน hardlink
                 if policy.verify_checksum_before_action && !action.expected_sha256.is_empty() {
@@ -427,7 +427,7 @@ pub fn execute_duplicate_mutation(
                     backup_path: Some(backup_file.display().to_string()),
                     restored: false,
                 });
-            },
+            }
         }
     }
 

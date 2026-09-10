@@ -277,11 +277,6 @@ mod tests {
 
         let all_present = hooks::has_required_hook_commands(&settings, &required);
 
-        // Check each event individually
-        for (event, req_entries) in required.as_object().unwrap() {
-            let settings_entries = settings["hooks"].get(event).and_then(|v| v.as_array());
-        }
-
         assert!(all_present, "all required hook commands should be present after merge");
     }
 

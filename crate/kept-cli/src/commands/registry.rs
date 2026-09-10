@@ -100,7 +100,7 @@ pub async fn handle_registry(cmd: RegistryCommands) -> anyhow::Result<()> {
             if failed {
                 anyhow::bail!("validation failed")
             }
-        },
+        }
         RegistryCommands::Search {
             path,
             query,
@@ -135,7 +135,7 @@ pub async fn handle_registry(cmd: RegistryCommands) -> anyhow::Result<()> {
                     println!("{}: {} (score: {:.2})", r.id, r.description, r.score);
                 }
             }
-        },
+        }
         RegistryCommands::Analyze { path, json } => {
             let mut registry =
                 load_registry(path).map_err(|error| anyhow::anyhow!(error.to_string()))?;
@@ -145,7 +145,7 @@ pub async fn handle_registry(cmd: RegistryCommands) -> anyhow::Result<()> {
             } else {
                 println!("Analysis complete for {}", registry.metadata.description);
             }
-        },
+        }
         RegistryCommands::Import {
             csv,
             group_id,
@@ -157,7 +157,7 @@ pub async fn handle_registry(cmd: RegistryCommands) -> anyhow::Result<()> {
             let registry = prepare_imported_registry(legacy_registry)?;
             save_registry(output, &registry).map_err(|error| anyhow::anyhow!(error.to_string()))?;
             println!("Imported successfully!");
-        },
+        }
     }
     Ok(())
 }

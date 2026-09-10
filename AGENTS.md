@@ -3,11 +3,13 @@
 ## 0. Rust Core Standards
 
 ### Safety & Error Handling
+
 - **No panic / avoid `unwrap()`:** Use `?`, `match`, or `if let` exclusively
 - **Don't swallow errors with `let _ =`:** Propagate with `?` or log — never ignore silently
 - **Guard index access:** Avoid `arr[i]`; use `.get(i)` for bounds safety
 
 ### Coding Philosophy & Ergonomics
+
 - **Correctness before performance:** Code must be correct and readable first; optimize only hot paths with benchmarks
 - **Full variable names:** No cryptic abbreviations (e.g., `query` not `q`, `buffer` not `buf`)
 - **No gratuitous sub-files:** Extend existing modules unless it's a genuine new logical component
@@ -21,9 +23,11 @@ tokio::spawn(async move {
 ```
 
 ### Module Structure
+
 - **No `mod.rs`:** Use modern path convention (e.g., `src/scanner.rs` + `src/scanner/fff.rs`)
 
 ### Agent Discipline
+
 - **Strict scope adherence:** Work only within agreed boundaries
 - **Don't guess vague terms as preferred actions:**
   - "Test" → `cargo test`, Dogfooding, CLI execution, or result verification — observe context
@@ -96,16 +100,19 @@ Configured in `.mcp.json` for stdio transport.
 ## 6. Key Architecture Facts
 
 ### Observation Model (kept-core)
+
 All data access goes through `Observation` with:
 - **Source:** `File`, `Grep`, `TreeSitter`, `Parser`, `Fts`, `Bm25`, `Vector`, etc.
 - **Target URI:** Unambiguous resource locator (`file://`, `symbol://`, `search://`, `document://`, `context://`)
 - **Revision & ContentIdentity:** Timestamp/token + content hash for change detection
 
 ### Look vs View
+
 - `look` — lightweight: identity, size, revision, outline (no full content)
 - `view` — materialize content by range or symbol when needed
 
 ### Judge Engine Treatments
+
 - `PASS` — new content, deliver full
 - `REFERENCE` — seen before, unchanged (13-token pointer)
 - `DELTA` — seen before, changed (diff only)
@@ -113,21 +120,13 @@ All data access goes through `Observation` with:
 - `WARN` / `BLOCK` — repeated redundant requests (≥3x threshold)
 
 ### FFF Engine
+
 Filesystem operations use `fff-search` (not `std::fs::read_dir`):
 - Traversal, `.gitignore`/`.ignore`, Git status, fuzzy path search, content grep, live watcher
 - Canonical root required; results as deterministic relative paths
 
 ### Duplicate Verification Pipeline (fixed order)
-```
-size bucket → partial SHA-256 → full SHA-256 → group evidence
-```
-Categories: `same_name`, `near_name`, `same_content`, `hard_link` — with verifiable evidence/confidence
 
----
-
-## 7. Testing & Verification
-
-### Test Organization
 - Unit tests: `#[cfg(test)]` modules in source files
 - Integration tests: `tests/*.py` (Python) + `tests/*.rs` (Rust)
 - Run single crate: `cargo test -p kept-core`
@@ -135,12 +134,14 @@ Categories: `same_name`, `near_name`, `same_content`, `hard_link` — with verif
 - Nextest config: `nextest.toml` (CI retries=1, 60s slow timeout)
 
 ### Benchmarks
+
 - Component: FFF vs ripgrep (throughput, latency, memory, cold/warm cache)
 - Treatment: token savings per `PASS`/`COMPRESS`/`SELECT`/`DELTA`/`REFERENCE`
 - Workflow: end-to-end tasks (understand repo, fix bug, refactor, repeated inquiry)
 - Client impact: context reduction %, repeated reads %, tool calls %, time-to-completion
 
 ### Golden Rules
+
 - Every public behavior change needs focused test + CLI/MCP proof
 - After CLI changes: test source archive + `just cli-smoke` from extracted archive
 - `just check` must pass 100% before PR/handoff

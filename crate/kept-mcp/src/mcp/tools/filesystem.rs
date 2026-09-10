@@ -268,7 +268,7 @@ impl FffManager {
                                 }
                             }
                         }
-                    },
+                    }
                     kept_core::context::AdmissionDecision::Reference {
                         target: _,
                         hash: _,
@@ -289,12 +289,12 @@ impl FffManager {
                                 }
                             }
                         }
-                    },
+                    }
                     kept_core::context::AdmissionDecision::Block { target, reason } => {
                         tracing::warn!("Acquisition blocked by Judge for {}: {}", target, reason);
                         break;
-                    },
-                    _ => {},
+                    }
+                    _ => {}
                 }
             }
         }
@@ -401,11 +401,11 @@ impl FffManager {
                         match plan {
                             Ok(ref p) => {
                                 apply_refresh_plan(&mut state.records, p, &new_records);
-                            },
+                            }
                             Err(_) => {
                                 // NOTE-003: fallback — replace ทั้งหมดถ้า plan ล้มเหลว
                                 state.records = new_records;
-                            },
+                            }
                         }
                     }
                 }

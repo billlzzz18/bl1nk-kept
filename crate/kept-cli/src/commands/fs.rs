@@ -65,7 +65,7 @@ pub fn handle_fs(cmd: FsCommands) -> anyhow::Result<()> {
             )?;
             std::fs::write(output, serde_json::to_string_pretty(&index)?)?;
             println!("Indexed {} files.", index.files.len());
-        },
+        }
         FsCommands::Treemap { index, json } => {
             let index_data: kept_core::ScanIndex =
                 serde_json::from_str(&std::fs::read_to_string(index)?)?;
@@ -79,7 +79,7 @@ pub fn handle_fs(cmd: FsCommands) -> anyhow::Result<()> {
                     tree.children.len()
                 );
             }
-        },
+        }
         FsCommands::Filter {
             index,
             all_filters,
@@ -112,7 +112,7 @@ pub fn handle_fs(cmd: FsCommands) -> anyhow::Result<()> {
                 }
                 println!("Matched {} of {} file(s).", records.len(), index_data.files.len());
             }
-        },
+        }
     }
     Ok(())
 }
@@ -185,10 +185,10 @@ pub fn parse_file_filter(raw: &str) -> anyhow::Result<kept_core::FileFilter> {
         ("size", "lt") => Ok(FileFilter::MaxSize(parse_human_size(value)?.saturating_sub(1))),
         ("modified", "after" | "ge") => {
             Ok(FileFilter::ModifiedAfter(parse_filter_number(field, value)?))
-        },
+        }
         ("modified", "before" | "le") => {
             Ok(FileFilter::ModifiedBefore(parse_filter_number(field, value)?))
-        },
+        }
         _ => anyhow::bail!("คู่ field:operator ไม่รองรับ '{field}:{operator}'"),
     }
 }

@@ -184,7 +184,7 @@ fn rich_text_single_to_ir(rt: &RichText) -> InlineElement {
                 content: text.content.clone(),
                 style: Some(style),
             }
-        },
+        }
         RichText::Mention { mention, annotations, .. } => {
             let mut style = TextStyle::new();
             if let Some(ann) = annotations {
@@ -216,7 +216,7 @@ fn rich_text_single_to_ir(rt: &RichText) -> InlineElement {
                 label: Some(rt.plain_text().to_string()),
                 style: Some(style),
             }
-        },
+        }
         RichText::Equation { equation, annotations, .. } => {
             let mut style = TextStyle::new();
             if let Some(ann) = annotations {
@@ -246,7 +246,7 @@ fn rich_text_single_to_ir(rt: &RichText) -> InlineElement {
                 expression: equation.expression.clone(),
                 style: Some(style),
             }
-        },
+        }
     }
 }
 
@@ -427,7 +427,7 @@ pub fn block_to_ir(block: &Block) -> Result<UniversalBlock, ConverterError> {
                 header: None,
                 style: None,
             })
-        },
+        }
         _ => Ok(UniversalBlock::Raw {
             platform: Platform::Notion,
             data: serde_json::json!({ "type": "unsupported" }),
@@ -528,7 +528,7 @@ fn block_ir_to_notion(block: &UniversalBlock) -> Result<Block, ConverterError> {
                 parent: None,
                 block_type,
             })
-        },
+        }
         UniversalBlock::CodeBlock { language, content, .. } => Ok(Block {
             object: "block".to_string(),
             id: "temp".to_string(),
@@ -669,7 +669,7 @@ fn block_ir_to_notion(block: &UniversalBlock) -> Result<Block, ConverterError> {
                         .map(|c| match c {
                             UniversalBlock::Paragraph { content, .. } => {
                                 inline_to_rich_text(content)
-                            },
+                            }
                             _ => vec![],
                         })
                         .unwrap_or_default(),
@@ -774,7 +774,7 @@ fn block_ir_to_notion(block: &UniversalBlock) -> Result<Block, ConverterError> {
                     },
                 },
             })
-        },
+        }
         _ => Err(ConverterError::ConversionFailed(
             "Block type not yet implemented for Notion export".to_string(),
         )),
@@ -863,7 +863,7 @@ fn inline_single_to_rich_text(elem: &InlineElement) -> RichText {
                 plain_text: Some(content.clone()),
                 href: None,
             }
-        },
+        }
         _ => RichText::Text {
             text: crate::models::common::TextContent {
                 content: "unsupported".to_string(),
@@ -881,7 +881,7 @@ fn file_content_to_media_source(file: &FileBlockContent) -> Result<MediaSource, 
     match &file.file_type {
         crate::models::common::FileType::External { external } => {
             Ok(MediaSource::External { url: external.url.clone() })
-        },
+        }
         crate::models::common::FileType::Uploaded { file } => Ok(MediaSource::Uploaded {
             url: file.url.clone(),
             expiry_time: file.expiry_time.map(|t| t.to_string()),
@@ -943,14 +943,14 @@ fn property_value_from_ir(value: &PropertyValue) -> Result<Value, ConverterError
         PropertyValue::Select { select } => Ok(serde_json::json!({ "select": select })),
         PropertyValue::MultiSelect { multi_select } => {
             Ok(serde_json::json!({ "multi_select": multi_select }))
-        },
+        }
         PropertyValue::Date { date } => Ok(serde_json::json!({ "date": date })),
         PropertyValue::Checkbox { checkbox } => Ok(serde_json::json!({ "checkbox": checkbox })),
         PropertyValue::Url { url } => Ok(serde_json::json!({ "url": url })),
         PropertyValue::Email { email } => Ok(serde_json::json!({ "email": email })),
         PropertyValue::PhoneNumber { phone_number } => {
             Ok(serde_json::json!({ "phone_number": phone_number }))
-        },
+        }
         PropertyValue::Relation { relation } => Ok(
             serde_json::json!({ "relation": relation.iter().map(|id| serde_json::json!({ "id": id })).collect::<Vec<_>>() }),
         ),
@@ -1023,7 +1023,7 @@ mod tests {
                 let children = table.children.expect("rows");
                 assert_eq!(children.len(), 2);
                 assert!(matches!(children[0].block_type, BlockType::TableRow { .. }));
-            },
+            }
             other => panic!("expected Table, got {:?}", other),
         }
     }
@@ -1051,7 +1051,7 @@ mod tests {
                     }
                 }
                 assert_eq!(s, "Alice");
-            },
+            }
             other => panic!("expected Table, got {:?}", other),
         }
     }
@@ -1084,11 +1084,11 @@ mod tests {
                     match &child.block_type {
                         BlockType::TableRow { table_row } => {
                             assert_eq!(table_row.cells.len(), 3);
-                        },
+                        }
                         other => panic!("expected TableRow, got {:?}", other),
                     }
                 }
-            },
+            }
             other => panic!("expected Table, got {:?}", other),
         }
     }

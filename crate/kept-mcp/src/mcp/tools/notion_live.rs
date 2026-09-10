@@ -119,7 +119,7 @@ impl ToolHandler for CreatePageTool {
         let children = match input.children {
             Some(v) => {
                 Some(serde_json::from_value(v).map_err(|e| invalid_args("Invalid children", e))?)
-            },
+            }
             None => None,
         };
         let page = self

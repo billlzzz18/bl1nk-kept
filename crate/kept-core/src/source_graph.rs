@@ -557,7 +557,7 @@ pub fn coalesce_file_events(events: &[FileEvent]) -> Vec<FileEvent> {
         match ev.kind {
             FileEventKind::Created => {
                 map.insert(ev.path.clone(), FileEventKind::Created);
-            },
+            }
             FileEventKind::Modified => {
                 map.entry(ev.path.clone())
                     .and_modify(|k| {
@@ -566,14 +566,14 @@ pub fn coalesce_file_events(events: &[FileEvent]) -> Vec<FileEvent> {
                         }
                     })
                     .or_insert(FileEventKind::Modified);
-            },
+            }
             FileEventKind::Deleted => {
                 if let Some(FileEventKind::Created) = map.get(&ev.path) {
                     map.remove(&ev.path);
                 } else {
                     map.insert(ev.path.clone(), FileEventKind::Deleted);
                 }
-            },
+            }
         }
     }
 
@@ -630,7 +630,7 @@ impl IndexManager {
             match event.kind {
                 FileEventKind::Deleted => {
                     guard.remove_file(&path_str);
-                },
+                }
                 FileEventKind::Created | FileEventKind::Modified => {
                     guard.remove_file(&path_str);
                     if event.path.is_file() {
@@ -654,7 +654,7 @@ impl IndexManager {
                             guard.indexed_files.extend(file_idx.indexed_files);
                         }
                     }
-                },
+                }
             }
         }
         guard.compact();

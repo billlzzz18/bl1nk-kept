@@ -1,6 +1,6 @@
 ---
 name: error-logger
-description: Use after every mistake, wrong approach, or misunderstood request. Enforces mandatory error logging to .learnings/ERRORS.md. Invoke after any correction from user.
+description: Use when agent makes a mistake, takes wrong approach, misunderstands a request, or user issues a correction. Enforces mandatory error logging to .learnings/ERRORS.md.
 triggers:
   - mistake
   - wrong approach
@@ -46,10 +46,10 @@ Append to `.learnings/ERRORS.md`:
 ```markdown
 ## [ERR-YYYYMMDD-XXX] <short title>
 
-**บันทึกเมื่อ**: <ISO timestamp>
-**ลำดับความสำคัญ**: ต่ำ/ปานกลาง/สูง/วิกฤต
-**สถานะ**: กำลังแก้ไข
-**ขอบเขต**: <scope tags>
+**Logged at**: <ISO timestamp>
+**Severity**: low/medium/high/critical
+**Status**: active
+**Scope**: <scope tags>
 
 ### Summary
 
@@ -61,17 +61,17 @@ Append to `.learnings/ERRORS.md`:
 
 ### Context
 
-- คำส่ัง: <what user asked>
-- สิ่งที่ทำ: <what you did wrong>
-- สาเหตุ: <root cause>
+- Request: <what user asked>
+- Action: <what you did wrong>
+- Root cause: <root cause>
 
 ### Suggested Fix
 
 <how to prevent this in the future>
 
 ### Metadata
-- ทำซ้ำได้: ใช่/ไม่ใช่
-- ไฟล์ที่เกี่ยวข้อง: <list>
+- Reproducible: yes/no
+- Files: <list>
 - Session: <session ID if available>
 ```
 

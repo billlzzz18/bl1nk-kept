@@ -43,7 +43,7 @@ fn test_judge_fresh_observation_passes_and_registers() {
         AdmissionDecision::Pass(obs) => {
             assert_eq!(obs.id, "obs_01");
             assert_eq!(obs.target.to_string(), "file://src/main.rs");
-        },
+        }
         other => panic!("Expected Pass, got {:?}", other),
     }
 
@@ -54,7 +54,7 @@ fn test_judge_fresh_observation_passes_and_registers() {
             assert_eq!(t, "file://src/main.rs");
             assert_eq!(hash.len(), 8);
             assert_eq!(token_cost, 13);
-        },
+        }
         other => panic!("Expected Reference, got {:?}", other),
     }
 
@@ -68,7 +68,7 @@ fn test_judge_fresh_observation_passes_and_registers() {
         AdmissionDecision::Warn { target: t, warning } => {
             assert_eq!(t, "file://src/main.rs");
             assert!(warning.contains("Repetitive read detected"));
-        },
+        }
         other => panic!("Expected Warn, got {:?}", other),
     }
 }
@@ -161,7 +161,7 @@ fn test_unproductive_acquisition_requires_outcome_declaration() {
         AdmissionDecision::Block { target, reason } => {
             assert_eq!(target, "file://src/c.rs");
             assert!(reason.contains("Unproductive acquisition"));
-        },
+        }
         other => panic!("Expected Block due to missing outcome, got {:?}", other),
     }
 }
@@ -178,7 +178,7 @@ fn test_reject_unproductive_verbosity_on_failure() {
     match eval.decision {
         AdmissionDecision::Drop { reason, .. } | AdmissionDecision::Block { reason, .. } => {
             assert!(reason.contains("Shameless failure verbosity"));
-        },
+        }
         other => panic!("Expected Block/Drop for shameless failure verbosity, got {:?}", other),
     }
 }
@@ -193,10 +193,10 @@ fn test_block_subagent_spawning_for_simple_explanation() {
         AdmissionDecision::Block { target, reason } => {
             assert_eq!(target, "spawn_subagent");
             assert!(reason.contains("Subagent spawning blocked for simple explanation"));
-        },
+        }
         other => {
             panic!("Expected Block for spawning subagent on explanation task, got {:?}", other)
-        },
+        }
     }
 }
 
@@ -214,7 +214,7 @@ fn test_forbid_extrapolation_without_provenance() {
     match eval.decision {
         AdmissionDecision::Block { reason, .. } => {
             assert!(reason.contains("Unfounded fabrication without raw data provenance"));
-        },
+        }
         other => panic!("Expected Block for ungrounded narrative extrapolation, got {:?}", other),
     }
 }
@@ -270,7 +270,7 @@ fn test_judge_blocks_observation_conflicting_with_active_correction() {
         AdmissionDecision::Block { reason, .. } => {
             assert!(reason.contains("Active correction"));
             assert!(reason.contains("blocks acquisition"));
-        },
+        }
         other => panic!("Expected Block from ledger guard, got {:?}", other),
     }
     assert_eq!(eval.confidence, 1.0);
@@ -344,7 +344,7 @@ fn test_resolve_returned_for_ambiguous_term_test() {
         AdmissionDecision::Resolve { term, choices, .. } => {
             assert_eq!(term, "ทดสอบ");
             assert!(!choices.is_empty(), "Resolve must carry at least one choice for the caller");
-        },
+        }
         other => panic!("Expected Resolve for ambiguous term 'ทดสอบ', got {:?}", other),
     }
 }
@@ -358,7 +358,7 @@ fn test_resolve_returned_for_ambiguous_term_problem() {
         AdmissionDecision::Resolve { term, choices, .. } => {
             assert_eq!(term, "ปัญหา");
             assert!(!choices.is_empty(), "Resolve must carry at least one choice for the caller");
-        },
+        }
         other => panic!("Expected Resolve for ambiguous term 'ปัญหา', got {:?}", other),
     }
 }
@@ -373,7 +373,7 @@ fn test_resolve_returned_for_ambiguous_term_delete() {
         AdmissionDecision::Resolve { term, choices, .. } => {
             assert_eq!(term, "ลบ");
             assert!(!choices.is_empty(), "Resolve must carry at least one choice for the caller");
-        },
+        }
         other => panic!("Expected Resolve for ambiguous term 'ลบ', got {:?}", other),
     }
 }
@@ -406,7 +406,7 @@ fn test_scope_resolution_blocks_implicit_wider_scope() {
     match decision {
         AdmissionDecision::Block { reason, .. } => {
             assert!(!reason.is_empty(), "Block for implicit wider scope must carry a reason");
-        },
+        }
         other => panic!("Expected Block for implicit wider scope '/', got {:?}", other),
     }
 }

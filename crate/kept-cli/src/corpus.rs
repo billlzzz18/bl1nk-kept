@@ -78,7 +78,7 @@ pub fn handle_corpus(cmd: CorpusCommands) -> anyhow::Result<()> {
                 );
             }
             Ok(())
-        },
+        }
         CorpusCommands::Snapshot {
             cmd: CorpusSnapshotCommands::Save { corpus, snapshot },
         } => {
@@ -96,7 +96,7 @@ pub fn handle_corpus(cmd: CorpusCommands) -> anyhow::Result<()> {
                 )?,
             )?;
             Ok(())
-        },
+        }
         CorpusCommands::Replay { snapshot, json } => {
             let value: serde_json::Value = serde_json::from_slice(&std::fs::read(snapshot)?)?;
             let mut dictionary = Vec::new();
@@ -123,6 +123,6 @@ pub fn handle_corpus(cmd: CorpusCommands) -> anyhow::Result<()> {
                 println!("{}", serde_json::json!({"dictionary":dictionary}));
             }
             Ok(())
-        },
+        }
     }
 }

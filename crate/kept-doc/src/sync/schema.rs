@@ -117,20 +117,20 @@ impl DatabaseSchema {
                     let opts: Vec<serde_json::Value> =
                         options.iter().map(|o| json!({"name": o})).collect();
                     json!({ "select": { "options": opts } })
-                },
+                }
                 PropertySchema::MultiSelect { options } => {
                     let opts: Vec<serde_json::Value> =
                         options.iter().map(|o| json!({"name": o})).collect();
                     json!({ "multi_select": { "options": opts } })
-                },
+                }
                 PropertySchema::Status { options } => {
                     let opts: Vec<serde_json::Value> =
                         options.iter().map(|o| json!({"name": o})).collect();
                     json!({ "status": { "options": opts } })
-                },
+                }
                 PropertySchema::Relation { linked_db_id, .. } => {
                     json!({ "relation": { "database_id": linked_db_id } })
-                },
+                }
             };
             properties.insert(name.clone(), prop);
         }

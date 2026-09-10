@@ -39,11 +39,11 @@ impl DocxAdapter {
                             style: None,
                         });
                     }
-                },
+                }
                 DocumentChild::Table(_t) => {
                     // Table support placeholder in docx AST
-                },
-                _ => {},
+                }
+                _ => {}
             }
         }
 
@@ -80,7 +80,7 @@ impl DocxAdapter {
                         }
                     }
                     docx = docx.add_paragraph(paragraph);
-                },
+                }
                 UniversalBlock::Heading { level: _level, content, .. } => {
                     let heading_text = content
                         .iter()
@@ -95,8 +95,8 @@ impl DocxAdapter {
                         Paragraph::new().add_run(Run::new().add_text(heading_text).bold());
 
                     docx = docx.add_paragraph(paragraph);
-                },
-                _ => {},
+                }
+                _ => {}
             }
         }
 

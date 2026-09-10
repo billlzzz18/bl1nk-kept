@@ -29,7 +29,7 @@ async fn main() -> anyhow::Result<()> {
     match embed {
         Ok(vectors) => {
             println!("embeddings=ok dimensions={} count={}", vectors[0].len(), vectors.len())
-        },
+        }
         Err(error) => println!("embeddings=unavailable ({error})"),
     }
 

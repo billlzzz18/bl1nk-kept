@@ -281,9 +281,9 @@ impl Judge {
                         confidence: 1.0,
                         rationale: "Correction ledger guard: acquisition blocked to prevent re-introducing a corrected fact".to_string(),
                     };
-                },
-                Ok(None) => {},
-                Err(_) => {},
+                }
+                Ok(None) => {}
+                Err(_) => {}
             }
         }
 

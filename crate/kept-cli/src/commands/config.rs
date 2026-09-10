@@ -243,15 +243,15 @@ pub fn config_field_default_value(field: &str, naming: &kept_core::NamingSetting
         _ if field.starts_with("aliases.") => {
             let key = field.trim_start_matches("aliases.");
             naming.aliases.get(key).cloned().unwrap_or_default()
-        },
+        }
         _ if field.starts_with("shortcuts.") => {
             let key = field.trim_start_matches("shortcuts.");
             naming.shortcuts.get(key).cloned().unwrap_or_default()
-        },
+        }
         _ if field.starts_with("variables.") => {
             let key = field.trim_start_matches("variables.");
             naming.variables.get(key).cloned().unwrap_or_default()
-        },
+        }
         _ => String::new(),
     }
 }
@@ -302,12 +302,12 @@ pub fn handle_config(cmd: Option<ConfigCommands>) -> anyhow::Result<()> {
             println!("  kept config scope list / add <profile> <absolute-path>");
             println!("  kept config edit");
             Ok(())
-        },
+        }
         Some(ConfigCommands::Fields) => {
             let config = load_config_for_mutation(&path)?;
             print_config_field_catalog(&config.defaults.naming);
             Ok(())
-        },
+        }
         Some(ConfigCommands::Defaults { cmd }) => handle_config_defaults(&path, cmd),
         Some(ConfigCommands::Profile { cmd }) => handle_config_profile(&path, cmd),
         Some(ConfigCommands::Scope { cmd }) => handle_config_scope(&path, cmd),
@@ -330,7 +330,7 @@ pub fn handle_config(cmd: Option<ConfigCommands>) -> anyhow::Result<()> {
                 );
             }
             Ok(())
-        },
+        }
     }
 }
 
@@ -349,19 +349,19 @@ pub fn handle_config_defaults(path: &Path, cmd: DefaultCommands) -> anyhow::Resu
         DefaultCommands::Show => {
             println!("{}", serde_yaml::to_string(&config.defaults.naming)?);
             Ok(())
-        },
+        }
         DefaultCommands::Set { field, value } => {
             set_profile_field(&mut config.defaults.naming, &field, &value)?;
             kept_core::save_user_config(path, &config)?;
             println!("Set default field '{field}'");
             Ok(())
-        },
+        }
         DefaultCommands::Unset { field } => {
             unset_profile_field(&mut config.defaults.naming, &field)?;
             kept_core::save_user_config(path, &config)?;
             println!("Unset default field '{field}'");
             Ok(())
-        },
+        }
     }
 }
 
@@ -375,7 +375,7 @@ pub fn handle_config_profile(path: &Path, cmd: ProfileCommands) -> anyhow::Resul
                 println!("{name}\t{description}\t{}", profile.naming.extensions.join(","));
             }
             Ok(())
-        },
+        }
         ProfileCommands::Show { name } => {
             let profile = config
                 .profiles
@@ -383,7 +383,7 @@ pub fn handle_config_profile(path: &Path, cmd: ProfileCommands) -> anyhow::Resul
                 .ok_or_else(|| anyhow::anyhow!("ไม่พบ profile '{name}'"))?;
             println!("{}", serde_yaml::to_string(profile)?);
             Ok(())
-        },
+        }
         ProfileCommands::Add { name, description } => {
             if config.profiles.contains_key(&name) {
                 anyhow::bail!("profile '{name}' มีอยู่แล้ว");
@@ -398,7 +398,7 @@ pub fn handle_config_profile(path: &Path, cmd: ProfileCommands) -> anyhow::Resul
             kept_core::save_user_config(path, &config)?;
             println!("Added profile '{name}'");
             Ok(())
-        },
+        }
         ProfileCommands::Remove { name } => {
             let has_scope = config.scopes.iter().any(|scope| scope.profile == name);
             if has_scope {
@@ -410,7 +410,7 @@ pub fn handle_config_profile(path: &Path, cmd: ProfileCommands) -> anyhow::Resul
             kept_core::save_user_config(path, &config)?;
             println!("Removed profile '{name}'");
             Ok(())
-        },
+        }
         ProfileCommands::Set { name, field, value } => {
             let profile = config
                 .profiles
@@ -420,7 +420,7 @@ pub fn handle_config_profile(path: &Path, cmd: ProfileCommands) -> anyhow::Resul
             kept_core::save_user_config(path, &config)?;
             println!("Set profile '{name}' field '{field}'");
             Ok(())
-        },
+        }
         ProfileCommands::Unset { name, field } => {
             let profile = config
                 .profiles
@@ -430,7 +430,7 @@ pub fn handle_config_profile(path: &Path, cmd: ProfileCommands) -> anyhow::Resul
             kept_core::save_user_config(path, &config)?;
             println!("Unset profile '{name}' field '{field}'");
             Ok(())
-        },
+        }
     }
 }
 
@@ -468,13 +468,13 @@ pub fn handle_config_scope(path: &Path, cmd: ScopeCommands) -> anyhow::Result<()
                 );
             }
             Ok(())
-        },
+        }
         ScopeCommands::Show { path: scope_path } => {
             require_absolute_user_path(&scope_path, "scope path")?;
             let index = find_scope_index(&config, &scope_path)?;
             println!("{}", serde_yaml::to_string(&config.scopes[index])?);
             Ok(())
-        },
+        }
         ScopeCommands::Add {
             profile,
             path: scope_path,
@@ -499,7 +499,7 @@ pub fn handle_config_scope(path: &Path, cmd: ScopeCommands) -> anyhow::Result<()
             kept_core::save_user_config(path, &config)?;
             println!("Added scope: {}", scope_path.display());
             Ok(())
-        },
+        }
         ScopeCommands::Set {
             path: scope_path,
             profile,
@@ -524,7 +524,7 @@ pub fn handle_config_scope(path: &Path, cmd: ScopeCommands) -> anyhow::Result<()
             kept_core::save_user_config(path, &config)?;
             println!("Updated scope: {}", scope_path.display());
             Ok(())
-        },
+        }
         ScopeCommands::Remove { path: scope_path } => {
             require_absolute_user_path(&scope_path, "scope path")?;
             let index = find_scope_index(&config, &scope_path)?;
@@ -532,7 +532,7 @@ pub fn handle_config_scope(path: &Path, cmd: ScopeCommands) -> anyhow::Result<()
             kept_core::save_user_config(path, &config)?;
             println!("Removed scope: {}", scope_path.display());
             Ok(())
-        },
+        }
         ScopeCommands::Setting { cmd } => match cmd {
             ScopeSettingCommands::Set {
                 scope: scope_path,
@@ -545,7 +545,7 @@ pub fn handle_config_scope(path: &Path, cmd: ScopeCommands) -> anyhow::Result<()
                 kept_core::save_user_config(path, &config)?;
                 println!("Set scope '{}' field '{field}'", scope_path.display());
                 Ok(())
-            },
+            }
             ScopeSettingCommands::Unset { scope: scope_path, field } => {
                 require_absolute_user_path(&scope_path, "scope path")?;
                 let index = find_scope_index(&config, &scope_path)?;
@@ -553,7 +553,7 @@ pub fn handle_config_scope(path: &Path, cmd: ScopeCommands) -> anyhow::Result<()
                 kept_core::save_user_config(path, &config)?;
                 println!("Unset scope '{}' field '{field}'", scope_path.display());
                 Ok(())
-            },
+            }
         },
         ScopeCommands::Exception { cmd } => match cmd {
             ScopeExceptionCommands::Add {
@@ -577,7 +577,7 @@ pub fn handle_config_scope(path: &Path, cmd: ScopeCommands) -> anyhow::Result<()
                 kept_core::save_user_config(path, &config)?;
                 println!("Added scope exception: {}", exception_path.display());
                 Ok(())
-            },
+            }
             ScopeExceptionCommands::Remove {
                 scope: scope_path,
                 path: exception_path,
@@ -597,7 +597,7 @@ pub fn handle_config_scope(path: &Path, cmd: ScopeCommands) -> anyhow::Result<()
                 kept_core::save_user_config(path, &config)?;
                 println!("Removed scope exception: {}", exception_path.display());
                 Ok(())
-            },
+            }
         },
     }
 }
@@ -612,39 +612,39 @@ pub fn set_profile_field(
         "unicode" => anyhow::bail!("unicode รองรับ nfc"),
         "case" if matches!(value, "lower" | "upper" | "preserve") => {
             naming.case = Some(value.to_string())
-        },
+        }
         "case" => anyhow::bail!("case ต้องเป็น lower, upper หรือ preserve"),
         "separator" if matches!(value, "kebab" | "snake" | "preserve") => {
             naming.separator = Some(value.to_string())
-        },
+        }
         "separator" => anyhow::bail!("separator ต้องเป็น kebab, snake หรือ preserve"),
         "extensions" => naming.extensions = parse_string_list(value),
         "flagControlCharacters" => {
             naming.flag_control_characters = Some(parse_boolean(value, field)?)
-        },
+        }
         "flagTrimWhitespace" => naming.flag_trim_whitespace = Some(parse_boolean(value, field)?),
         "flagCaseCollisions" => naming.flag_case_collisions = Some(parse_boolean(value, field)?),
         "flagPortabilityConflicts" => {
             naming.flag_portability_conflicts = Some(parse_boolean(value, field)?)
-        },
+        }
         "numbers.allow" => naming.numbers.allow = Some(parse_boolean(value, field)?),
         "numbers.maxDigitsPerToken" => {
             naming.numbers.max_digits_per_token = Some(parse_usize(value, field)?)
-        },
+        }
         "words.min" => naming.words.min = Some(parse_usize(value, field)?),
         "words.max" => naming.words.max = Some(parse_usize(value, field)?),
         "length.stem.min" => {
             naming.length.stem.get_or_insert_with(Default::default).min =
                 Some(parse_usize(value, field)?)
-        },
+        }
         "length.stem.max" => {
             naming.length.stem.get_or_insert_with(Default::default).max =
                 Some(parse_usize(value, field)?)
-        },
+        }
         "whitespace.trim" => naming.whitespace.trim = Some(parse_boolean(value, field)?),
         "whitespace.collapseInternal" => {
             naming.whitespace.collapse_internal = Some(parse_boolean(value, field)?)
-        },
+        }
         "prefix.required" => naming.prefix.required = Some(value.to_string()),
         "prefix.allow" => naming.prefix.allow = parse_string_list(value),
         "similarity.name.threshold" => {
@@ -662,7 +662,7 @@ pub fn set_profile_field(
                     case_sensitive: false,
                 })
                 .threshold = threshold;
-        },
+        }
         "similarity.name.caseSensitive" => {
             naming
                 .similarity
@@ -672,39 +672,39 @@ pub fn set_profile_field(
                     case_sensitive: false,
                 })
                 .case_sensitive = parse_boolean(value, field)?;
-        },
+        }
         "replacements" => {
             naming.replacements = serde_yaml::from_str(value).map_err(|error| {
                 anyhow::anyhow!(
                     "replacements YAML ไม่ถูกต้อง: {error}; ใช้รายการ {{from: ..., to: ...}}"
                 )
             })?
-        },
+        }
         "reposition" => {
             naming.reposition = serde_yaml::from_str(value).map_err(|error| {
                 anyhow::anyhow!(
                 "reposition YAML ไม่ถูกต้อง: {error}; ใช้รายการ {{token: ..., position: front/back}}"
             )
             })?
-        },
+        }
         "stemRegex" => {
             naming.stem_regex = Some(value.to_string());
-        },
+        }
         _ if field.starts_with("aliases.") => {
             naming
                 .aliases
                 .insert(parse_map_field(field, "aliases.")?.to_string(), value.to_string());
-        },
+        }
         _ if field.starts_with("shortcuts.") => {
             naming
                 .shortcuts
                 .insert(parse_map_field(field, "shortcuts.")?.to_string(), value.to_string());
-        },
+        }
         _ if field.starts_with("variables.") => {
             naming
                 .variables
                 .insert(parse_map_field(field, "variables.")?.to_string(), value.to_string());
-        },
+        }
         _ => anyhow::bail!("ไม่รู้จัก naming field '{field}'; ดู kept config fields"),
     }
     Ok(())
@@ -731,35 +731,35 @@ pub fn unset_profile_field(
             if let Some(range) = naming.length.stem.as_mut() {
                 range.min = None;
             }
-        },
+        }
         "length.stem.max" => {
             if let Some(range) = naming.length.stem.as_mut() {
                 range.max = None;
             }
-        },
+        }
         "whitespace.trim" => naming.whitespace.trim = None,
         "whitespace.collapseInternal" => naming.whitespace.collapse_internal = None,
         "prefix.required" => naming.prefix.required = None,
         "prefix.allow" => naming.prefix.allow.clear(),
         "similarity.name.threshold" | "similarity.name.caseSensitive" => {
             naming.similarity.name = None
-        },
+        }
         "replacements" => naming.replacements.clear(),
         "reposition" => naming.reposition.clear(),
         "stemRegex" => naming.stem_regex = None,
         _ if field.starts_with("aliases.") => {
             naming.aliases.remove(parse_map_field(field, "aliases.")?);
-        },
+        }
         _ if field.starts_with("shortcuts.") => {
             naming
                 .shortcuts
                 .remove(parse_map_field(field, "shortcuts.")?);
-        },
+        }
         _ if field.starts_with("variables.") => {
             naming
                 .variables
                 .remove(parse_map_field(field, "variables.")?);
-        },
+        }
         _ => anyhow::bail!("ไม่รู้จัก naming field '{field}'; ดู kept config fields"),
     }
     Ok(())

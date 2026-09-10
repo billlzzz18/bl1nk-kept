@@ -157,7 +157,7 @@ pub fn scan_index_integrity(index: &ScanIndex) -> (Vec<BadExtensionIssue>, Vec<S
                     actual_extension,
                     detected_extension,
                 });
-            },
+            }
             Ok(IntegrityStatus::CorruptOrEmpty) => {
                 scan_issues.push(ScanIssue {
                     path: record.path.clone(),
@@ -168,11 +168,11 @@ pub fn scan_index_integrity(index: &ScanIndex) -> (Vec<BadExtensionIssue>, Vec<S
                         "Verify file source; empty or incomplete download.".to_string(),
                     ),
                 });
-            },
-            Ok(IntegrityStatus::Valid) | Ok(IntegrityStatus::UnknownSignature) => {},
+            }
+            Ok(IntegrityStatus::Valid) | Ok(IntegrityStatus::UnknownSignature) => {}
             Err(e) => {
                 scan_issues.push(ScanIssue::new(record.path.clone(), "read_header", e.to_string()));
-            },
+            }
         }
     }
 

@@ -1,7 +1,28 @@
 ---
 name: repository-operating-recovery
-description: Recover, organize, and harden a software repository for reliable agent or developer handoff. Use when a repository has mixed reports/snapshots/specs, missing source-of-truth navigation, absent task automation/CI/versioning/schema artifacts, unclear mutation commands, or an incomplete source ZIP. Preserves active product behavior, research, benchmark evidence, and agent learning while adding tested operating contracts.
+description: Use when a repository has mixed reports/snapshots/specs, missing source-of-truth navigation, absent task automation/CI/versioning/schema artifacts, unclear mutation commands, or an incomplete source ZIP. Recovers, organizes, and hardens for reliable agent or developer handoff.
+triggers:
+  - messy repository
+  - no clear entrypoint
+  - missing CI
+  - broken automation
+  - repository handoff
+  - source ZIP
+role: Repository recovery specialist — establish facts, classify files, apply operating layer with TDD
+scope: Entire repository structure, automation, and handoff packaging
+output-format: |
+  [RECOVERY REPORT]
+  Facts established: <list>
+  Classification: <table>
+  Contracts added: <list>
+  Verification: <pass/fail per contract>
 ---
+
+# Repository Operating Recovery
+
+Turn a difficult-to-continue repository into an operating one with clear entrypoint, active spec/backlog, tested automation, and verified source handoff.
+
+Do not use as generic refactor. Preserve supported product behavior and recover facts before changing structure.
 
 # Repository Operating Recovery
 

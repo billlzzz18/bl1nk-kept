@@ -21,18 +21,18 @@ pub fn mention_to_markdown(mention: &MentionObject) -> String {
             let name = user.name.as_deref().unwrap_or("User");
             let url = format!("https://www.notion.so/{}", user.id);
             format!(r#"<mention-user url="{}">{}</mention-user>"#, url, name)
-        },
+        }
         MentionObject::Page { page } => {
             // PageMention only has id; we don't have title. Use placeholder.
             let title = "Page"; // Ideally we would fetch the title, but we don't have it here.
             let url = format!("https://www.notion.so/{}", page.id);
             format!(r#"<mention-page url="{}">{}</mention-page>"#, url, title)
-        },
+        }
         MentionObject::Database { database } => {
             let name = "Database"; // Placeholder
             let url = format!("https://www.notion.so/{}", database.id);
             format!(r#"<mention-database url="{}">{}</mention-database>"#, url, name)
-        },
+        }
         MentionObject::Date { date } => {
             // Try to parse the date object; fallback to a simple representation.
             // Expected format: {"start": "2024-01-01", "end": "2024-01-02", "timeZone": "America/New_York", ...}
@@ -67,10 +67,10 @@ pub fn mention_to_markdown(mention: &MentionObject) -> String {
             } else {
                 "<mention-date />".to_string()
             }
-        },
+        }
         MentionObject::LinkPreview { url } => {
             format!(r#"<mention-link-preview url="{}" />"#, url)
-        },
+        }
     }
 }
 impl ToMarkdown for Vec<RichText> {
@@ -109,13 +109,13 @@ impl ToMarkdown for Vec<RichText> {
                     }
 
                     result.push_str(&content);
-                },
+                }
                 RichText::Mention { mention, .. } => {
                     result.push_str(&mention_to_markdown(mention));
-                },
+                }
                 RichText::Equation { equation, .. } => {
                     result.push_str(&format!("$`{}$", equation.expression));
-                },
+                }
             }
         }
         result
@@ -129,42 +129,42 @@ impl ToMarkdown for Block {
         match &self.block_type {
             BlockType::Paragraph { paragraph } => {
                 result.push_str(&format!("{}{}", tabs, render_text_content(paragraph, indent)));
-            },
+            }
             BlockType::Heading1 { heading_1 } => {
                 result.push_str(&format!(
                     "{}# {}",
                     tabs,
                     render_heading_content(heading_1, indent)
                 ));
-            },
+            }
             BlockType::Heading2 { heading_2 } => {
                 result.push_str(&format!(
                     "{}## {}",
                     tabs,
                     render_heading_content(heading_2, indent)
                 ));
-            },
+            }
             BlockType::Heading3 { heading_3 } => {
                 result.push_str(&format!(
                     "{}### {}",
                     tabs,
                     render_heading_content(heading_3, indent)
                 ));
-            },
+            }
             BlockType::BulletedListItem { bulleted_list_item } => {
                 result.push_str(&format!(
                     "{}- {}",
                     tabs,
                     render_text_content(bulleted_list_item, indent)
                 ));
-            },
+            }
             BlockType::NumberedListItem { numbered_list_item } => {
                 result.push_str(&format!(
                     "{}1. {}",
                     tabs,
                     render_text_content(numbered_list_item, indent)
                 ));
-            },
+            }
             BlockType::ToDo { to_do } => {
                 let check = if to_do.checked { "x" } else { " " };
                 result.push_str(&format!(
@@ -173,13 +173,13 @@ impl ToMarkdown for Block {
                     check,
                     render_todo_content(to_do, indent)
                 ));
-            },
+            }
             BlockType::Divider {} => {
                 result.push_str(&format!("{}---", tabs));
-            },
+            }
             BlockType::Quote { quote } => {
                 result.push_str(&format!("{}> {}", tabs, render_text_content(quote, indent)));
-            },
+            }
             BlockType::Callout { callout } => {
                 let icon_str = callout
                     .icon
@@ -202,14 +202,14 @@ impl ToMarkdown for Block {
                     }
                 }
                 result.push_str(&format!("{}</callout>", tabs));
-            },
+            }
             _ => {
                 result.push_str(&format!(
                     "{}<!-- Unsupported block type: {} -->",
                     tabs,
                     self.type_str()
                 ));
-            },
+            }
         }
 
         result
@@ -368,7 +368,7 @@ pub fn parse_markdown(md: &str) -> Vec<Block> {
                     } else {
                         state.container_stack.push(ContainerType::BulletedList);
                     }
-                },
+                }
                 Tag::BlockQuote(_) => state.container_stack.push(ContainerType::Quote),
                 Tag::Table(alignments) => {
                     table_rows.clear();
@@ -376,8 +376,8 @@ pub fn parse_markdown(md: &str) -> Vec<Block> {
                     table_width = alignments.len() as u32;
                     table_has_header = false;
                     current_rich_text.clear();
-                },
-                _ => {},
+                }
+                _ => {}
             },
             Event::End(tag_end) => match tag_end {
                 TagEnd::Strong => state.bold = false,
@@ -386,7 +386,7 @@ pub fn parse_markdown(md: &str) -> Vec<Block> {
                 TagEnd::CodeBlock => state.code = false,
                 TagEnd::List(_is_ordered) => {
                     state.container_stack.pop();
-                },
+                }
                 TagEnd::BlockQuote(_) => {
                     state.container_stack.pop();
                     blocks.push(create_block(BlockType::Quote {
@@ -396,7 +396,7 @@ pub fn parse_markdown(md: &str) -> Vec<Block> {
                             children: None,
                         },
                     }));
-                },
+                }
                 TagEnd::Paragraph => {
                     if !state.is_in_list() && !state.is_in_quote() && !state.is_in_callout() {
                         if !current_rich_text.is_empty() {
@@ -422,7 +422,7 @@ pub fn parse_markdown(md: &str) -> Vec<Block> {
                             });
                         }
                     }
-                },
+                }
                 TagEnd::Item => {
                     let block_type = if let Some(checked) = state.current_todo_checked.take() {
                         BlockType::ToDo {
@@ -452,7 +452,7 @@ pub fn parse_markdown(md: &str) -> Vec<Block> {
                         }
                     };
                     blocks.push(create_block(block_type));
-                },
+                }
                 TagEnd::Heading(level) => {
                     let block_type = match level {
                         pulldown_cmark::HeadingLevel::H1 => BlockType::Heading1 {
@@ -481,10 +481,10 @@ pub fn parse_markdown(md: &str) -> Vec<Block> {
                         },
                     };
                     blocks.push(create_block(block_type));
-                },
+                }
                 TagEnd::TableCell => {
                     table_cells.push(std::mem::take(&mut current_rich_text));
-                },
+                }
                 TagEnd::TableHead => {
                     table_has_header = true;
                     table_rows.push(create_block(BlockType::TableRow {
@@ -492,14 +492,14 @@ pub fn parse_markdown(md: &str) -> Vec<Block> {
                             cells: std::mem::take(&mut table_cells),
                         },
                     }));
-                },
+                }
                 TagEnd::TableRow => {
                     table_rows.push(create_block(BlockType::TableRow {
                         table_row: TableRowContent {
                             cells: std::mem::take(&mut table_cells),
                         },
                     }));
-                },
+                }
                 TagEnd::Table => {
                     let rows = std::mem::take(&mut table_rows);
                     let has_rows = !rows.is_empty();
@@ -515,8 +515,8 @@ pub fn parse_markdown(md: &str) -> Vec<Block> {
                     // the flag consumers rely on (e.g. recursive export).
                     block.has_children = has_rows;
                     blocks.push(block);
-                },
-                _ => {},
+                }
+                _ => {}
             },
             Event::Text(text) => {
                 current_rich_text.push(RichText::Text {
@@ -528,7 +528,7 @@ pub fn parse_markdown(md: &str) -> Vec<Block> {
                     plain_text: Some(text.to_string()),
                     href: None,
                 });
-            },
+            }
             Event::Code(code) => {
                 current_rich_text.push(RichText::Text {
                     text: TextContent {
@@ -542,13 +542,13 @@ pub fn parse_markdown(md: &str) -> Vec<Block> {
                     plain_text: Some(code.to_string()),
                     href: None,
                 });
-            },
+            }
             Event::TaskListMarker(checked) => {
                 state.current_todo_checked = Some(checked);
-            },
+            }
             Event::Rule => {
                 blocks.push(create_block(BlockType::Divider {}));
-            },
+            }
             Event::Html(html) | Event::InlineHtml(html) => {
                 if html.starts_with("<callout") {
                     state.container_stack.push(ContainerType::Callout);
@@ -579,8 +579,8 @@ pub fn parse_markdown(md: &str) -> Vec<Block> {
                         },
                     }));
                 }
-            },
-            _ => {},
+            }
+            _ => {}
         }
     }
 

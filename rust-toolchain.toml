@@ -1,6 +1,9 @@
 [toolchain]
-# NOTE-001: Sprint 0 — ใช้ stable toolchain ที่รองรับ dependency graph ปัจจุบัน รวมถึง crates ที่ใช้ Rust edition 2024.
-# CI ต้องบันทึก rustc --version เพื่อให้การ build ทำซ้ำได้ตามรุ่นที่ใช้งานจริง.
 channel = "stable"
-profile = "minimal"
-components = ["rustfmt", "clippy"]
+components = [
+  "clippy",
+  "rustfmt",
+  "llvm-tools",
+  "rust-src",
+  "rust-analyzer",
+]

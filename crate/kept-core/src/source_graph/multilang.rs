@@ -103,7 +103,7 @@ pub fn parse_source(language: Language, path_str: &str, content: &str) -> Option
         Err(e) => {
             eprintln!("Query::new failed for {:?}: {:?}", language, e);
             return None;
-        },
+        }
     };
 
     let mut index = ScopeGraphIndex::new();
@@ -147,7 +147,7 @@ pub fn parse_source(language: Language, path_str: &str, content: &str) -> Option
                 let (path_part, alias) = match raw.find(" as ") {
                     Some(idx) => {
                         (raw[..idx].trim().to_string(), Some(raw[idx + 4..].trim().to_string()))
-                    },
+                    }
                     None => (raw.to_string(), None),
                 };
                 index.imports.push(ImportRecord {
@@ -241,7 +241,7 @@ mod tests {
                     "rust dogfood parse returned None. syntax::parse_rust_ast returned: {:?}",
                     syntax_index.is_some()
                 );
-            },
+            }
         };
         let fn_names: Vec<&str> = index
             .definitions

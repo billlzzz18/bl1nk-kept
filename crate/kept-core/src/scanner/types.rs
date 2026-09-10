@@ -191,7 +191,7 @@ pub fn plan_incremental_refresh(
             None => plan.added.push((*path).to_string()),
             Some(previous_file) if file_changed(previous_file, file) => {
                 plan.modified.push((*path).to_string())
-            },
+            }
             Some(_) => plan.unchanged.push((*path).to_string()),
         }
     }

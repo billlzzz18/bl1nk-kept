@@ -1,6 +1,6 @@
 ---
 name: post-commit
-description: Use after every git commit. Enforces post-commit checklist. Invoke automatically after commit or manually.
+description: Use when a git commit completes. Enforces post-commit checklist: verify TODO.md, update CHANGELOG.md, clean temp files.
 triggers:
   - after commit
   - post commit
@@ -41,7 +41,6 @@ Runs mandatory checks after every commit. Prevents state divergence and forgotte
 
 - **NEVER** skip TODO.md update after a code change commit
 - **NEVER** leave untracked temp files from the session
-- **NEVER** commit without running checks first (this is pre-commit, not post-commit)
 - **ALWAYS** report what was updated
 
 ## Output Format

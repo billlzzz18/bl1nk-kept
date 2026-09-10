@@ -784,18 +784,18 @@ pub fn analyze_naming(
                 issues.push(issue(NamingIssueKind::Case, "stem must be lowercase"));
                 target_stem = lower;
             }
-        },
+        }
         Some("upper") => {
             let upper = target_stem.to_uppercase();
             if upper != target_stem {
                 issues.push(issue(NamingIssueKind::Case, "stem must be uppercase"));
                 target_stem = upper;
             }
-        },
-        Some("preserve") | None => {},
+        }
+        Some("preserve") | None => {}
         Some(value) => {
             return Err(PolicyError::InvalidConfig(format!("unsupported case value {value}")))
-        },
+        }
     }
 
     if rule.naming.separator.as_deref() == Some("kebab") {

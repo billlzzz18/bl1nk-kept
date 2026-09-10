@@ -106,19 +106,13 @@ pub fn parse_source(language: Language, path_str: &str, content: &str) -> Option
         },
     };
 
-    eprintln!(
-        "DEBUG: parse_source for {:?}, capture_names = {:?}",
-        language,
-        query.capture_names()
-    );
-
     let mut index = ScopeGraphIndex::new();
     index.indexed_files.insert(path_str.to_string());
 
     let mut cursor = QueryCursor::new();
     let source_bytes = content.as_bytes();
 
-    // NOTE-002: tree-sitter 0.25 ใช้ StreamingIterator — ต้องเรียก .advance() + .get()
+    // NOTE-022: tree-sitter 0.25 ใช้ StreamingIterator — ต้องเรียก .advance() + .get()
     let mut matches = cursor.matches(&query, tree.root_node(), source_bytes);
     while let Some(mat) = {
         matches.advance();
@@ -141,7 +135,7 @@ pub fn parse_source(language: Language, path_str: &str, content: &str) -> Option
                 continue;
             }
 
-            if capture_name == "import.statement" {
+            if capture_name == "import.statement" || capture_name.starts_with("import.") {
                 // Parse the entire use_declaration node text
                 // Format: "use path::to::module;" or "use path::to::module as alias;" or "use path::to::*;"
                 let raw = text

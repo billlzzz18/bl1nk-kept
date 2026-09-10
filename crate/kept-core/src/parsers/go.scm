@@ -14,9 +14,10 @@
   name: (type_identifier) @definition.interface
   type: (interface_type) @_iface)
 
-(type_spec
-  name: (type_identifier) @definition.type_alias
-  type: _ @_other)
+; NOTE: Skip the generic type_alias pattern — it duplicates struct/interface captures
+; (type_spec
+;   name: (type_identifier) @definition.type_alias
+;   type: _ @_other)
 
 (import_spec
   path: (interpreted_string_literal) @import.name)

@@ -35,7 +35,6 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
             return None;
         },
     };
-    eprintln!("DEBUG: parse_rust_ast, capture_names = {:?}", query.capture_names());
 
     let mut index = ScopeGraphIndex::new();
     index.indexed_files.insert(path_str.to_string());
@@ -52,12 +51,6 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
         for capture in mat.captures {
             let capture_name = &query.capture_names()[capture.index as usize];
             let node = capture.node;
-            eprintln!(
-                "DEBUG: capture = {:?}, node.kind = {:?}, node.text = {:?}",
-                capture_name,
-                node.kind(),
-                &source_bytes[node.start_byte()..node.end_byte()]
-            );
 
             match &**capture_name {
                 "definition.function" => {
@@ -135,16 +128,12 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
                 "implementation.block" => {
                     // Parse the entire impl block text to extract trait and target type
                     let text = node_text_bytes(node, source_bytes);
-                    eprintln!("DEBUG: impl text = {:?}", text);
                     // Format: "impl<T: Clone> Visitor<'static> for Container<T>" or "impl Container<u8>"
                     let body = text.strip_prefix("impl").unwrap_or(text).trim();
-                    eprintln!("DEBUG: impl body = {:?}", body);
                     // Find " for " to separate trait and target
                     if let Some(for_idx) = body.find(" for ") {
                         let trait_part = body[..for_idx].trim();
                         let target_part = body[for_idx + 5..].trim();
-                        eprintln!("DEBUG: trait_part = {:?}", trait_part);
-                        eprintln!("DEBUG: target_part = {:?}", target_part);
                         // Extract trait name: find the identifier after the generic parameters
                         // e.g., "<T: Clone> Visitor<'static>" → "Visitor"
                         // The generic parameters end at the first '>' that's not inside another '<>'
@@ -166,7 +155,6 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
                                 }
                             }
                             let after_generics = trait_part[end_of_generics..].trim();
-                            eprintln!("DEBUG: after_generics = {:?}", after_generics);
                             after_generics
                                 .split('<')
                                 .next()
@@ -182,7 +170,6 @@ pub fn parse_rust_ast(path_str: &str, content: &str) -> Option<ScopeGraphIndex> 
                                 .trim()
                                 .to_string()
                         };
-                        eprintln!("DEBUG: trait_name = {:?}", trait_name);
                         let target_type = target_part
                             .split('<')
                             .next()

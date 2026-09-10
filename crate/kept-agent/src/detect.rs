@@ -31,7 +31,10 @@ pub trait AgentSetup {
 
 /// Return all registered agent implementations.
 pub fn registered_agents() -> Vec<Box<dyn AgentSetup>> {
-    vec![Box::new(crate::antigravity::Antigravity::new())]
+    vec![
+        Box::new(crate::antigravity::Antigravity::new()),
+        Box::new(crate::claude::ClaudeCode::new()),
+    ]
 }
 
 #[cfg(test)]

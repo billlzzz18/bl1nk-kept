@@ -106,6 +106,6 @@ kept-core policy.rs ยังคง types เดิม (ไม่ใช่ re-ex
 ## เอกสารอ้างอิง
 
 - [TODO.md — section 2.4-2.6](../../TODO.md)
-- [SQZ source](../../../references/campbellr/sqz/) (reference only)
+- **SQZ source** (reference only at `D:\01work\Active\references\campbellr\sqz\`)
 - [ADR 0004 — SQZ Reimplement](./0004_semantic_disambiguation_two_tier_architecture.md)
 - [CHANGELOG.md](../../CHANGELOG.md)

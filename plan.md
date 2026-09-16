@@ -150,7 +150,7 @@ gantt
    - รัน `cargo test --workspace` เพื่อยืนยันว่าไม่มี regression
    - รัน `tools/check_markdown_links.py` เพื่อตรวจสอบลิงก์ในเอกสาร
 3. **Pre-commit Gate:**
-   - ทุก commit ต้องผ่านสคริปต์ [tools/pre_commit_hook.py](tools/pre_commit_hook.py) ภายในเวลาไม่เกิน 1 วินาที
+   - ทุก commit ต้องผ่านสคริปต์ `tools/pre_commit_hook.py` (หรือ `just check`) ภายในเวลาไม่เกิน 1 วินาที
 
 ---
 

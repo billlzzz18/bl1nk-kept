@@ -413,6 +413,6 @@ mod foundation_release_version_tests {
     fn foundation_release_uses_workspace_version() {
         // NOTE: test verifies version sync between Cargo.toml and compile-time env
         let expected = env!("CARGO_PKG_VERSION");
-        assert!(expected.starts_with("0.4"), "version should be in 0.4.x series; got {}", expected);
+        assert_eq!(expected, "0.4.0");
     }
 }

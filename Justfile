@@ -56,3 +56,220 @@ check: fix-eol fmt test clippy repo-contract cli-smoke schema-check links versio
 
 package:
     {{python}} tools/package_source.py
+
+image := "claude-container"
+prefix := "claude-"
+
+# ── Colima / Docker setup ────────────────────────────────────────
+
+# Install Colima + Docker CLI and start the VM
+setup:
+    brew install colima docker docker-buildx
+    colima start --cpu 4 --memory 8 --disk 60 --vm-type vz --vz-rosetta
+
+# Start Colima VM
+colima-start:
+    colima start
+
+# Stop Colima VM
+colima-stop:
+    colima stop
+
+# Show Colima status
+colima-status:
+    colima status
+
+# ── Image ─────────────────────────────────────────────────────────
+
+# Build the container image
+build:
+    docker build -t {{image}} .
+
+# Rebuild without cache
+rebuild:
+    docker build --no-cache -t {{image}} .
+
+# ── Container lifecycle ───────────────────────────────────────────
+
+# Create a new container with bind-mounted project dir
+create name *DOCKER_ARGS:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if docker inspect {{prefix}}{{name}} &>/dev/null; then
+        echo "Container {{prefix}}{{name}} already exists. Use 'just destroy {{name}}' first."
+        exit 1
+    fi
+    mkdir -p "$(pwd)/projects/{{name}}"
+    docker create \
+        --name {{prefix}}{{name}} \
+        --hostname {{name}} \
+        ${ANTHROPIC_API_KEY:+-e ANTHROPIC_API_KEY} \
+        ${GOOGLE_API_KEY:+-e GOOGLE_API_KEY} \
+        ${OPENAI_API_KEY:+-e OPENAI_API_KEY} \
+        -v "$(pwd)/projects/{{name}}:/workspace" \
+        {{DOCKER_ARGS}} \
+        {{image}} \
+        sleep infinity
+    echo "Container {{prefix}}{{name}} created. Project dir: projects/{{name}}/"
+
+# Start a stopped container
+start name:
+    docker start {{prefix}}{{name}}
+
+# Stop a running container
+stop name:
+    docker stop {{prefix}}{{name}}
+
+# Restart a container
+restart name:
+    docker restart {{prefix}}{{name}}
+
+# Open a shell (auto-starts if stopped)
+shell name:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    state=$(docker inspect -f '{{{{.State.Status}}}}' {{prefix}}{{name}} 2>/dev/null || true)
+    if [ "$state" != "running" ]; then
+        docker start {{prefix}}{{name}} > /dev/null
+    fi
+    docker exec -it {{prefix}}{{name}} bash
+
+# Log in to Claude with your subscription (opens a URL to authenticate)
+login name:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    state=$(docker inspect -f '{{{{.State.Status}}}}' {{prefix}}{{name}} 2>/dev/null || true)
+    if [ "$state" != "running" ]; then
+        docker start {{prefix}}{{name}} > /dev/null
+    fi
+    docker exec -it {{prefix}}{{name}} claude login
+
+# Run Claude in YOLO mode (auto-starts, optional prompt)
+claude name *PROMPT:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    state=$(docker inspect -f '{{{{.State.Status}}}}' {{prefix}}{{name}} 2>/dev/null || true)
+    if [ "$state" != "running" ]; then
+        docker start {{prefix}}{{name}} > /dev/null
+    fi
+    if [ -n "{{PROMPT}}" ]; then
+        docker exec -it {{prefix}}{{name}} claude --dangerously-skip-permissions -p "{{PROMPT}}"
+    else
+        docker exec -it {{prefix}}{{name}} claude --dangerously-skip-permissions
+    fi
+
+# Run Claude in normal (permission-prompting) mode
+claude-safe name *PROMPT:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    state=$(docker inspect -f '{{{{.State.Status}}}}' {{prefix}}{{name}} 2>/dev/null || true)
+    if [ "$state" != "running" ]; then
+        docker start {{prefix}}{{name}} > /dev/null
+    fi
+    if [ -n "{{PROMPT}}" ]; then
+        docker exec -it {{prefix}}{{name}} claude -p "{{PROMPT}}"
+    else
+        docker exec -it {{prefix}}{{name}} claude
+    fi
+
+# Run Pi coding agent (auto-starts, optional prompt)
+pi name *PROMPT:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    state=$(docker inspect -f '{{{{.State.Status}}}}' {{prefix}}{{name}} 2>/dev/null || true)
+    if [ "$state" != "running" ]; then
+        docker start {{prefix}}{{name}} > /dev/null
+    fi
+    if [ -n "{{PROMPT}}" ]; then
+        docker exec -it {{prefix}}{{name}} pi -p "{{PROMPT}}"
+    else
+        docker exec -it {{prefix}}{{name}} pi
+    fi
+
+# Run Pi with restricted tools (read-only, no bash/write)
+pi-safe name *PROMPT:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    state=$(docker inspect -f '{{{{.State.Status}}}}' {{prefix}}{{name}} 2>/dev/null || true)
+    if [ "$state" != "running" ]; then
+        docker start {{prefix}}{{name}} > /dev/null
+    fi
+    if [ -n "{{PROMPT}}" ]; then
+        docker exec -it {{prefix}}{{name}} pi --tools read -p "{{PROMPT}}"
+    else
+        docker exec -it {{prefix}}{{name}} pi --tools read
+    fi
+
+# Copy files from host to container
+cp-to name src dest:
+    docker cp {{src}} {{prefix}}{{name}}:{{dest}}
+
+# Copy files from container to host
+cp-from name src dest:
+    docker cp {{prefix}}{{name}}:{{src}} {{dest}}
+
+# Stop and remove a container (project files preserved on host)
+destroy name:
+    -docker stop {{prefix}}{{name}} 2>/dev/null
+    docker rm {{prefix}}{{name}}
+    @echo "Container removed. Project files preserved in projects/{{name}}/"
+
+# ── Info / diagnostics ────────────────────────────────────────────
+
+# List all claude containers
+list:
+    #!/usr/bin/env bash
+    docker ps -a --filter "name=^{{prefix}}" --format "table {{'{{'}}.Names{{'}}'}}\t{{'{{'}}.Status{{'}}'}}\t{{'{{'}}.Image{{'}}'}}"
+
+# Show container logs
+logs name:
+    docker logs {{prefix}}{{name}}
+
+# Show resource usage for all claude containers
+stats:
+    docker stats --no-stream --filter "name=^{{prefix}}"
+
+# ── agent-sync (host-side, optional) ──────────────────────────────
+# Requires agent-sync (https://github.com/kljensen/agent-sync).
+# These recipes are optional — remove them if you don't use agent-sync.
+
+# Install agent config (skills, extensions, hooks) into a project dir
+sync name +ITEMS:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    command -v agent-sync >/dev/null 2>&1 || { echo "Error: agent-sync not found. Install it first."; exit 1; }
+    [ -d "$(pwd)/projects/{{name}}" ] || { echo "Error: projects/{{name}}/ does not exist. Run 'just create {{name}}' first."; exit 1; }
+    cd "$(pwd)/projects/{{name}}"
+    agent-sync add {{ITEMS}}
+
+# Restore agent config from .agent-sync/state.json
+sync-restore name:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    command -v agent-sync >/dev/null 2>&1 || { echo "Error: agent-sync not found. Install it first."; exit 1; }
+    [ -d "$(pwd)/projects/{{name}}" ] || { echo "Error: projects/{{name}}/ does not exist. Run 'just create {{name}}' first."; exit 1; }
+    cd "$(pwd)/projects/{{name}}"
+    if [ ! -f .agent-sync/state.json ]; then
+        echo "No .agent-sync/state.json in projects/{{name}}/."
+        echo "Run 'just sync {{name}} <bundle/item>' first."
+        exit 1
+    fi
+    agent-sync restore
+
+# Show agent-sync status for a project
+sync-status name:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    command -v agent-sync >/dev/null 2>&1 || { echo "Error: agent-sync not found. Install it first."; exit 1; }
+    [ -d "$(pwd)/projects/{{name}}" ] || { echo "Error: projects/{{name}}/ does not exist. Run 'just create {{name}}' first."; exit 1; }
+    cd "$(pwd)/projects/{{name}}"
+    agent-sync status
+
+# Remove agent-sync items from a project
+sync-remove name +ITEMS:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    command -v agent-sync >/dev/null 2>&1 || { echo "Error: agent-sync not found. Install it first."; exit 1; }
+    [ -d "$(pwd)/projects/{{name}}" ] || { echo "Error: projects/{{name}}/ does not exist. Run 'just create {{name}}' first."; exit 1; }
+    cd "$(pwd)/projects/{{name}}"
+    agent-sync remove {{ITEMS}}

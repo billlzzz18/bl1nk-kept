@@ -58,6 +58,10 @@ fix-eol:
 check-eol:
     {{python}} tools/fix_line_endings.py --check
 
+# Safe clean with confirmation
+clean:
+    bash scripts/clean.sh
+
 check: fix-eol fmt test clippy repo-contract cli-smoke schema-check links version-check note-comments
 
 package:

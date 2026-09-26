@@ -138,6 +138,12 @@ Search is a great fallback if you cannot find the relevant pages or need more co
 2. **Fetch specific pages** when you identify the right one
 3. Fall back to **search** when the topic is unclear and you want more context
 
+## 6. Client-Side & Local Observability Discipline (bl1nk Standards)
+
+- **Concise Single-Word Labels:** Use short tags (`quality`, `cost`, `perf`, `agent`, `error`, `eval`, `ops`) and place detailed domain descriptions in metadata/documentation.
+- **Main Agent Dual-Tracing:** Trace the main agent automatically and asynchronously by reading conversation logs (`transcript.jsonl`) on `Stop` hooks without blocking chat turns.
+- **Local-First Judge:** Evaluate traces on the client side (Local Heuristics/Model scoring) and push scores (`quality`, `reliability`, `cost_efficiency`) directly via the ingestion API rather than incurring redundant cloud LLM charges.
+
 ## Skill Feedback
 
 When the user expresses that something about this skill is not working as expected, gives incorrect guidance, is missing information, or could be improved — offer to submit feedback to the Langfuse skill maintainers. This includes when:
@@ -150,3 +156,4 @@ When the user expresses that something about this skill is not working as expect
 **Do NOT trigger this** for issues with Langfuse itself (the product) — only for issues with this skill's instructions and behavior.
 
 When triggered, follow the process in [references/skill-feedback.md](references/skill-feedback.md).
+

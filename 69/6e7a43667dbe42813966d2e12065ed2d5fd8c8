@@ -1,0 +1,31 @@
+crate/kept-core/src/terminal/terminal_settings.rs
+  s_1845870a29c35f::t_98dbfdb08a3348 1-31
+crate/kept-core/src/terminal/pty_info.rs
+  s_1845870a29c35f::t_9111ad9278beb0 1-33
+crate/kept-core/src/terminal/alacritty.rs
+  s_1845870a29c35f::t_2083a2488fdd93 11-22
+  s_1845870a29c35f::t_c8f0e405a73a2b 47-50
+  s_1845870a29c35f::t_a67e3825434af5 1,4,24,39,44-45,64
+  s_1845870a29c35f::t_6790e6a4c5c517 3,10,35-38,40-43,46,51-54,56-63,65-83
+  s_1845870a29c35f::t_3cd31a8a7f6466 34
+  s_1845870a29c35f::t_026ffe21927bb9 55
+  s_1845870a29c35f::t_d2cd8c3f33ef3f 9
+  s_1845870a29c35f::t_128045230c110e 2,8,23,25-33
+  s_1845870a29c35f::t_5035b934840f1c 5-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "696e7a43667dbe42813966d2e12065ed2d5fd8c8",
+  "prompts": {},
+  "sessions": {
+    "s_1845870a29c35f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6dc5690c-c625-4849-8f13-7fb1aad4decb",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "Test Runner <test@example.com>"
+    }
+  }
+}

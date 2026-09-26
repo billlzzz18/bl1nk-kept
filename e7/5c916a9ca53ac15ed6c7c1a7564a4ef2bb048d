@@ -1,0 +1,42 @@
+crate/kept-core/Cargo.toml
+  s_c7b7b64c58f102::t_940502144acea5 26
+crate/kept-cli/src/commands/registry.rs
+  s_c7b7b64c58f102::t_43d6a9368a760d 194
+.buildkite/hooks/pre-command
+  s_c7b7b64c58f102::t_20e7f42a868ce7 1-15
+tools/check_note_comments.py
+  s_c7b7b64c58f102::t_d8e32d816d0bb1 1-60
+.buildkite/pipeline.yml
+  s_c7b7b64c58f102::t_185a0ab5551f31 1-19
+.buildkite/hooks/post-command
+  s_c7b7b64c58f102::t_e1f337300d4dfc 1-8
+crate/kept-grammars/tests/grammar_comprehensive.rs
+  s_c7b7b64c58f102::t_126004dd6daba5 1,15-16
+crate/kept-doc/src/sync.rs
+  s_c7b7b64c58f102::t_bc226ac071ba00 21,31
+crate/kept-core/CLAUDE.md
+  s_c7b7b64c58f102::t_ce19f86c99e55f 22
+crate/kept-doc/src/converter.rs
+  s_c7b7b64c58f102::t_a522d854b32bc1 32,45
+crate/kept-doc/src/converter/filter.rs
+  s_c7b7b64c58f102::t_517f671e4b2eb0 9,19,45
+  s_c7b7b64c58f102::t_2cf4b69127f9ed 97
+Justfile
+  s_c7b7b64c58f102::t_c0f358cf9f44bd 46-48,61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e75c916a9ca53ac15ed6c7c1a7564a4ef2bb048d",
+  "prompts": {},
+  "sessions": {
+    "s_c7b7b64c58f102": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bfdea74e-bcfe-4805-974a-06bd022234d2",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "Test Runner <test@example.com>"
+    }
+  }
+}

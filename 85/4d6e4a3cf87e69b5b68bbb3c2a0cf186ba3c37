@@ -1,0 +1,74 @@
+crate/kept-core/src/terminal/runner.rs
+  s_c7b7b64c58f102::t_423b430da996f4 177
+.buildkite/pipeline.yml
+  s_c7b7b64c58f102::t_3d92ec797dfde7 7,13-14,23-29
+  s_c7b7b64c58f102::t_3f4e1414918d77 30-35
+crate/kept-core/src/terminal.rs
+  s_c7b7b64c58f102::t_a08d85f677fd58 216
+  s_c7b7b64c58f102::t_159e2c48bf5694 41,48
+.agents/skills/langfuse/references/instrumentation.md
+  s_c7b7b64c58f102::t_645e90927a8271 59
+  s_c7b7b64c58f102::t_f975287118c643 56-58
+  s_c7b7b64c58f102::t_61fc3501397136 60-62
+  s_c7b7b64c58f102::t_731cd070a01e72 1-55,63-118
+Cargo.toml
+  s_c7b7b64c58f102::t_250aa4af0d3714 80
+crate/kept-core/src/terminal/alacritty.rs
+  s_c7b7b64c58f102::t_88f412ae83f751 124
+.agents/skills/langfuse/SKILL.md
+  s_c7b7b64c58f102::t_4837b3c4e679a7 1-152
+.agents/skills/langfuse/references/ci-cd.md
+  s_c7b7b64c58f102::t_9a0833a2151ab0 1-35
+.agents/skills/langfuse/references/cli.md
+  s_c7b7b64c58f102::t_4fd44634ae77ff 1-57
+.agents/skills/langfuse/references/create-dataset.md
+  s_c7b7b64c58f102::t_faac2e0b001f39 1-31
+.agents/skills/langfuse/references/error-analysis.md
+  s_c7b7b64c58f102::t_48383768fb0ffc 1-84
+.agents/skills/langfuse/references/judge-calibration.md
+  s_c7b7b64c58f102::t_015c7dc4351e08 1-289
+.agents/skills/langfuse/references/prompt-engineering.md
+  s_c7b7b64c58f102::t_5a29fa049aeb4e 1-33
+.agents/skills/langfuse/references/prompt-migration.md
+  s_c7b7b64c58f102::t_f8704afe90c80d 1-75
+.agents/skills/langfuse/references/sdk-upgrade.md
+  s_c7b7b64c58f102::t_4a29a0ce5b01aa 1-30
+.agents/skills/langfuse/references/setting-up-evals.md
+  s_c7b7b64c58f102::t_97a64ff8228398 1-43
+.agents/skills/langfuse/references/skill-feedback.md
+  s_c7b7b64c58f102::t_76663f0db1fd24 1-32
+.agents/skills/langfuse/references/trace-evaluator-upgrade.md
+  s_c7b7b64c58f102::t_b5683723ba7d53 1-71
+.agents/skills/langfuse/references/user-feedback.md
+  s_c7b7b64c58f102::t_94ebf2ffd89d83 1-35
+.agents/skills/langfuse/references/v4-project-migration.md
+  s_c7b7b64c58f102::t_7501b2f73558bb 1-70
+CLAUDE.md
+  s_c7b7b64c58f102::t_4b97730c5ee12a 205-220
+Cargo.lock
+  s_1845870a29c35f::t_1a88c3e9b4488e 47,49,61,65-66,136,147,536,883,1269,2084,2418,2517,3009,3384,3389,3391,3395,3452,3691,3693,3777,3978,4683-4696,4871
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "854d6e4a3cf87e69b5b68bbb3c2a0cf186ba3c37",
+  "prompts": {},
+  "sessions": {
+    "s_1845870a29c35f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6dc5690c-c625-4849-8f13-7fb1aad4decb",
+        "model": "unknown"
+      },
+      "human_author": "Test Runner <test@example.com>"
+    },
+    "s_c7b7b64c58f102": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bfdea74e-bcfe-4805-974a-06bd022234d2",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
+      },
+      "human_author": "Test Runner <test@example.com>"
+    }
+  }
+}

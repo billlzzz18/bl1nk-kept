@@ -62,7 +62,6 @@ pmcp = "2.10"
 # Source: D:\01work\Active\references\campbellr\sqz
 
 # Grammar types (keyword validation, naming profiles, config resolution)
-kept-grammar = { package = "kept-grammars", path = "crate/kept-grammars" }
 kept-grammars = { path = "crate/kept-grammars" }
 
 # AST parsing (Phase 1.1: tree-sitter symbol extraction)

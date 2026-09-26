@@ -43,6 +43,9 @@ links:
 version-check:
     {{python}} tools/check_version_contract.py
 
+note-comments:
+    {{python}} tools/check_note_comments.py
+
 # Bump the workspace version. With no argument it increments the patch release.
 version-bump new_version="":
     {{python}} tools/bump_version.py {{new_version}}
@@ -55,7 +58,7 @@ fix-eol:
 check-eol:
     {{python}} tools/fix_line_endings.py --check
 
-check: fix-eol fmt test clippy repo-contract cli-smoke schema-check links version-check
+check: fix-eol fmt test clippy repo-contract cli-smoke schema-check links version-check note-comments
 
 package:
     {{python}} tools/package_source.py

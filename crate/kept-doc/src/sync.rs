@@ -18,7 +18,7 @@ pub use schema::{DatabaseSchema, PropertySchema};
 use crate::ir::UniversalBlock;
 use serde::{Deserialize, Serialize};
 
-// NOTE-001: M5 - ChangeSet (Diff/Apply model)
+// NOTE-001: โมเดล ChangeSet (Diff/Apply) สำหรับจัดเก็บชุดคำสั่งเปลี่ยนแปลงเพื่อนำไปประยุกต์ใช้กับปลายทาง
 /// ตัวแทนของรายการความเปลี่ยนแปลงที่ต้องนำไปใช้กับแพลตฟอร์มปลายทาง
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChangeSet {
@@ -28,7 +28,7 @@ pub struct ChangeSet {
     pub idempotency_key: Option<String>,
 }
 
-// NOTE-002: ประเภทของคำสั่งเปลี่ยนแปลง (Atomic Operations)
+// NOTE-002: ประเภทของคำสั่งเปลี่ยนแปลงระดับอะตอมิก (Atomic Operations) ใน ChangeSet
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum Op {

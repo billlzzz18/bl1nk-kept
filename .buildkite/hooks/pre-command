@@ -1,0 +1,15 @@
+#!/bin/bash
+set -euo pipefail
+
+# NOTE-001: ตั้งค่า Persistent sccache บน Runner เพื่อเร่งความเร็วการคอมไพล์ข้าม Build
+if command -v sccache >/dev/null 2>&1; then
+    export RUSTC_WRAPPER="sccache"
+    export SCCACHE_DIR="${BUILDKITE_AGENT_CACHE_DIR:-/tmp}/sccache"
+    mkdir -p "$SCCACHE_DIR"
+fi
+
+# NOTE-002: แชร์ CARGO_HOME cache ข้าม Job เพื่อไม่ให้ดาวน์โหลด crates.io ซ้ำ
+if [ -n "${BUILDKITE_AGENT_CACHE_DIR:-}" ]; then
+    export CARGO_HOME="${BUILDKITE_AGENT_CACHE_DIR}/cargo"
+    mkdir -p "$CARGO_HOME"
+fi

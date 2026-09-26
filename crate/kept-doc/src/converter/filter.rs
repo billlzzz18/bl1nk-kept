@@ -6,7 +6,7 @@
 use crate::converter::ConvertError;
 use crate::ir::UniversalDocument;
 
-// NOTE-001: M3 - Filter Trait
+// NOTE-001: Trait สำหรับตัวกรองเอกสาร (Filter Trait) ในสถาปัตยกรรม M3
 /// อินเทอร์เฟซสำหรับตัวกรองเอกสารที่ทำงานกับ Universal IR โดยตรง
 pub trait Filter: Send + Sync {
     /// ชื่อของตัวกรอง (สำหรับการทำ Logging/Debugging)
@@ -16,7 +16,7 @@ pub trait Filter: Send + Sync {
     fn apply(&self, doc: &mut UniversalDocument) -> Result<(), ConvertError>;
 }
 
-// NOTE-002: M3 - FilterPipeline
+// NOTE-002: Pipeline รวบรวมตัวกรองเอกสารเพื่อประมวลผลตามลำดับ (Middleware Pattern)
 /// ระบบรวบรวมและรันตัวกรองตามลำดับที่กำหนด (Middleware Pattern)
 #[derive(Default)]
 pub struct FilterPipeline {
@@ -42,7 +42,7 @@ impl FilterPipeline {
     }
 }
 
-// NOTE-003: M3 - ThaiSanitizationFilter
+// NOTE-003: ตัวกรองทำความสะอาดและปรับมาตรฐานข้อความภาษาไทย (ThaiSanitizationFilter)
 /// ตัวกรองสำหรับทำความสะอาดข้อความภาษาไทย (เช่น ลบช่องว่างส่วนเกิน, ปรับมาตรฐานวรรณยุกต์)
 pub struct ThaiSanitizationFilter;
 
@@ -94,7 +94,7 @@ impl ThaiSanitizationFilter {
     }
 }
 
-// NOTE-005: M3 - MarkdownAlertFilter
+// NOTE-005: ตัวกรองแปลงรูปแบบ GitHub Markdown Alerts ให้เป็น Callout blocks ของ Universal IR
 /// แปลง GitHub Alerts (> [!NOTE], > [!TIP], > [!IMPORTANT], > [!WARNING], > [!CAUTION]) ให้เป็น IR Callout
 pub struct MarkdownAlertFilter;
 

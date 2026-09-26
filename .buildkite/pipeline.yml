@@ -1,0 +1,19 @@
+steps:
+  - label: ":rust: Lint & Format"
+    key: "lint"
+    command:
+      - "cargo fmt --all -- --check"
+      - "cargo clippy --workspace --all-targets -- -D warnings"
+
+  - label: ":test_tube: Workspace Tests"
+    key: "test"
+    command:
+      - "cargo test --workspace"
+
+  - label: ":white_check_mark: Full Quality Gate & Contracts"
+    key: "contracts"
+    depends_on:
+      - "lint"
+      - "test"
+    command:
+      - "just check"

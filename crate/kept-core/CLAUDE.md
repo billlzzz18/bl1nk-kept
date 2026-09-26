@@ -19,7 +19,7 @@
 
 ## Error Handling
 
-- Library layers (`kept-core`, `kept-grammar`): `thiserror` for error types
+- Library layers (`kept-core`, `kept-grammars`): `thiserror` for error types
 - Application layers (`kept-cli`, `kept-mcp`): `anyhow` for error propagation
 - ห้าม `unwrap()` / `expect()` — ใช้ `?`, `match`, `if let`
 

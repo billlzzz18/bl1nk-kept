@@ -191,7 +191,7 @@ async fn rerank_with_semantic(
         .map(|(idx, rerank_score)| {
             let mut result = results[idx].clone();
             if blend {
-                // NOTE-SEM-002: weighted blend — BM25 40%, reranker 60%
+                // NOTE-SEM-002: การรวมคะแนนแบบถ่วงน้ำหนัก (weighted blend) — BM25 40% ร่วมกับ reranker 60%
                 result.score = result.score * 0.4 + rerank_score * 10.0 * 0.6;
             } else {
                 result.score = rerank_score * 10.0;

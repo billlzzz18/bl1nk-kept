@@ -29,7 +29,7 @@ pub enum ConvertError {
     },
 }
 
-// NOTE-002: M2 - Reader/Writer Traits (Synchronous, Total functions over bytes)
+// NOTE-002: Traits สำหรับ Reader และ Writer แบบ Synchronous บนระดับไบต์ (Byte-level abstraction)
 // ช่วยให้ Registry จัดการ Crate ได้อย่างปลอดภัยโดยไม่ต้องใช้ Box<dyn Any>
 
 /// Trait สำหรับการอ่านไฟล์จาก bytes เข้าสู่ Universal IR
@@ -42,7 +42,7 @@ pub trait Writer: Send + Sync {
     fn write(&self, doc: &UniversalDocument) -> Result<Vec<u8>, ConvertError>;
 }
 
-// NOTE-003: M4 - Source/Sink Traits (Asynchronous, for live platforms)
+// NOTE-003: Traits สำหรับ Source และ Sink แบบ Asynchronous สำหรับเชื่อมต่อกับแพลตฟอร์มภายนอก
 
 /// Trait สำหรับการดึงข้อมูลจาก API ภายนอกเข้าสู่ Universal IR
 #[async_trait]

@@ -1,4 +1,4 @@
-//! Comprehensive unit tests for kept-grammar
+//! Comprehensive unit tests for kept-grammars
 //!
 //! Covers: validate_naming_settings edge cases, config I/O roundtrip,
 //! starter config YAML parsing, create_user_config_if_missing behavior.
@@ -12,7 +12,8 @@ use std::fs;
 use std::path::PathBuf;
 
 fn temp_dir(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!("kept-grammar-test-{name}-{}", std::process::id()));
+    let dir =
+        std::env::temp_dir().join(format!("kept-grammars-test-{name}-{}", std::process::id()));
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).expect("temp dir must be created");
     dir

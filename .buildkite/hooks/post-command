@@ -1,0 +1,8 @@
+#!/bin/bash
+set -euo pipefail
+
+# NOTE-001: แสดงสถิติการใช้งาน Sccache Cache Hit/Miss ใน Buildkite log
+if command -v sccache >/dev/null 2>&1; then
+    echo "--- :sccache: Sccache Stats"
+    sccache --show-stats || true
+fi

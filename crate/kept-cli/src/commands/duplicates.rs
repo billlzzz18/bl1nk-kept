@@ -70,9 +70,9 @@ pub fn run_duplicate_action(
     scan_index: Option<&kept_core::ScanIndex>,
 ) -> anyhow::Result<()> {
     use kept_core::{
-        create_duplicate_mutation_plan, execute_duplicate_mutation, rollback_duplicate_mutation,
-        simulate_duplicate_mutation, DuplicateActionKind, DuplicateGroup, DuplicateMutationPlan,
-        DuplicateMutationPolicy, RollbackJournal, ScanIndex,
+        DuplicateActionKind, DuplicateGroup, DuplicateMutationPlan, DuplicateMutationPolicy,
+        RollbackJournal, ScanIndex, create_duplicate_mutation_plan, execute_duplicate_mutation,
+        rollback_duplicate_mutation, simulate_duplicate_mutation,
     };
 
     let journal_file = root.join("kept-duplicate-rollback.json");
@@ -209,7 +209,7 @@ pub fn handle_task_duplicates(
     action: Option<DuplicateAction>,
     yes: bool,
 ) -> anyhow::Result<()> {
-    use kept_core::{find_content_duplicates, ContentDuplicateOptions, PersistentScanSnapshot};
+    use kept_core::{ContentDuplicateOptions, PersistentScanSnapshot, find_content_duplicates};
 
     let canonical_root = root.canonicalize()?;
     let snapshot_path =
@@ -274,10 +274,9 @@ pub fn handle_task_duplicates(
         println!("Scan issue: {unreadable} candidate file(s) could not be read for hashing.");
     }
 
-    if is_interactive_terminal() {
-        if let Some(action) = choose_duplicate_action()? {
+    if is_interactive_terminal()
+        && let Some(action) = choose_duplicate_action()? {
             run_duplicate_action(action, &canonical_root, &report, false, Some(&snapshot.index))?;
         }
-    }
     Ok(())
 }

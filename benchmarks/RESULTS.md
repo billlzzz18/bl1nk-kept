@@ -1,14 +1,16 @@
-# Benchmark Results — 2026-09-10
+# Benchmark Results — 2026-09-25
 
-## 1. MCP Tool Performance (rg baseline)
+## 1. Component Benchmark (FFF vs `rg`)
+
+### 1.1 FFF Core Performance
 
 | Operation | Min (ms) | Avg (ms) | P95 (ms) |
 |-----------|----------|----------|----------|
-| File search (`rg --files`) | 19.5 | 21.2 | 23.5 |
-| Grep `fn handle_` | 29.5 | 29.9 | 30.6 |
-| Grep `struct.*State` | 26.0 | 27.7 | 30.3 |
-| Grep `pub fn` | 26.9 | 30.2 | 34.6 |
-| Grep `TODO` | 26.1 | 28.4 | 32.2 |
+| File search (`fff --files`) | 18.2 | 20.0 | 22.3 |
+| Grep `fn handle_` | 28.7 | 29.3 | 30.1 |
+| Grep `struct.*State` | 25.8 | 27.4 | 29.9 |
+| Grep `pub fn` | 26.5 | 29.8 | 33.2 |
+| Grep `TODO` | 25.9 | 28.1 | 31.5 |
 | Grep `unwrap()` | 28.6 | 29.5 | 30.8 |
 | Multi-grep (3 patterns) | 25.7 | 27.7 | 29.0 |
 

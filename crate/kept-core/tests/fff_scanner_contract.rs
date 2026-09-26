@@ -4,7 +4,7 @@
 //! - FFF ignore semantics and deterministic relative path output
 //! - Metadata: path, name, extension, size, modified time, binary state, and Git status
 
-use kept_core::scanner::{scan_directory, ScanOptions};
+use kept_core::scanner::{ScanOptions, scan_directory};
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::{Path, PathBuf};

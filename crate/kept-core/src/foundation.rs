@@ -46,7 +46,9 @@ pub enum FoundationError {
         term_id: String,
         confidence: String,
     },
-    #[error("Corpus manifest entry '{entry_id}' is incomplete, duplicated, or has invalid checksum/split")]
+    #[error(
+        "Corpus manifest entry '{entry_id}' is incomplete, duplicated, or has invalid checksum/split"
+    )]
     InvalidCorpusManifestEntry { entry_id: String },
     #[error("Experiment summary requires at least one measurement")]
     EmptyExperimentMeasurements,
@@ -716,7 +718,7 @@ fn is_latin(character: char) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{decode_utf8, FoundationError};
+    use super::{FoundationError, decode_utf8};
 
     #[test]
     fn decode_utf8_rejects_invalid_bytes_with_the_failing_offset() {
@@ -730,7 +732,7 @@ mod tests {
 
 #[cfg(test)]
 mod regex_rule_tests {
-    use super::{validate_regex_rule, RegexRule, RegexScope, RegexTestVector, RuleSeverity};
+    use super::{RegexRule, RegexScope, RegexTestVector, RuleSeverity, validate_regex_rule};
 
     #[test]
     fn regex_rule_requires_passing_accept_and_reject_vectors() {
@@ -763,8 +765,8 @@ mod regex_rule_tests {
 #[cfg(test)]
 mod classification_tests {
     use super::{
-        classify_evidence, ClassificationDecision, ClassificationPolicy, EvidenceKind,
-        EvidenceRecord,
+        ClassificationDecision, ClassificationPolicy, EvidenceKind, EvidenceRecord,
+        classify_evidence,
     };
 
     #[test]
@@ -796,7 +798,7 @@ mod classification_tests {
 
 #[cfg(test)]
 mod glossary_tests {
-    use super::{validate_glossary_term, GlossaryTerm, ProvenanceRecord};
+    use super::{GlossaryTerm, ProvenanceRecord, validate_glossary_term};
 
     #[test]
     fn glossary_term_requires_normalized_text_and_known_provenance() {
@@ -827,12 +829,10 @@ mod anonymized_import_tests {
 
     #[test]
     fn importer_masks_sensitive_values_and_reports_rejected_rows() {
-        let report = import_anonymized_jsonl(
-            concat!(
-                "{\"raw_text\":\"ติดต่อ alice@example.com ที่ 127.0.0.1\",\"source_ref\":\"/home/alice/private.txt\",\"observed_at\":\"2026-08-19T00:00:00Z\",\"language\":\"th\",\"source_kind\":\"fixture\"}\n",
-                "{\"raw_text\":\"missing required fields\"}\n"
-            ),
-        );
+        let report = import_anonymized_jsonl(concat!(
+            "{\"raw_text\":\"ติดต่อ alice@example.com ที่ 127.0.0.1\",\"source_ref\":\"/home/alice/private.txt\",\"observed_at\":\"2026-08-19T00:00:00Z\",\"language\":\"th\",\"source_kind\":\"fixture\"}\n",
+            "{\"raw_text\":\"missing required fields\"}\n"
+        ));
 
         assert_eq!(report.accepted.len(), 1);
         assert_eq!(report.rejected.len(), 1);
@@ -845,7 +845,7 @@ mod anonymized_import_tests {
 
 #[cfg(test)]
 mod corpus_manifest_tests {
-    use super::{validate_corpus_manifest, CorpusManifest, CorpusManifestEntry};
+    use super::{CorpusManifest, CorpusManifestEntry, validate_corpus_manifest};
 
     #[test]
     fn corpus_manifest_requires_complete_unique_and_checksum_verified_entries() {
@@ -866,7 +866,7 @@ mod corpus_manifest_tests {
 
 #[cfg(test)]
 mod corpus_file_integrity_tests {
-    use super::{verify_corpus_bytes, CorpusManifest};
+    use super::{CorpusManifest, verify_corpus_bytes};
     use std::path::PathBuf;
 
     #[test]
@@ -896,7 +896,7 @@ mod corpus_file_integrity_tests {
 
 #[cfg(test)]
 mod experiment_distribution_tests {
-    use super::{summarize_measurements, RunMeasurement};
+    use super::{RunMeasurement, summarize_measurements};
 
     #[test]
     fn experiment_summary_keeps_distribution_statistics_for_repeated_runs() {
@@ -930,7 +930,7 @@ mod experiment_distribution_tests {
 
 #[cfg(test)]
 mod default_selection_tests {
-    use super::{select_default_candidate, DefaultCandidate, SelectionConstraints};
+    use super::{DefaultCandidate, SelectionConstraints, select_default_candidate};
 
     #[test]
     fn selection_rule_rejects_unsafe_candidate_and_prefers_lower_candidate_cost_on_f1_tie() {
@@ -975,7 +975,7 @@ mod default_selection_tests {
 
 #[cfg(test)]
 mod experiment_false_positive_distribution_tests {
-    use super::{summarize_measurements, RunMeasurement};
+    use super::{RunMeasurement, summarize_measurements};
 
     #[test]
     fn summary_reports_per_run_false_positive_extrema_not_a_cross_run_total() {

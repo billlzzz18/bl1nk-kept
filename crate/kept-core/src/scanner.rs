@@ -16,30 +16,29 @@ pub mod scan;
 pub mod types;
 
 pub use duplicate::{
-    filter_allowed_duplicates, find_content_duplicates, find_duplicates,
-    find_duplicates_with_stats, normalized_similarity, ContentDuplicateOptions,
-    ContentDuplicateStats, DuplicateAllowRule, DuplicateEvidence, DuplicateGroup, DuplicateOptions,
-    DuplicateSearchStats,
+    ContentDuplicateOptions, ContentDuplicateStats, DuplicateAllowRule, DuplicateEvidence,
+    DuplicateGroup, DuplicateOptions, DuplicateSearchStats, filter_allowed_duplicates,
+    find_content_duplicates, find_duplicates, find_duplicates_with_stats, normalized_similarity,
 };
 pub use fff::{FffAcquisitionMode, FffAdapterError, FffScanner};
 pub use filter::{
-    build_treemap, filter_index, CustomFilter, CustomOperator, FileFilter, FilterSet, TreemapNode,
+    CustomFilter, CustomOperator, FileFilter, FilterSet, TreemapNode, build_treemap, filter_index,
 };
 pub use integrity::{
-    check_file_extension_integrity, scan_index_integrity, BadExtensionIssue, IntegrityStatus,
+    BadExtensionIssue, IntegrityStatus, check_file_extension_integrity, scan_index_integrity,
 };
 pub use mutation::{
+    ActionSimulation, DuplicateActionKind, DuplicateMutationPlan, DuplicateMutationPolicy,
+    DuplicatePlanAction, DuplicateSimulationResult, RollbackEntry, RollbackJournal,
     create_duplicate_mutation_plan, execute_duplicate_mutation, rollback_duplicate_mutation,
-    simulate_duplicate_mutation, ActionSimulation, DuplicateActionKind, DuplicateMutationPlan,
-    DuplicateMutationPolicy, DuplicatePlanAction, DuplicateSimulationResult, RollbackEntry,
-    RollbackJournal,
+    simulate_duplicate_mutation,
 };
-pub use query::{compile_query, parse_size_to_bytes, QueryClause, QueryPlan};
+pub use query::{QueryClause, QueryPlan, compile_query, parse_size_to_bytes};
 pub use scan::scan_directory;
 pub use types::{
-    apply_refresh_plan, create_persistent_snapshot, migrate_snapshot, plan_incremental_refresh,
-    FileRecord, PersistentScanSnapshot, RefreshPlan, ScanIndex, ScanIssue, ScanIssueKind,
-    ScanOptions, CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION,
+    CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION, FileRecord, PersistentScanSnapshot, RefreshPlan,
+    ScanIndex, ScanIssue, ScanIssueKind, ScanOptions, apply_refresh_plan,
+    create_persistent_snapshot, migrate_snapshot, plan_incremental_refresh,
 };
 
 #[cfg(test)]
@@ -347,10 +346,12 @@ mod content_duplicate_tests {
         // 1. Simulate dry-run
         let simulation = simulate_duplicate_mutation(&plan, &index, &policy);
         assert!(!simulation.valid_actions.is_empty());
-        assert!(simulation
-            .blocked_actions
-            .iter()
-            .any(|b| b.action.target_path.contains(".git")));
+        assert!(
+            simulation
+                .blocked_actions
+                .iter()
+                .any(|b| b.action.target_path.contains(".git"))
+        );
         assert!(primary_path.exists());
         assert!(duplicate_path.exists());
 
@@ -470,13 +471,12 @@ mod content_duplicate_tests {
         };
 
         let simulation = simulate_duplicate_mutation(&plan, &index, &policy);
-        assert!(simulation
-            .blocked_actions
-            .iter()
-            .any(|b| b.action.target_path.contains(".git")
+        assert!(simulation.blocked_actions.iter().any(|b| {
+            b.action.target_path.contains(".git")
                 && b.rejection_reason
                     .as_deref()
-                    .is_some_and(|r| r.contains("protected"))));
+                    .is_some_and(|r| r.contains("protected"))
+        }));
 
         std::fs::remove_dir_all(directory).expect("cleanup must succeed");
     }
@@ -534,10 +534,11 @@ mod content_duplicate_tests {
         };
 
         let simulation = simulate_duplicate_mutation(&plan, &index_with_oob, &policy);
-        assert!(simulation.blocked_actions.iter().any(|b| b
-            .rejection_reason
-            .as_deref()
-            .is_some_and(|r| r.contains("outside"))));
+        assert!(simulation.blocked_actions.iter().any(|b| {
+            b.rejection_reason
+                .as_deref()
+                .is_some_and(|r| r.contains("outside"))
+        }));
 
         let _ = std::fs::remove_dir_all(&outside_dir);
         std::fs::remove_dir_all(directory).expect("cleanup must succeed");
@@ -569,10 +570,11 @@ mod content_duplicate_tests {
 
         let simulation = simulate_duplicate_mutation(&plan, &index, &policy);
         assert!(!simulation.blocked_actions.is_empty());
-        assert!(simulation.blocked_actions.iter().any(|b| b
-            .rejection_reason
-            .as_deref()
-            .is_some_and(|r| r.contains("size"))));
+        assert!(simulation.blocked_actions.iter().any(|b| {
+            b.rejection_reason
+                .as_deref()
+                .is_some_and(|r| r.contains("size"))
+        }));
 
         std::fs::remove_dir_all(directory).expect("cleanup must succeed");
     }
@@ -612,10 +614,11 @@ mod content_duplicate_tests {
 
         let simulation = simulate_duplicate_mutation(&plan, &index, &policy);
         assert!(!simulation.blocked_actions.is_empty());
-        assert!(simulation.blocked_actions.iter().any(|b| b
-            .rejection_reason
-            .as_deref()
-            .is_some_and(|r| r.contains("size mismatch"))));
+        assert!(simulation.blocked_actions.iter().any(|b| {
+            b.rejection_reason
+                .as_deref()
+                .is_some_and(|r| r.contains("size mismatch"))
+        }));
 
         std::fs::remove_dir_all(directory).expect("cleanup must succeed");
     }
@@ -824,7 +827,7 @@ mod mixed_content_duplicate_tests {
 
 #[cfg(test)]
 mod persistent_index_tests {
-    use super::{plan_incremental_refresh, FileRecord, ScanIndex};
+    use super::{FileRecord, ScanIndex, plan_incremental_refresh};
 
     fn record(path: &str, size: u64, modified_unix: u64) -> FileRecord {
         FileRecord {
@@ -868,7 +871,7 @@ mod persistent_index_tests {
 
 #[cfg(test)]
 mod persistent_snapshot_tests {
-    use super::{create_persistent_snapshot, FileRecord, ScanIndex, ScanOptions};
+    use super::{FileRecord, ScanIndex, ScanOptions, create_persistent_snapshot};
 
     #[test]
     fn persistent_snapshot_binds_index_to_root_and_scan_options() {

@@ -257,11 +257,13 @@ pub fn migrate_snapshot(
         v if v == CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION => Ok(snapshot),
         "1.1.0" => {
             // NOTE-SNAP-001: v1.1.0 → v1.2.0 — เพิ่ม root_fingerprint field
-            let root_fingerprint =
-                scan_context_fingerprint(&snapshot.root, &ScanOptions {
+            let root_fingerprint = scan_context_fingerprint(
+                &snapshot.root,
+                &ScanOptions {
                     include_hidden: snapshot.include_hidden,
                     max_depth: snapshot.max_depth,
-                });
+                },
+            );
             Ok(PersistentScanSnapshot {
                 schema_version: CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION.to_string(),
                 root_fingerprint,
@@ -471,12 +473,16 @@ mod tests {
         apply_refresh_plan(&mut records, &plan, &new_records);
 
         assert_eq!(records.len(), 3);
-        assert!(records
-            .iter()
-            .any(|r| r.path == "unchanged.txt" && r.size == 10));
-        assert!(records
-            .iter()
-            .any(|r| r.path == "modified.txt" && r.size == 99));
+        assert!(
+            records
+                .iter()
+                .any(|r| r.path == "unchanged.txt" && r.size == 10)
+        );
+        assert!(
+            records
+                .iter()
+                .any(|r| r.path == "modified.txt" && r.size == 99)
+        );
         assert!(records.iter().any(|r| r.path == "added.txt" && r.size == 5));
         assert!(!records.iter().any(|r| r.path == "removed.txt"));
     }

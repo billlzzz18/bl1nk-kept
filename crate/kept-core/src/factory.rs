@@ -3,7 +3,7 @@ use thiserror::Error;
 
 use crate::judgment::{AgentJudgment, JudgmentError};
 use crate::operation::{ExpectedEffect, ObservedState, OperationContract, Policy};
-use crate::scanner::{find_duplicates, scan_directory, DuplicateOptions, ScanOptions};
+use crate::scanner::{DuplicateOptions, ScanOptions, find_duplicates, scan_directory};
 
 // NOTE-001: Error ประเภทต่าง ๆ ที่เกิดขึ้นจาก Factory Layer
 #[derive(Debug, Error)]

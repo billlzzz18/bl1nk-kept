@@ -144,13 +144,16 @@ const BUNDLED_HOOKS_JSON: &str = r#"{
 /// Check settings for hook installation status.
 fn check_settings(settings: &Value) -> StatusCheck {
     // Check plugin installation
-    if let Some(plugins) = settings.get("enabledPlugins").and_then(|v| v.as_object()) {
-        if plugins
-            .iter()
-            .any(|(key, enabled)| key.starts_with("workmux-status@") && enabled == true)
-        {
-            return StatusCheck::Installed;
-        }
+    let has_plugin = settings
+        .get("enabledPlugins")
+        .and_then(|v| v.as_object())
+        .is_some_and(|plugins| {
+            plugins.iter().any(|(key, enabled)| {
+                key.starts_with("workmux-status@") && enabled.as_bool() == Some(true)
+            })
+        });
+    if has_plugin {
+        return StatusCheck::Installed;
     }
 
     // Check manual hook installation
@@ -330,10 +333,12 @@ mod tests {
         let settings: Value = serde_json::from_str(&content).unwrap();
         let stop = settings["hooks"]["Stop"].as_array().unwrap();
         assert_eq!(stop.len(), 1);
-        assert!(stop[0]["hooks"][0]["command"]
-            .as_str()
-            .unwrap()
-            .contains("glass"));
+        assert!(
+            stop[0]["hooks"][0]["command"]
+                .as_str()
+                .unwrap()
+                .contains("glass")
+        );
     }
 
     #[test]

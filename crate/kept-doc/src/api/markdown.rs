@@ -339,8 +339,8 @@ impl ParserState {
 /// Parses a Markdown string into a sequence of Notion blocks.
 pub fn parse_markdown(md: &str) -> Vec<Block> {
     let options = Options::all(); // Just enable everything to be safe and compatible with GFM
-                                  // options.insert(Options::ENABLE_STRIKETHROUGH);
-                                  // options.insert(Options::ENABLE_TASKLISTS);
+    // options.insert(Options::ENABLE_STRIKETHROUGH);
+    // options.insert(Options::ENABLE_TASKLISTS);
 
     let parser = Parser::new_ext(md, options);
     let mut blocks = Vec::new();

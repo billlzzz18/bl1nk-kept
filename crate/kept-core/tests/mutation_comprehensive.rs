@@ -5,9 +5,9 @@
 
 use kept_core::scanner::DuplicateMutationPlan;
 use kept_core::{
-    create_duplicate_mutation_plan, simulate_duplicate_mutation, DuplicateActionKind,
-    DuplicateEvidence, DuplicateGroup, DuplicateMutationPolicy, DuplicatePlanAction, FileRecord,
-    ScanIndex,
+    DuplicateActionKind, DuplicateEvidence, DuplicateGroup, DuplicateMutationPolicy,
+    DuplicatePlanAction, FileRecord, ScanIndex, create_duplicate_mutation_plan,
+    simulate_duplicate_mutation,
 };
 
 fn make_file(path: &str, name: &str, size: u64) -> FileRecord {
@@ -39,9 +39,11 @@ fn make_index(root: &str, files: Vec<FileRecord>) -> ScanIndex {
 fn default_policy_has_protected_patterns() {
     let policy = DuplicateMutationPolicy::default();
     assert!(policy.protected_patterns.contains(&".git".to_string()));
-    assert!(policy
-        .protected_patterns
-        .contains(&"node_modules".to_string()));
+    assert!(
+        policy
+            .protected_patterns
+            .contains(&"node_modules".to_string())
+    );
     assert!(policy.protected_patterns.contains(&".kept".to_string()));
 }
 
@@ -201,11 +203,13 @@ fn simulate_blocks_path_outside_root() {
     let result = simulate_duplicate_mutation(&plan, &index, &policy);
     assert!(!result.simulation_passed);
     assert_eq!(result.blocked_actions.len(), 1);
-    assert!(result.blocked_actions[0]
-        .rejection_reason
-        .as_ref()
-        .unwrap()
-        .contains("outside allowed root"));
+    assert!(
+        result.blocked_actions[0]
+            .rejection_reason
+            .as_ref()
+            .unwrap()
+            .contains("outside allowed root")
+    );
 }
 
 #[test]
@@ -228,11 +232,13 @@ fn simulate_blocks_protected_pattern() {
 
     let result = simulate_duplicate_mutation(&plan, &index, &policy);
     assert!(!result.simulation_passed);
-    assert!(result.blocked_actions[0]
-        .rejection_reason
-        .as_ref()
-        .unwrap()
-        .contains("protected directory"));
+    assert!(
+        result.blocked_actions[0]
+            .rejection_reason
+            .as_ref()
+            .unwrap()
+            .contains("protected directory")
+    );
 }
 
 #[test]
@@ -258,11 +264,13 @@ fn simulate_blocks_size_mismatch_in_index() {
 
     let result = simulate_duplicate_mutation(&plan, &index, &policy);
     assert!(!result.simulation_passed);
-    assert!(result.blocked_actions[0]
-        .rejection_reason
-        .as_ref()
-        .unwrap()
-        .contains("File size mismatch"));
+    assert!(
+        result.blocked_actions[0]
+            .rejection_reason
+            .as_ref()
+            .unwrap()
+            .contains("File size mismatch")
+    );
 }
 
 #[test]

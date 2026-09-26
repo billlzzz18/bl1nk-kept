@@ -4,10 +4,30 @@
 schema_version = 1
 
 # Example: suppress build noise from a custom tool
-# [filters.my-tool]
-# description = "Compact my-tool output"
-# match_command = "^my-tool\\s+build"
-# strip_ansi = true
-# strip_lines_matching = ["^\\s*$", "^Downloading", "^Installing"]
-# max_lines = 30
-# on_empty = "my-tool: ok"
+[filters.cargo-check]
+description = "Mute cargo check noise for Antigravity"
+# Match `cargo check` and related commands
+match_command = "^\\w+cargo\\s+check\\b"
+
+# Strip ANSI codes
+strip_ansi = true
+
+# Suppress known noisy patterns
+strip_lines_matching = [
+  # Progress bars
+  "^\\s*\\d+/\\d+\\s+\\",
+  # Package compilation output (we just care about errors)
+  "^\\s*Compiling\\b",
+  "^\\s*Finished\\b",
+  "^\\s*Running\\b",
+  "^\\s*Checking\\b",
+  "^\\s*Updating\\b",
+  "^\\s*Adding\\b",
+  "^\\s*Resolving\\b",
+  "^\\s*Documenting\\b",
+  "^\\s*Blocking\\b",
+  "^\\s*Blocking\\s+on\\b",
+]
+
+# Only show errors and warnings (keep important messages)
+only_matching = ["error", "warning", "help", "note", "For more information on this error"]

@@ -4,8 +4,8 @@
 
 use crate::converter::{ConverterError, FromPlatform, ToPlatform};
 use crate::ir::{
-    table::TableCell, table::TableRow, table::TableRowType, Platform, UniversalBlock,
-    UniversalDocument,
+    Platform, UniversalBlock, UniversalDocument, table::TableCell, table::TableRow,
+    table::TableRowType,
 };
 
 /// Lark/CSV Adapter

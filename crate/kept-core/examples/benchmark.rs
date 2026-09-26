@@ -3,7 +3,7 @@ use kept_core::schema::{
     NormalizationProfile, ValidationConfig,
 };
 use kept_core::{
-    find_duplicates_with_stats, DuplicateOptions, FileRecord, KeywordSearch, ScanIndex, Validator,
+    DuplicateOptions, FileRecord, KeywordSearch, ScanIndex, Validator, find_duplicates_with_stats,
 };
 use serde::Serialize;
 use serde_json::json;
@@ -65,7 +65,9 @@ fn parse_scales() -> Result<Vec<usize>, Box<dyn Error>> {
                 scales.push(count);
             }
             "--help" | "-h" => {
-                println!("Usage: cargo run -p kept-core --example benchmark --release -- [--objects COUNT]...");
+                println!(
+                    "Usage: cargo run -p kept-core --example benchmark --release -- [--objects COUNT]..."
+                );
                 println!(
                     "When no scale is supplied, the benchmark runs 10,000 and 100,000 objects."
                 );

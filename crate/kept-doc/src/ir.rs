@@ -13,8 +13,8 @@ pub mod table;
 pub use crate::converter::{ConverterError, ConverterRegistry, FromPlatform, ToPlatform};
 pub use blocks::{EmbedProvider, ListItem, MediaSource, MentionType, TaskItem, UniversalBlock};
 pub use inline::{
-    equation, hard_break, labeled_mention, mention, soft_break, styled_text, text, InlineElement,
-    TextStyle,
+    InlineElement, TextStyle, equation, hard_break, labeled_mention, mention, soft_break,
+    styled_text, text,
 };
 pub use metadata::DocumentMetadata;
 pub use style::{BlockStyle, CodeStyle, Style, StyleRef, StyleSheet, StyleTextStyle, TableStyle};

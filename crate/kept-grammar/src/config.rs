@@ -128,31 +128,27 @@ profiles:
 
 /// Validate naming settings (grammar rules).
 pub fn validate_naming_settings(naming: &NamingSettings) -> Result<(), PolicyError> {
-    if let Some(value) = &naming.unicode {
-        if value != "nfc" {
+    if let Some(value) = &naming.unicode
+        && value != "nfc" {
             return Err(PolicyError::InvalidConfig(format!("unsupported unicode value {value}")));
         }
-    }
-    if let Some(value) = &naming.case {
-        if !matches!(value.as_str(), "lower" | "upper" | "preserve") {
+    if let Some(value) = &naming.case
+        && !matches!(value.as_str(), "lower" | "upper" | "preserve") {
             return Err(PolicyError::InvalidConfig(format!("unsupported case value {value}")));
         }
-    }
-    if let Some(value) = &naming.separator {
-        if !matches!(value.as_str(), "kebab" | "snake" | "preserve") {
+    if let Some(value) = &naming.separator
+        && !matches!(value.as_str(), "kebab" | "snake" | "preserve") {
             return Err(PolicyError::InvalidConfig(format!("unsupported separator value {value}")));
         }
-    }
-    if let Some(rule) = &naming.similarity.name {
-        if !(0.0..=1.0).contains(&rule.threshold) {
+    if let Some(rule) = &naming.similarity.name
+        && !(0.0..=1.0).contains(&rule.threshold) {
             return Err(PolicyError::InvalidConfig(format!(
                 "similarity threshold must be between 0.0 and 1.0: {}",
                 rule.threshold
             )));
         }
-    }
-    if let Some(range) = &naming.length.stem {
-        if range
+    if let Some(range) = &naming.length.stem
+        && range
             .min
             .is_some_and(|min| range.max.is_some_and(|max| min > max))
         {
@@ -160,7 +156,6 @@ pub fn validate_naming_settings(naming: &NamingSettings) -> Result<(), PolicyErr
                 "length.stem min cannot exceed max".to_string(),
             ));
         }
-    }
     if naming
         .words
         .min

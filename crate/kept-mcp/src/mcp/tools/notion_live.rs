@@ -10,10 +10,10 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use serde::Deserialize;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::mcp::core::{
-    invalid_args, McpError, McpResult, RequestHandlerExtra, SchemaBuilder, ToolHandler, ToolInfo,
+    McpError, McpResult, RequestHandlerExtra, SchemaBuilder, ToolHandler, ToolInfo, invalid_args,
 };
 use kept_doc::api::trash::Resource;
 use kept_doc::client::NotionClient;

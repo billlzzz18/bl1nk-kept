@@ -59,8 +59,8 @@ impl Validator {
     }
 
     pub fn validate_search_policy(&self) -> Result<(), Vec<ValidationError>> {
-        if let Some(policy) = &self.registry.search_policy {
-            if !valid_search_policy(policy) {
+        if let Some(policy) = &self.registry.search_policy
+            && !valid_search_policy(policy) {
                 return Err(vec![ValidationError {
                     code: "INVALID_SEARCH_POLICY".into(),
                     message: format!(
@@ -70,7 +70,6 @@ impl Validator {
                     field: Some("searchPolicy".into()),
                 }]);
             }
-        }
         Ok(())
     }
 
@@ -367,26 +366,24 @@ fn validate_field(
                 _ => {}
             }
         }
-        if let Some(values) = &schema.values {
-            if !values.iter().any(|allowed| allowed == text) {
+        if let Some(values) = &schema.values
+            && !values.iter().any(|allowed| allowed == text) {
                 errors.push(ValidationError {
                     code: "INVALID_ENUM".into(),
                     message: format!("Field '{}' must be one of: {}", name, values.join(", ")),
                     field: Some(name.into()),
                 });
             }
-        }
         if let Some(max) = schema.max_length.or_else(|| {
             (name == "description").then_some(registry.validation.rules.description_max_length)
-        }) {
-            if text.chars().count() > max {
+        })
+            && text.chars().count() > max {
                 errors.push(ValidationError {
                     code: "DESCRIPTION_TOO_LONG".into(),
                     message: format!("Field '{}' exceeds {} characters", name, max),
                     field: Some(name.into()),
                 });
             }
-        }
         if name == "description"
             && text.chars().count() < registry.validation.rules.description_min_length
         {
@@ -536,19 +533,23 @@ mod tests {
 
     #[test]
     fn validates_legacy_valid_entry() {
-        assert!(Validator::new(registry())
-            .validate_entry("g", &json!({"id":"x","aliases":["xx"],"description":"valid"}))
-            .is_ok());
+        assert!(
+            Validator::new(registry())
+                .validate_entry("g", &json!({"id":"x","aliases":["xx"],"description":"valid"}))
+                .is_ok()
+        );
     }
 
     #[test]
     fn detects_short_description() {
         let result = Validator::new(registry())
             .validate_entry("g", &json!({"id":"x","aliases":["xx"],"description":"x"}));
-        assert!(result
-            .unwrap_err()
-            .iter()
-            .any(|error| error.code == "DESCRIPTION_TOO_SHORT"));
+        assert!(
+            result
+                .unwrap_err()
+                .iter()
+                .any(|error| error.code == "DESCRIPTION_TOO_SHORT")
+        );
     }
 }
 
@@ -583,9 +584,11 @@ mod foundation_profile_tests {
             .validate_registry()
             .expect_err("out-of-range user search policy must be rejected");
 
-        assert!(errors
-            .iter()
-            .any(|error| error.code == "INVALID_SEARCH_POLICY"));
+        assert!(
+            errors
+                .iter()
+                .any(|error| error.code == "INVALID_SEARCH_POLICY")
+        );
     }
 
     #[test]
@@ -612,9 +615,11 @@ mod foundation_profile_tests {
             .validate_registry()
             .expect_err("zero search budgets must be rejected");
 
-        assert!(errors
-            .iter()
-            .any(|error| error.code == "INVALID_SEARCH_POLICY"));
+        assert!(
+            errors
+                .iter()
+                .any(|error| error.code == "INVALID_SEARCH_POLICY")
+        );
     }
 
     #[test]
@@ -644,9 +649,11 @@ mod foundation_profile_tests {
             .validate_registry()
             .expect_err("invalid normalization profile must be rejected");
 
-        assert!(errors
-            .iter()
-            .any(|error| error.code == "INVALID_NORMALIZATION_PROFILE"));
+        assert!(
+            errors
+                .iter()
+                .any(|error| error.code == "INVALID_NORMALIZATION_PROFILE")
+        );
     }
 }
 
@@ -700,8 +707,10 @@ mod foundation_regex_catalog_tests {
             .validate_registry()
             .expect_err("invalid regex catalog entry must be rejected");
 
-        assert!(errors
-            .iter()
-            .any(|error| error.code == "INVALID_REGEX_RULE"));
+        assert!(
+            errors
+                .iter()
+                .any(|error| error.code == "INVALID_REGEX_RULE")
+        );
     }
 }

@@ -1,8 +1,8 @@
 //! Agent lifecycle management subcommand.
 
 use anyhow::Result;
-use kept_agent::detect::AgentSetup;
 use kept_agent::StatusCheck;
+use kept_agent::detect::AgentSetup;
 
 /// Subcommands for agent management.
 #[derive(Debug, Clone, clap::Subcommand)]

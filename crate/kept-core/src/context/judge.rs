@@ -200,7 +200,8 @@ impl Judge {
                             ),
                         },
                         confidence: 0.95,
-                        rationale: "Repeated acquisition of identical content exceeds threshold".to_string(),
+                        rationale: "Repeated acquisition of identical content exceeds threshold"
+                            .to_string(),
                     };
                 }
 

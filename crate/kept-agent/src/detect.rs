@@ -33,6 +33,18 @@ pub trait AgentSetup {
 pub fn registered_agents() -> Vec<Box<dyn AgentSetup>> {
     vec![
         Box::new(crate::antigravity::Antigravity::new()),
+        Box::new(crate::antigravity::Antigravity::for_client(
+            crate::antigravity::AntigravityClient::Ide,
+        )),
+        Box::new(crate::antigravity::Antigravity::for_client(
+            crate::antigravity::AntigravityClient::Cli,
+        )),
+        Box::new(crate::antigravity::Antigravity::for_client(
+            crate::antigravity::AntigravityClient::Agy2,
+        )),
+        Box::new(crate::antigravity::Antigravity::for_client(
+            crate::antigravity::AntigravityClient::Acp,
+        )),
         Box::new(crate::claude::ClaudeCode::new()),
     ]
 }

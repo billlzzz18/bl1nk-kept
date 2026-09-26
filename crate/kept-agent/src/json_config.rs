@@ -148,10 +148,10 @@ fn remove_workmux_hooks(config: &mut Value, remove_plugins: bool) -> bool {
 
     // Remove from enabledPlugins
     if remove_plugins {
-        if let Some(plugins) = config
+        let plugins_opt = config
             .get_mut("enabledPlugins")
-            .and_then(|v| v.as_object_mut())
-        {
+            .and_then(|v| v.as_object_mut());
+        if let Some(plugins) = plugins_opt {
             let before = plugins.len();
             plugins.retain(|key, _| !key.starts_with("workmux-status@"));
             if plugins.len() < before {
@@ -166,10 +166,12 @@ fn remove_workmux_hooks(config: &mut Value, remove_plugins: bool) -> bool {
 /// Check if a hook entry is workmux-related.
 fn is_workmux_entry(entry: &Value) -> bool {
     // Check direct command
-    if let Some(cmd) = entry.get("command").and_then(|v| v.as_str()) {
-        if cmd.contains("workmux") {
-            return true;
-        }
+    let has_direct_cmd = entry
+        .get("command")
+        .and_then(|v| v.as_str())
+        .is_some_and(|cmd| cmd.contains("workmux"));
+    if has_direct_cmd {
+        return true;
     }
     // Check nested hooks
     entry["hooks"]

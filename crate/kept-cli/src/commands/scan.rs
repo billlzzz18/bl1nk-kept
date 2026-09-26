@@ -91,8 +91,8 @@ pub fn create_or_refresh_scan(
     include_hidden: bool,
 ) -> anyhow::Result<TaskScanResult> {
     use kept_core::{
-        create_persistent_snapshot, plan_incremental_refresh, scan_directory,
-        PersistentScanSnapshot, ScanOptions,
+        PersistentScanSnapshot, ScanOptions, create_persistent_snapshot, plan_incremental_refresh,
+        scan_directory,
     };
 
     let options = ScanOptions {
@@ -133,7 +133,7 @@ pub fn create_or_refresh_scan(
 }
 
 pub fn handle_task_find(request: FindRequest) -> anyhow::Result<()> {
-    use kept_core::{compile_query, filter_index, FileFilter, FilterSet, PersistentScanSnapshot};
+    use kept_core::{FileFilter, FilterSet, PersistentScanSnapshot, compile_query, filter_index};
 
     if let Some(q) = &request.query {
         let (compiled_filters, plan) = compile_query(q).map_err(anyhow::Error::msg)?;
@@ -389,7 +389,7 @@ pub fn naming_review_summary_at(index: &kept_core::ScanIndex, config_path: &Path
             return format!(
                 "Naming policy: config error at '{}': {error}; run kept doctor",
                 config_path.display()
-            )
+            );
         }
     };
     let findings = match kept_core::analyze_index_naming(index, &config) {

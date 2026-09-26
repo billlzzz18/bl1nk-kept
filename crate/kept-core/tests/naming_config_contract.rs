@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use kept_core::{analyze_naming, resolve_naming_rule, NamingIssueKind, UserConfig};
+use kept_core::{NamingIssueKind, UserConfig, analyze_naming, resolve_naming_rule};
 
 #[test]
 fn starter_config_is_broad_user_owned_and_has_no_guessed_scope() {
@@ -81,14 +81,18 @@ scopes:
 
     let finding = analyze_naming(path, &rule, &[]).expect("analysis must succeed");
 
-    assert!(finding
-        .issues
-        .iter()
-        .any(|issue| issue.kind == NamingIssueKind::Case));
-    assert!(finding
-        .issues
-        .iter()
-        .any(|issue| issue.kind == NamingIssueKind::Separator));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|issue| issue.kind == NamingIssueKind::Case)
+    );
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|issue| issue.kind == NamingIssueKind::Separator)
+    );
     assert_eq!(finding.proposed_target, Some("q1-report-final.pdf".into()));
     assert!(!finding.blocked);
 }
@@ -123,7 +127,7 @@ scopes:
 
 #[test]
 fn index_analysis_uses_only_real_scopes_and_blocks_existing_target_collisions() {
-    use kept_core::{analyze_index_naming, FileRecord, ScanIndex};
+    use kept_core::{FileRecord, ScanIndex, analyze_index_naming};
 
     let config: UserConfig = serde_yaml::from_str(
         r#"
@@ -189,10 +193,12 @@ scopes:
     assert_eq!(findings[0].source, Path::new("/work/reports/Q1_Report.pdf"));
     assert_eq!(findings[0].proposed_target, Some("q1-report.pdf".into()));
     assert!(findings[0].blocked, "existing target must block a future rename plan");
-    assert!(findings[0]
-        .issues
-        .iter()
-        .any(|issue| issue.kind == NamingIssueKind::Collision));
+    assert!(
+        findings[0]
+            .issues
+            .iter()
+            .any(|issue| issue.kind == NamingIssueKind::Collision)
+    );
 }
 
 #[test]

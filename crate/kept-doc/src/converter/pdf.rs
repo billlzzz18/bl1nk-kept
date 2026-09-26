@@ -3,7 +3,7 @@
 //! Extracts text and document structure from PDF files into Universal IR.
 
 use crate::converter::{ConvertError, ConverterError, FromPlatform, Reader};
-use crate::ir::{inline::text, DocumentMetadata, Platform, UniversalBlock, UniversalDocument};
+use crate::ir::{DocumentMetadata, Platform, UniversalBlock, UniversalDocument, inline::text};
 
 /// PDF Document Adapter
 pub struct PdfAdapter;

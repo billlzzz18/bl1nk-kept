@@ -429,8 +429,8 @@ pub struct SearchResponse {
 
 #[cfg(test)]
 mod schema_export_tests {
-    use super::{export_keyword_registry_schema, KeywordRegistry, Metadata, ValidationConfig};
-    use crate::{load_registry, migrate_registry, Validator};
+    use super::{KeywordRegistry, Metadata, ValidationConfig, export_keyword_registry_schema};
+    use crate::{Validator, load_registry, migrate_registry};
     use serde_json::json;
     use std::fs;
     use std::time::{SystemTime, UNIX_EPOCH};
@@ -439,11 +439,13 @@ mod schema_export_tests {
     fn public_schema_export_contains_current_registry_and_foundation_profile() {
         let schema = export_keyword_registry_schema().expect("schema export must succeed");
 
-        assert!(schema
-            .schema
-            .object
-            .as_ref()
-            .is_some_and(|object| object.properties.contains_key("version")));
+        assert!(
+            schema
+                .schema
+                .object
+                .as_ref()
+                .is_some_and(|object| object.properties.contains_key("version"))
+        );
         assert!(schema.definitions.contains_key("FoundationProfile"));
     }
 

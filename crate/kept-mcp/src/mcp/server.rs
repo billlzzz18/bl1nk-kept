@@ -6,7 +6,7 @@
 
 use std::sync::Arc;
 
-use crate::mcp::core::{init_logging, Server, ServerCapabilities};
+use crate::mcp::core::{Server, ServerCapabilities, init_logging};
 use crate::mcp::tools;
 use kept_doc::client::NotionClient;
 

@@ -2,12 +2,12 @@
 
 use crate::converter::{ConvertError, ConverterError, FromPlatform, Sink, Source, ToPlatform};
 use crate::ir::{
+    Platform, UniversalDocument,
     blocks::{EmbedProvider, ListItem, MediaSource, MentionType, TaskItem, UniversalBlock},
     inline::{InlineElement, TextStyle},
     metadata::{DocumentMetadata, PropertyValue},
     style::StyleSheet,
     table::{TableCell, TableRow, TableRowType},
-    Platform, UniversalDocument,
 };
 use crate::models::{
     block::{Block, BlockType, TableContent, TableRowContent},

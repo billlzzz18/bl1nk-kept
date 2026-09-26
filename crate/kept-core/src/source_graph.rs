@@ -484,11 +484,10 @@ impl IndexBuilder {
                     .and_then(|e| e.to_str())
                     .is_some_and(|ext| multilang::language_from_extension(ext).is_some());
                 if supported {
-                    if let Ok(meta) = entry.metadata() {
-                        if meta.len() > self.config.max_file_size_bytes {
+                    if let Ok(meta) = entry.metadata()
+                        && meta.len() > self.config.max_file_size_bytes {
                             continue;
                         }
-                    }
 
                     if Self::is_binary_file(&path, self.config.max_prefix_check_bytes) {
                         continue;
@@ -640,11 +639,10 @@ impl IndexManager {
                         ) {
                             continue;
                         }
-                        if let Ok(meta) = fs::metadata(&event.path) {
-                            if meta.len() > self.config.builder_config.max_file_size_bytes {
+                        if let Ok(meta) = fs::metadata(&event.path)
+                            && meta.len() > self.config.builder_config.max_file_size_bytes {
                                 continue;
                             }
-                        }
                         if let Ok(content) = fs::read_to_string(&event.path) {
                             let file_idx = IndexBuilder::parse_file(&event.path, &content);
                             guard.definitions.extend(file_idx.definitions);

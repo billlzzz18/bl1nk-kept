@@ -1,6 +1,6 @@
 //! JSON Schema Builder for Tool input/output definitions.
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 #[derive(Debug, Clone)]
 pub struct JsonSchema {
@@ -89,14 +89,18 @@ mod tests {
         let schema = JsonSchema::object().string("name").number("age").build();
 
         assert_eq!(schema["type"], "object");
-        assert!(schema["required"]
-            .as_array()
-            .unwrap()
-            .contains(&json!("name")));
-        assert!(schema["required"]
-            .as_array()
-            .unwrap()
-            .contains(&json!("age")));
+        assert!(
+            schema["required"]
+                .as_array()
+                .unwrap()
+                .contains(&json!("name"))
+        );
+        assert!(
+            schema["required"]
+                .as_array()
+                .unwrap()
+                .contains(&json!("age"))
+        );
         assert_eq!(schema["properties"]["name"]["type"], "string");
     }
 }

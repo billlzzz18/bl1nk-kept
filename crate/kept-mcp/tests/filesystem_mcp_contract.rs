@@ -69,20 +69,24 @@ async fn test_fff_manager_lifecycle_and_tools() {
 
     // 2. filesystem_find
     let find_res = manager.find(root_str, "lib").await.expect("find query");
-    assert!(find_res
-        .matches
-        .iter()
-        .any(|m| m.path.contains("src/lib.rs")));
+    assert!(
+        find_res
+            .matches
+            .iter()
+            .any(|m| m.path.contains("src/lib.rs"))
+    );
 
     // 3. filesystem_grep
     let grep_res = manager
         .grep(root_str, "pub fn add")
         .await
         .expect("grep query");
-    assert!(grep_res
-        .matches
-        .iter()
-        .any(|m| m.path.contains("src/lib.rs") && m.line_content.contains("pub fn add")));
+    assert!(
+        grep_res
+            .matches
+            .iter()
+            .any(|m| m.path.contains("src/lib.rs") && m.line_content.contains("pub fn add"))
+    );
 
     // 4. filesystem_multi_grep
     let multi_grep_res = manager

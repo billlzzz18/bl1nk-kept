@@ -680,13 +680,11 @@ pub fn set_profile_field(
                 )
             })?
         }
-        "reposition" => {
-            naming.reposition = serde_yaml::from_str(value).map_err(|error| {
-                anyhow::anyhow!(
+        "reposition" => naming.reposition = serde_yaml::from_str(value).map_err(|error| {
+            anyhow::anyhow!(
                 "reposition YAML ไม่ถูกต้อง: {error}; ใช้รายการ {{token: ..., position: front/back}}"
             )
-            })?
-        }
+        })?,
         "stemRegex" => {
             naming.stem_regex = Some(value.to_string());
         }

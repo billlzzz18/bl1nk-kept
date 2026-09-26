@@ -1,6 +1,7 @@
 use kept_core::{
-    find_duplicates_with_stats, select_default_candidate, summarize_measurements, DefaultCandidate,
-    DuplicateOptions, FileRecord, RunMeasurement, ScanIndex, SelectionConstraints,
+    DefaultCandidate, DuplicateOptions, FileRecord, RunMeasurement, ScanIndex,
+    SelectionConstraints, find_duplicates_with_stats, select_default_candidate,
+    summarize_measurements,
 };
 use serde::Serialize;
 use std::error::Error;

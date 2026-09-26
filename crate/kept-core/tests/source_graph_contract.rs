@@ -1,4 +1,4 @@
-use kept_core::{load_index, save_index, FileEvent, IndexBuilder, IndexManager, ScopeGraphIndex};
+use kept_core::{FileEvent, IndexBuilder, IndexManager, ScopeGraphIndex, load_index, save_index};
 use std::fs;
 
 #[test]

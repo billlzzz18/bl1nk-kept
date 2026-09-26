@@ -20,7 +20,7 @@
 //! styling/relations) round-trip between YAML frontmatter and the
 //! `metadata.properties` map of [`crate::ir::metadata::DocumentMetadata`].
 
-use crate::ir::inline::{text, InlineElement};
+use crate::ir::inline::{InlineElement, text};
 use crate::ir::metadata::{PropertyValue, SelectOption};
 use serde_yaml::Value as YamlValue;
 use std::collections::HashMap;
@@ -121,7 +121,7 @@ pub fn parse_frontmatter_to_properties(
                 "<root>".into(),
                 "object".into(),
                 format!("{:?}", other),
-            ))
+            ));
         }
     };
 
@@ -133,7 +133,7 @@ pub fn parse_frontmatter_to_properties(
                     "<key>".into(),
                     "string".into(),
                     format!("{:?}", other),
-                ))
+                ));
             }
         };
         let prop = parse_property(&key, &v)?;
@@ -150,7 +150,7 @@ fn parse_property(name: &str, v: &YamlValue) -> Result<PropertyValue, Frontmatte
                 name.into(),
                 "object with `type:`".into(),
                 format!("{:?}", other),
-            ))
+            ));
         }
     };
 
@@ -164,7 +164,7 @@ fn parse_property(name: &str, v: &YamlValue) -> Result<PropertyValue, Frontmatte
                 name.into(),
                 "type".into(),
                 format!("{:?}", other),
-            ))
+            ));
         }
     };
     let pt = PropertyType::from_tag(type_str)
@@ -203,7 +203,7 @@ fn parse_property(name: &str, v: &YamlValue) -> Result<PropertyValue, Frontmatte
                         name.into(),
                         "value".into(),
                         format!("{:?}", other),
-                    ))
+                    ));
                 }
             };
             Ok(PropertyValue::Number { number: Some(n) })
@@ -234,7 +234,7 @@ fn parse_property(name: &str, v: &YamlValue) -> Result<PropertyValue, Frontmatte
                         name.into(),
                         "values".into(),
                         format!("{:?}", other),
-                    ))
+                    ));
                 }
             };
             let mut opts = Vec::with_capacity(seq.len());
@@ -250,7 +250,7 @@ fn parse_property(name: &str, v: &YamlValue) -> Result<PropertyValue, Frontmatte
                             name.into(),
                             "values[].name".into(),
                             format!("{:?}", other),
-                        ))
+                        ));
                     }
                 }
             }

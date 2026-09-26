@@ -1,7 +1,7 @@
 use std::sync::Mutex;
 
 use chrono::{SecondsFormat, Utc};
-use rusqlite::{params, Connection, Row};
+use rusqlite::{Connection, Row, params};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use uuid::Uuid;

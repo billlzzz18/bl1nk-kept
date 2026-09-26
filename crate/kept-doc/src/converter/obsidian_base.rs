@@ -4,9 +4,9 @@
 
 use crate::converter::{ConverterError, FromPlatform, ToPlatform};
 use crate::ir::{
+    Platform, UniversalBlock, UniversalDocument,
     inline::text,
     table::{CellAlignment, TableCell, TableRow, TableRowType},
-    Platform, UniversalBlock, UniversalDocument,
 };
 
 /// Obsidian Base / Markdown Table Adapter

@@ -100,15 +100,14 @@ impl ContextRegistry {
     pub fn record(&self, observation: &Observation) {
         if let Ok(mut guard) = self.entries.write() {
             // LRU eviction: if at capacity, remove oldest entry
-            if guard.len() >= self.max_entries {
-                if let Some(oldest_key) = guard
+            if guard.len() >= self.max_entries
+                && let Some(oldest_key) = guard
                     .iter()
                     .min_by_key(|(_, e)| e.last_seen_unix)
                     .map(|(k, _)| k.clone())
                 {
                     guard.remove(&oldest_key);
                 }
-            }
 
             let key = observation.source.target.to_string();
             let now = std::time::SystemTime::now()

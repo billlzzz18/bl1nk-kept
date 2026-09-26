@@ -36,13 +36,9 @@ permissions:
 
 jobs:
   verify:
-    name: Verify (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+    name: Verify
+    runs-on: ubuntu-latest
     timeout-minutes: 10
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
 

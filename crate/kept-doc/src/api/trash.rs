@@ -13,7 +13,7 @@
 
 use crate::client::NotionClient;
 use crate::error::{NotionError, Result};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 /// A Notion resource that participates in the trash lifecycle.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -6,9 +6,9 @@
 
 use kept_core::scanner::normalized_similarity;
 use kept_core::{
-    filter_allowed_duplicates, find_duplicates, find_duplicates_with_stats,
     ContentDuplicateOptions, DuplicateAllowRule, DuplicateEvidence, DuplicateGroup,
-    DuplicateOptions, FileRecord, ScanIndex,
+    DuplicateOptions, FileRecord, ScanIndex, filter_allowed_duplicates, find_duplicates,
+    find_duplicates_with_stats,
 };
 
 fn make_file(path: &str, name: &str, size: u64) -> FileRecord {

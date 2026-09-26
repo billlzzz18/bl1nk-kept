@@ -14,13 +14,11 @@ pub mod notion_live;
 pub mod unified;
 pub mod watcher;
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::mcp::core::{McpError, McpResult};
 
-/// Serialize document conversion response with unified document and block_count schema.
-// NOTE-001: รักษา response contract `document` และ `block_count` ให้ conversion tools ทุก platform
-// ใช้ serialization เดียวกัน เพื่อลดความเสี่ยงที่ schema ของ MCP แต่ละ adapter จะค่อย ๆ ต่างกัน
+/// Serialize document conversion response.
 pub(crate) fn serialize_document_response(
     document: &kept_doc::UniversalDocument,
 ) -> McpResult<Value> {
@@ -35,8 +33,8 @@ pub(crate) fn serialize_document_response(
 #[cfg(test)]
 mod tests {
     use super::serialize_document_response;
-    use kept_doc::converter::markdown::MarkdownConverter;
     use kept_doc::FromPlatform;
+    use kept_doc::converter::markdown::MarkdownConverter;
 
     #[test]
     fn shared_document_response_serializes_document_and_block_count() {

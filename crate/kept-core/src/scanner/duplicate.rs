@@ -62,13 +62,11 @@ pub struct DuplicateAllowRule {
 
 impl DuplicateAllowRule {
     pub fn matches_group(&self, group: &DuplicateGroup) -> bool {
-        if let Some(rule_hash) = &self.sha256 {
-            if let Some(evidence) = &group.evidence {
-                if evidence.full_sha256.eq_ignore_ascii_case(rule_hash) {
+        if let Some(rule_hash) = &self.sha256
+            && let Some(evidence) = &group.evidence
+                && evidence.full_sha256.eq_ignore_ascii_case(rule_hash) {
                     return true;
                 }
-            }
-        }
         if let (Some(a), Some(b)) = (&self.path_a, &self.path_b) {
             let has_a = group.items.iter().any(|item| item == a);
             let has_b = group.items.iter().any(|item| item == b);

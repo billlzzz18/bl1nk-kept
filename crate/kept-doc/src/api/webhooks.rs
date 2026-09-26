@@ -235,8 +235,8 @@ mod tests {
         let body = b"{}";
         assert!(!verify_webhook_signature(token, body, "deadbeef")); // no sha256= prefix
         assert!(!verify_webhook_signature(token, body, "sha256=zzzz")); // non-hex
-                                                                        // Valid hex but the wrong byte length: exercises the length-mismatch
-                                                                        // branch in `ct_eq` (must return false, not panic).
+        // Valid hex but the wrong byte length: exercises the length-mismatch
+        // branch in `ct_eq` (must return false, not panic).
         assert!(!verify_webhook_signature(token, body, "sha256=dead"));
     }
 

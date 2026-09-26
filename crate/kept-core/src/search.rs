@@ -1,8 +1,8 @@
 use crate::keyboard::{likely_thai_wrong_layout, qwerty_to_thai};
 use crate::scanner::normalized_similarity;
 use crate::schema::{KeywordRegistry, SearchPolicy, SearchResult, SemanticMetadata};
-use fuzzy_matcher::skim::SkimMatcherV2;
 use fuzzy_matcher::FuzzyMatcher;
+use fuzzy_matcher::skim::SkimMatcherV2;
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
 
@@ -97,8 +97,8 @@ impl Bm25Index {
                     content.push_str(description);
                     content.push(' ');
                 }
-                if let Some(semantic) = entry.get("semanticContext") {
-                    if let Ok(context) =
+                if let Some(semantic) = entry.get("semanticContext")
+                    && let Ok(context) =
                         serde_json::from_value::<SemanticMetadata>(semantic.clone())
                     {
                         for value in [context.root_word, context.definition_th]
@@ -109,7 +109,6 @@ impl Bm25Index {
                             content.push(' ');
                         }
                     }
-                }
 
                 fuzzy_terms.retain(|term| !term.is_empty());
                 fuzzy_terms.sort();

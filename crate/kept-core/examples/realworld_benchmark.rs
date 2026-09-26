@@ -53,11 +53,7 @@ pub struct AdmissionEvaluationResult {
 
 fn estimate_tokens(text: &str) -> usize {
     let len = text.len();
-    if len == 0 {
-        0
-    } else {
-        len.div_ceil(4)
-    }
+    if len == 0 { 0 } else { len.div_ceil(4) }
 }
 
 fn run_rg_search(dir: &Path, pattern: &str) -> (usize, f64) {
@@ -92,15 +88,14 @@ fn run_kept_fff_search(scanner: &mut FffScanner, pattern: &str) -> (usize, f64) 
             if record.is_binary.unwrap_or(false) {
                 continue;
             }
-            if let Ok(observation) = scanner.acquire(&record.path, FffAcquisitionMode::View) {
-                if let Some(content) = observation.content {
+            if let Ok(observation) = scanner.acquire(&record.path, FffAcquisitionMode::View)
+                && let Some(content) = observation.content {
                     for line in content.lines() {
                         if line.contains(pattern) {
                             matches += 1;
                         }
                     }
                 }
-            }
         }
     }
 

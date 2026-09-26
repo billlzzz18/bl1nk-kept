@@ -7,8 +7,8 @@
 use std::path::Path;
 
 use kept_core::{
-    analyze_naming, resolve_naming_rule, NamingIssueKind, NamingSettings, ResolvedNamingRule,
-    UserConfig,
+    NamingIssueKind, NamingSettings, ResolvedNamingRule, UserConfig, analyze_naming,
+    resolve_naming_rule,
 };
 
 // ─── validate_naming_settings edge cases ────────────────────────────────────
@@ -22,11 +22,13 @@ fn validate_rejects_unsupported_unicode_value() {
     let mut config = starter_config();
     config.defaults.naming.unicode = Some("nfkd".to_string());
     assert!(config.validate().is_err());
-    assert!(config
-        .validate()
-        .unwrap_err()
-        .to_string()
-        .contains("unsupported unicode value nfkd"));
+    assert!(
+        config
+            .validate()
+            .unwrap_err()
+            .to_string()
+            .contains("unsupported unicode value nfkd")
+    );
 }
 
 #[test]
@@ -41,11 +43,13 @@ fn validate_rejects_unsupported_case_value() {
     let mut config = starter_config();
     config.defaults.naming.case = Some("camel".to_string());
     assert!(config.validate().is_err());
-    assert!(config
-        .validate()
-        .unwrap_err()
-        .to_string()
-        .contains("unsupported case value camel"));
+    assert!(
+        config
+            .validate()
+            .unwrap_err()
+            .to_string()
+            .contains("unsupported case value camel")
+    );
 }
 
 #[test]
@@ -62,11 +66,13 @@ fn validate_rejects_unsupported_separator_value() {
     let mut config = starter_config();
     config.defaults.naming.separator = Some("dot".to_string());
     assert!(config.validate().is_err());
-    assert!(config
-        .validate()
-        .unwrap_err()
-        .to_string()
-        .contains("unsupported separator value dot"));
+    assert!(
+        config
+            .validate()
+            .unwrap_err()
+            .to_string()
+            .contains("unsupported separator value dot")
+    );
 }
 
 #[test]
@@ -106,9 +112,10 @@ fn validate_rejects_length_stem_min_exceeds_max() {
         stem: Some(kept_core::RangeLimit { min: Some(200), max: Some(100) }),
     };
     let err = config.validate().unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("length.stem min cannot exceed max"));
+    assert!(
+        err.to_string()
+            .contains("length.stem min cannot exceed max")
+    );
 }
 
 #[test]
@@ -139,9 +146,10 @@ fn validate_rejects_empty_extension() {
     let mut config = starter_config();
     config.defaults.naming.extensions = vec!["".to_string()];
     let err = config.validate().unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("extensions must be non-empty values"));
+    assert!(
+        err.to_string()
+            .contains("extensions must be non-empty values")
+    );
 }
 
 #[test]
@@ -149,9 +157,10 @@ fn validate_rejects_extension_with_leading_dot() {
     let mut config = starter_config();
     config.defaults.naming.extensions = vec![".rs".to_string()];
     let err = config.validate().unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("extensions must be non-empty values"));
+    assert!(
+        err.to_string()
+            .contains("extensions must be non-empty values")
+    );
 }
 
 #[test]
@@ -159,9 +168,10 @@ fn validate_rejects_extension_with_whitespace() {
     let mut config = starter_config();
     config.defaults.naming.extensions = vec!["r s".to_string()];
     let err = config.validate().unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("extensions must be non-empty values"));
+    assert!(
+        err.to_string()
+            .contains("extensions must be non-empty values")
+    );
 }
 
 // ─── UserConfig validation ─────────────────────────────────────────────────
@@ -201,9 +211,10 @@ fn validate_rejects_scope_with_missing_profile() {
         overrides: kept_core::ScopeOverrides::default(),
     });
     let err = config.validate().unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("scope /work references missing profile nonexistent"));
+    assert!(
+        err.to_string()
+            .contains("scope /work references missing profile nonexistent")
+    );
 }
 
 #[test]
@@ -388,10 +399,12 @@ fn analyze_lower_case_rule() {
     );
     let finding = analyze_naming(Path::new("/work/MyFile.txt"), &rule, &[]).unwrap();
     assert_eq!(finding.proposed_target, Some("myfile.txt".into()));
-    assert!(finding
-        .issues
-        .iter()
-        .any(|i| i.kind == NamingIssueKind::Case));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|i| i.kind == NamingIssueKind::Case)
+    );
 }
 
 #[test]
@@ -406,10 +419,12 @@ fn analyze_upper_case_rule() {
     let finding = analyze_naming(Path::new("/work/myfile.txt"), &rule, &[]).unwrap();
     // Extension is always lowercased in output
     assert_eq!(finding.proposed_target, Some("MYFILE.txt".into()));
-    assert!(finding
-        .issues
-        .iter()
-        .any(|i| i.kind == NamingIssueKind::Case));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|i| i.kind == NamingIssueKind::Case)
+    );
 }
 
 #[test]
@@ -423,10 +438,12 @@ fn analyze_kebab_separator_rule() {
     );
     let finding = analyze_naming(Path::new("/work/my_file_name.txt"), &rule, &[]).unwrap();
     assert_eq!(finding.proposed_target, Some("my-file-name.txt".into()));
-    assert!(finding
-        .issues
-        .iter()
-        .any(|i| i.kind == NamingIssueKind::Separator));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|i| i.kind == NamingIssueKind::Separator)
+    );
 }
 
 #[test]
@@ -440,10 +457,12 @@ fn analyze_snake_separator_rule() {
     );
     let finding = analyze_naming(Path::new("/work/my-file-name.txt"), &rule, &[]).unwrap();
     assert_eq!(finding.proposed_target, Some("my_file_name.txt".into()));
-    assert!(finding
-        .issues
-        .iter()
-        .any(|i| i.kind == NamingIssueKind::Separator));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|i| i.kind == NamingIssueKind::Separator)
+    );
 }
 
 #[test]
@@ -457,10 +476,12 @@ fn analyze_control_characters_detected() {
     );
     // Filename with control character (\x03)
     let finding = analyze_naming(Path::new("/work/file\x03name.txt"), &rule, &[]).unwrap();
-    assert!(finding
-        .issues
-        .iter()
-        .any(|i| i.kind == NamingIssueKind::ControlCharacter));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|i| i.kind == NamingIssueKind::ControlCharacter)
+    );
 }
 
 #[test]
@@ -473,10 +494,12 @@ fn analyze_whitespace_trim_detected() {
         },
     );
     let finding = analyze_naming(Path::new("/work/ spaced .txt"), &rule, &[]).unwrap();
-    assert!(finding
-        .issues
-        .iter()
-        .any(|i| i.kind == NamingIssueKind::TrimWhitespace));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|i| i.kind == NamingIssueKind::TrimWhitespace)
+    );
 }
 
 #[test]
@@ -489,10 +512,12 @@ fn analyze_stem_regex_violation() {
         },
     );
     let finding = analyze_naming(Path::new("/work/My File.txt"), &rule, &[]).unwrap();
-    assert!(finding
-        .issues
-        .iter()
-        .any(|i| i.kind == NamingIssueKind::StemRegex));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|i| i.kind == NamingIssueKind::StemRegex)
+    );
 }
 
 #[test]
@@ -507,10 +532,12 @@ fn analyze_stem_length_too_long() {
         },
     );
     let finding = analyze_naming(Path::new("/work/longfilename.txt"), &rule, &[]).unwrap();
-    assert!(finding
-        .issues
-        .iter()
-        .any(|i| i.kind == NamingIssueKind::Length));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|i| i.kind == NamingIssueKind::Length)
+    );
 }
 
 #[test]
@@ -525,10 +552,12 @@ fn analyze_stem_length_too_short() {
         },
     );
     let finding = analyze_naming(Path::new("/work/ab.txt"), &rule, &[]).unwrap();
-    assert!(finding
-        .issues
-        .iter()
-        .any(|i| i.kind == NamingIssueKind::Length));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|i| i.kind == NamingIssueKind::Length)
+    );
 }
 
 #[test]
@@ -541,10 +570,12 @@ fn analyze_word_count_violation() {
         },
     );
     let finding = analyze_naming(Path::new("/work/two words.txt"), &rule, &[]).unwrap();
-    assert!(finding
-        .issues
-        .iter()
-        .any(|i| i.kind == NamingIssueKind::WordCount));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|i| i.kind == NamingIssueKind::WordCount)
+    );
 }
 
 #[test]
@@ -560,10 +591,12 @@ fn analyze_numbers_not_allowed() {
         },
     );
     let finding = analyze_naming(Path::new("/work/file123.txt"), &rule, &[]).unwrap();
-    assert!(finding
-        .issues
-        .iter()
-        .any(|i| i.kind == NamingIssueKind::Number));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|i| i.kind == NamingIssueKind::Number)
+    );
 }
 
 #[test]
@@ -579,10 +612,12 @@ fn analyze_max_digits_per_token_exceeded() {
         },
     );
     let finding = analyze_naming(Path::new("/work/file12345.txt"), &rule, &[]).unwrap();
-    assert!(finding
-        .issues
-        .iter()
-        .any(|i| i.kind == NamingIssueKind::Number));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|i| i.kind == NamingIssueKind::Number)
+    );
 }
 
 #[test]
@@ -596,10 +631,12 @@ fn analyze_portability_conflict_detected() {
     );
     // Windows reserved name
     let finding = analyze_naming(Path::new("/work/con.txt"), &rule, &[]).unwrap();
-    assert!(finding
-        .issues
-        .iter()
-        .any(|i| i.kind == NamingIssueKind::Portability));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|i| i.kind == NamingIssueKind::Portability)
+    );
 }
 
 #[test]
@@ -612,10 +649,12 @@ fn analyze_portability_conflict_special_chars() {
         },
     );
     let finding = analyze_naming(Path::new("/work/file<name>.txt"), &rule, &[]).unwrap();
-    assert!(finding
-        .issues
-        .iter()
-        .any(|i| i.kind == NamingIssueKind::Portability));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|i| i.kind == NamingIssueKind::Portability)
+    );
 }
 
 #[test]
@@ -630,10 +669,12 @@ fn analyze_blocked_by_collision() {
     let occupied = vec![PathBuf::from("/work/target.txt")];
     let finding = analyze_naming(Path::new("/work/TARGET.txt"), &rule, &occupied).unwrap();
     assert!(finding.blocked);
-    assert!(finding
-        .issues
-        .iter()
-        .any(|i| i.kind == NamingIssueKind::Collision));
+    assert!(
+        finding
+            .issues
+            .iter()
+            .any(|i| i.kind == NamingIssueKind::Collision)
+    );
 }
 
 #[test]

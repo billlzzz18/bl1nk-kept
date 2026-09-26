@@ -11,30 +11,30 @@ pub mod registry;
 pub mod scan;
 pub mod setup;
 
-pub use agent::{handle_agent, AgentSubcommand};
+pub use agent::{AgentSubcommand, handle_agent};
 pub use config::{
-    config_field_default_value, handle_config, set_profile_field, unset_profile_field,
     ConfigCommands, DefaultCommands, ProfileCommands, ScopeCommands, ScopeExceptionCommands,
-    ScopeSettingCommands,
+    ScopeSettingCommands, config_field_default_value, handle_config, set_profile_field,
+    unset_profile_field,
 };
-pub use doc::{handle_doc, DocCommands};
+pub use doc::{DocCommands, handle_doc};
 pub use doctor::{
-    doctor_editor_at, handle_doctor, repair_invalid_config_at, repair_missing_config_at,
     DoctorFinding, DoctorReport, DoctorRunResult, DoctorStatus, InvalidConfigRepair,
+    doctor_editor_at, handle_doctor, repair_invalid_config_at, repair_missing_config_at,
 };
 pub use duplicates::{
-    choose_duplicate_action, duplicate_action_from_selection, handle_task_duplicates,
-    run_duplicate_action, DuplicateAction,
+    DuplicateAction, choose_duplicate_action, duplicate_action_from_selection,
+    handle_task_duplicates, run_duplicate_action,
 };
-pub use fs::{handle_duplicate_scan, handle_fs, DuplicateCommands, FsCommands};
-pub use group::{handle_group, GroupCommands, GroupFieldCommands};
-pub use registry::{handle_registry, RegistryCommands};
+pub use fs::{DuplicateCommands, FsCommands, handle_duplicate_scan, handle_fs};
+pub use group::{GroupCommands, GroupFieldCommands, handle_group};
+pub use registry::{RegistryCommands, handle_registry};
 pub use scan::{
-    build_scan_space_summary, create_or_refresh_scan, handle_task_find, handle_task_review,
-    handle_task_scan, naming_review_summary, naming_review_summary_at,
-    scan_review_action_from_selection, scan_review_summary, FindRequest, ScanReviewAction,
-    TaskScanResult,
+    FindRequest, ScanReviewAction, TaskScanResult, build_scan_space_summary,
+    create_or_refresh_scan, handle_task_find, handle_task_review, handle_task_scan,
+    naming_review_summary, naming_review_summary_at, scan_review_action_from_selection,
+    scan_review_summary,
 };
 pub use setup::{
-    handle_setup, setup_action_from_selection, setup_user_config_at, SetupAction, SetupResult,
+    SetupAction, SetupResult, handle_setup, setup_action_from_selection, setup_user_config_at,
 };

@@ -3,7 +3,7 @@
 use clap::Subcommand;
 use std::path::PathBuf;
 
-use super::duplicates::{run_duplicate_action, DuplicateAction};
+use super::duplicates::{DuplicateAction, run_duplicate_action};
 use crate::helpers::parse_human_size;
 
 #[derive(Subcommand)]
@@ -51,7 +51,7 @@ pub enum DuplicateCommands {
 }
 
 pub fn handle_fs(cmd: FsCommands) -> anyhow::Result<()> {
-    use kept_core::{build_treemap, filter_index, scan_directory, FilterSet, ScanOptions};
+    use kept_core::{FilterSet, ScanOptions, build_treemap, filter_index, scan_directory};
 
     match cmd {
         FsCommands::Duplicates { cmd } => handle_duplicate_scan(cmd)?,
@@ -119,7 +119,7 @@ pub fn handle_fs(cmd: FsCommands) -> anyhow::Result<()> {
 
 pub fn handle_duplicate_scan(cmd: DuplicateCommands) -> anyhow::Result<()> {
     use kept_core::{
-        find_content_duplicates, scan_directory, ContentDuplicateOptions, ScanOptions,
+        ContentDuplicateOptions, ScanOptions, find_content_duplicates, scan_directory,
     };
     use std::io::{self, IsTerminal};
 
@@ -153,11 +153,10 @@ pub fn handle_duplicate_scan(cmd: DuplicateCommands) -> anyhow::Result<()> {
         }
         return run_duplicate_action(action, &root, &report, yes, Some(&index));
     }
-    if !json && crate::helpers::is_interactive_terminal() {
-        if let Some(action) = super::duplicates::choose_duplicate_action()? {
+    if !json && crate::helpers::is_interactive_terminal()
+        && let Some(action) = super::duplicates::choose_duplicate_action()? {
             run_duplicate_action(action, &root, &report, false, Some(&index))?;
         }
-    }
     Ok(())
 }
 

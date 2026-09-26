@@ -139,7 +139,7 @@ pub fn compile_query(query: &str) -> Result<(FilterSet, QueryPlan), String> {
                     return Err(format!(
                         "Unknown duplicate filter type: 'dup:{}' (valid: content, name)",
                         dup_type
-                    ))
+                    ));
                 }
             }
             continue;

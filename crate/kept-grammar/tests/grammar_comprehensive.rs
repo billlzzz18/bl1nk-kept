@@ -4,9 +4,9 @@
 //! starter config YAML parsing, create_user_config_if_missing behavior.
 
 use kept_grammar::{
-    create_user_config_if_missing, load_user_config, save_user_config, starter_config_yaml,
-    validate_naming_settings, LengthSettings, NamingSettings, RangeLimit, SimilarityRule,
-    SimilaritySettings, UserConfig, WordSettings,
+    LengthSettings, NamingSettings, RangeLimit, SimilarityRule, SimilaritySettings, UserConfig,
+    WordSettings, create_user_config_if_missing, load_user_config, save_user_config,
+    starter_config_yaml, validate_naming_settings,
 };
 use std::fs;
 use std::path::PathBuf;
@@ -142,9 +142,10 @@ fn validate_rejects_length_stem_min_greater_than_max() {
         ..NamingSettings::default()
     };
     let err = validate_naming_settings(&settings).unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("length.stem min cannot exceed max"));
+    assert!(
+        err.to_string()
+            .contains("length.stem min cannot exceed max")
+    );
 }
 
 #[test]
@@ -183,9 +184,10 @@ fn validate_rejects_empty_extension() {
         ..NamingSettings::default()
     };
     let err = validate_naming_settings(&settings).unwrap_err();
-    assert!(err
-        .to_string()
-        .contains("extensions must be non-empty values"));
+    assert!(
+        err.to_string()
+            .contains("extensions must be non-empty values")
+    );
 }
 
 #[test]

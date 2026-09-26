@@ -6,45 +6,6 @@
 
 ---
 
-## Architecture Flow
-
-```text
-               User / Agent Intent (Focus, Search, Ask)
-                                │
-                                ▼
-                   ┌─────────────────────────┐
-                   │  FFF-based Core Adapter │ (look, view, watch, grep)
-                   └────────────┬────────────┘
-                                │
-          ┌─────────────────────┼─────────────────────┐
-          ▼                     ▼                     ▼
-   File Operations       Code Structure        Document IR
-   (FFF Primitives)       (Tree-sitter)        (kept-doc)
-   look / view / diff   outline / symbol     markdown / docx
-          └─────────────────────┬─────────────────────┘
-                                ▼
-                       Observation Model
-             (Target URI, Revision, Content ID)
-                                │
-                                ▼
-                      ┌───────────────────┐
-                      │    JUDGE ENGINE   │ (State & Context Registry)
-                      └─────────┬─────────┘
-                                │
-          ┌─────────────────────┼─────────────────────┐
-          ▼                     ▼                     ▼
-     [PASS]                [DELTA]              [REFERENCE]
-   (New context)       (Changed symbols)      (Known & unchanged)
-          └─────────────────────┬─────────────────────┘
-                                ▼
-                     Context Output Payload
-                                │
-                                ▼
-                     MCP Client / Agent CLI
-```
-
----
-
 ## Crate Responsibilities
 
 | Crate | บทบาทและหน้าที่หลัก |

@@ -1,26 +1,5 @@
 # TODO.md แผนงาน kept
 
----
-
-## Delivery Loop (TDD)
-
-ทุก Unit of Work ต้องปิดวงจรครบ 5 ขั้นตอน:
-1. **Red**: เขียน failing test ก่อน production code
-2. **Green**: minimal implementation ให้ test ผ่าน
-3. **Refactor**: จัด safety (ลบ unwrap, ใช้ `?`), จัด path module, comment `// NOTE-xxx:` ภาษาไทย
-4. **Verify**: รัน `cargo test --workspace`, `cargo clippy --workspace -- -D warnings`, `cargo fmt --all -- --check`
-5. **Reconcile**: อัปเดต `CHANGELOG.md` และเช็คบ็อกซ์ใน `TODO.md`
-
----
-
-## Status Legend
-
-- `[x]` — ทำแล้ว มี code + test ผ่าน
-- `[ ]` — ยังไม่ทำ
-- `[~]` — ทำบางส่วน ยังไม่ครบ acceptance
-
----
-
 ## Phase 0: Test Debt & Code Quality (ต้องทำก่อนขยายฟีเจอร์)
 
 > **Exit Gate:** `cargo clippy --workspace -- -D warnings` ผ่าน 0 warning, production unwrap/expect = 0
@@ -53,6 +32,7 @@
 ### 1.1 Plugin Manifest (Zed Extension Schema)
 
 - [ ] ออกแบบ `PluginManifest` ตาม Zed extension.json:
+
   ```json
   {
     "id": "author.name",
@@ -73,28 +53,9 @@
     "permissions": ["fs.read", "fs.write", "net.fetch", "shell.exec", "agent.tools"],
     "activationEvents": ["onCommand:...", "onLanguage:...", "onStartup", "onMcp:..."]
   }
-  ```
-  (Red) — tests ใน `tests/plugin_manifest_contract.rs`
-
-- [ ] Implement manifest validation: required fields, semver, contribution schema per type (Green) — `crate/kept-agent/src/plugin/manifest.rs`
-- [ ] Manifest → `PluginSummary` registry record + capabilities derivation (Green)
-
-### 1.2 Local Plugin Loader (Git Clone + Filesystem)
-
-- [ ] `kept plugin install <git-url>[@ref]` — clone shallow, resolve ref→commit SHA, validate manifest, copy to `~/.kept/plugins/installed/<id>@<sha>` (Green)
-- [ ] `kept plugin dev <path>` — symlink load สำหรับพัฒนา hot-reload (Green)
-- [ ] `kept plugin list` — แสดง id, name, version, source (git/dev), enabled, path
-- [ ] `kept plugin enable/disable <id>` — toggle ใน registry
-- [ ] `kept plugin uninstall <id>` — ลบ installed dir + registry entry (dev plugins แค่ unlink)
-
-### 1.3 Contribution Points (Zed Compatible)
-
-- [ ] `themes` — CSS theme files, base light/dark, register เข้า UI layer
-- [ ] `languages` — Tree-sitter grammar + language configuration (extend kept-core multilang)
-- [ ] `debuggers` — DAP adapter registration (future, optional)
-- [ ] `agents` — Agent definitions with capabilities → register เข้า kept-agent
-- [ ] `mcp` — MCP server definitions (name, command, args, env, transport) → auto-register เข้า `kept-mcp`
+  
 - [ ] `commands` — CLI subcommands → dispatch ไป plugin entrypoint
+
 - [ ] `settings` — JSON schema per plugin, merge เข้า user config
 - [ ] `keybindings` — Keybinding registration (TUI future)
 
@@ -262,21 +223,3 @@
 | DUP-001 | Duplicate mutation (rename/apply/rollback) | `[x]` DONE | `mutation.rs` 4 functions + CLI wiring + 8 safety tests + allow_list + rollback journal |
 | DATA-001 | Gold corpus 10,000 assertions | `[x]` DONE | `test_gold_corpus_contract.py`, `validate_corpus_manifest`, fixtures |
 | DATA-002 | Dictionary materialization | `[x]` DONE | `kept corpus snapshot save` + `kept corpus replay --json` deterministic |
-
----
-
-## Completed Sections (อ้างอิงได้)
-
-| Section | Status | หลักฐาน |
-|---|---|---|
-| 2.1 Observation, Target URI, Evidence | `[x]` | `observation_contract.rs`, `context_contract.rs` |
-| 2.2 FFF Acquisition & Filesystem | `[x]` | `fff_acquisition_contract.rs`, `fff_scanner_contract.rs` |
-| 2.3 Context Registry & Judge | `[x]` | `context_contract.rs` (15/15 pass) |
-| 2.3.1 P0.1 Behavioral Waste Gate | `[x]` | `context_contract.rs` |
-| 2.3.2 P0.2 Correction Ledger | `[x]` | `correction_ledger_contract.rs` |
-| 2.3.3 P0.3 Semantic Disambiguation | `[x]` | ADR-004, `context_contract.rs` |
-| 2.4 SQZ Integration (port functions) | `[x]` | `token_counter.rs`, `content_router.rs`, `regret_tracker.rs` |
-| 2.5 kept-grammar Separation | `[x]` | `crate/kept-grammar/` |
-| 3. FFF-backed scan/find/review | `[x]` | CLI contracts, smoke tests |
-| 4. MCP filesystem tools | `[x]` | `filesystem_mcp_contract.rs` |
-| 13. Installer & release workflow | `[x]` | `install-mcp.sh`, `install-mcp.ps1`, release-gate |

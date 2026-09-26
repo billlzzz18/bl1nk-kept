@@ -2,7 +2,7 @@ use clap::{CommandFactory, Parser, Subcommand};
 use std::path::PathBuf;
 
 mod completion;
-use completion::{generate_completion, Shell};
+use completion::{Shell, generate_completion};
 
 pub mod commands;
 pub mod corpus;
@@ -10,8 +10,8 @@ pub mod evidence;
 pub mod helpers;
 
 use commands::*;
-use corpus::{handle_corpus, CorpusCommands};
-use evidence::{handle_evidence, EvidenceCommands};
+use corpus::{CorpusCommands, handle_corpus};
+use evidence::{EvidenceCommands, handle_evidence};
 
 #[derive(Parser)]
 #[command(
@@ -215,15 +215,17 @@ async fn main() -> anyhow::Result<()> {
             json,
             semantic,
             hybrid,
-        } => handle_registry(RegistryCommands::Search {
-            path: registry,
-            query,
-            group,
-            json,
-            semantic,
-            hybrid,
-        })
-        .await?,
+        } => {
+            handle_registry(RegistryCommands::Search {
+                path: registry,
+                query,
+                group,
+                json,
+                semantic,
+                hybrid,
+            })
+            .await?
+        }
         Commands::Group { cmd } => handle_group(cmd)?,
         Commands::Convert { input, output } => {
             handle_doc(DocCommands::Convert { input, output }).await?
@@ -232,29 +234,25 @@ async fn main() -> anyhow::Result<()> {
         Commands::Config { cmd } => handle_config(cmd)?,
         Commands::Doctor { fix } => handle_doctor(fix)?,
         Commands::Review { root, index } => handle_task_review(root, index, true)?,
-        Commands::Duplicates {
-            root,
-            json,
-            index,
-            action,
-            yes,
-        } => handle_task_duplicates(root, index, json, action, yes)?,
+        Commands::Duplicates { root, json, index, action, yes } => {
+            handle_task_duplicates(root, index, json, action, yes)?
+        }
         Commands::Evidence { cmd } => handle_evidence(cmd)?,
         Commands::Corpus { cmd } => handle_corpus(cmd)?,
         Commands::Registry { cmd } => handle_registry(cmd).await?,
         Commands::Fs { cmd } => handle_fs(cmd)?,
         Commands::Doc { cmd } => handle_doc(cmd).await?,
         Commands::Agent { action } => handle_agent(action)?,
-        Commands::Tui => anyhow::bail!(
-            "TUI ยังไม่เปิดใช้ใน kept CLI รุ่นนี้; ใช้คำสั่ง registry, fs หรือ doc convert แทน"
-        ),
+        Commands::Tui => {
+            anyhow::bail!("TUI ยังไม่เปิดใช้ใน kept CLI รุ่นนี้; ใช้คำสั่ง registry, fs หรือ doc convert แทน")
+        }
         Commands::Mcp { transport } => anyhow::bail!(
             "MCP transport '{transport}' ยังไม่เปิดใช้ใน kept CLI รุ่นนี้; เปิด feature mcp ของ kept-doc เมื่อต้องการ server แยก"
         ),
         Commands::Completion { shell } => {
             let mut cmd = Cli::command();
             generate_completion(&mut cmd, &shell);
-        },
+        }
     }
 
     Ok(())
@@ -262,6 +260,7 @@ async fn main() -> anyhow::Result<()> {
 
 #[cfg(test)]
 mod tests {
+    use super::Cli;
     use super::commands::config::*;
     use super::commands::doctor::*;
     use super::commands::duplicates::*;
@@ -269,7 +268,6 @@ mod tests {
     use super::commands::scan::*;
     use super::commands::setup::*;
     use super::helpers::*;
-    use super::Cli;
     use clap::{CommandFactory, Parser};
     use kept_core::{CustomOperator, FileFilter, FileRecord, ScanIndex, ScanIssue};
 
@@ -326,7 +324,7 @@ mod tests {
 
     #[test]
     fn task_first_find_reads_the_existing_scan_index() {
-        use kept_core::{create_persistent_snapshot, scan_directory, ScanOptions};
+        use kept_core::{ScanOptions, create_persistent_snapshot, scan_directory};
 
         let root = std::env::temp_dir().join(format!("kept-task-find-{}", std::process::id()));
         std::fs::create_dir_all(&root).expect("fixture root must be created");
@@ -374,7 +372,7 @@ mod tests {
 
     #[test]
     fn task_first_find_with_fql_query_and_explain() {
-        use kept_core::{create_persistent_snapshot, scan_directory, ScanOptions};
+        use kept_core::{ScanOptions, create_persistent_snapshot, scan_directory};
 
         let root = std::env::temp_dir().join(format!("kept-task-fql-{}", std::process::id()));
         std::fs::create_dir_all(&root).expect("fixture root must be created");
@@ -438,7 +436,7 @@ mod tests {
 
     #[test]
     fn task_first_find_uses_user_selected_portable_index() {
-        use kept_core::{create_persistent_snapshot, scan_directory, ScanOptions};
+        use kept_core::{ScanOptions, create_persistent_snapshot, scan_directory};
 
         let root = std::env::temp_dir()
             .join(format!("kept-task-find-portable-root-{}", std::process::id()));
@@ -479,7 +477,7 @@ mod tests {
 
     #[test]
     fn task_first_review_reads_the_existing_scan_index() {
-        use kept_core::{create_persistent_snapshot, scan_directory, ScanOptions};
+        use kept_core::{ScanOptions, create_persistent_snapshot, scan_directory};
 
         let root = std::env::temp_dir().join(format!("kept-task-review-{}", std::process::id()));
         std::fs::create_dir_all(&root).expect("fixture root must be created");
@@ -562,7 +560,7 @@ mod tests {
 
     #[test]
     fn task_first_duplicates_reads_the_existing_scan_index() {
-        use kept_core::{create_persistent_snapshot, scan_directory, ScanOptions};
+        use kept_core::{ScanOptions, create_persistent_snapshot, scan_directory};
 
         let root =
             std::env::temp_dir().join(format!("kept-task-duplicates-{}", std::process::id()));
@@ -926,16 +924,20 @@ mod tests {
             run_doctor_at(&config_path, false, Some("/path/to/definitely/missing/editor".into()))
                 .expect("doctor run must complete");
 
-        assert!(result
-            .report
-            .findings
-            .iter()
-            .any(|finding| finding.code == "CONFIG_VALID"));
-        assert!(result
-            .report
-            .findings
-            .iter()
-            .any(|finding| finding.code == "CONFIG_EDITOR_MISSING"));
+        assert!(
+            result
+                .report
+                .findings
+                .iter()
+                .any(|finding| finding.code == "CONFIG_VALID")
+        );
+        assert!(
+            result
+                .report
+                .findings
+                .iter()
+                .any(|finding| finding.code == "CONFIG_EDITOR_MISSING")
+        );
         std::fs::remove_dir_all(directory).expect("temporary directory must be removed");
     }
 
@@ -1018,11 +1020,13 @@ mod tests {
 
         let result = run_doctor_at(&config_path, true, None).expect("doctor fix run must succeed");
         assert!(result.fixed);
-        assert!(result
-            .report
-            .findings
-            .iter()
-            .any(|finding| finding.code == "CONFIG_VALID"));
+        assert!(
+            result
+                .report
+                .findings
+                .iter()
+                .any(|finding| finding.code == "CONFIG_VALID")
+        );
         assert!(config_path.is_file());
 
         std::fs::remove_dir_all(directory).expect("temporary directory must be removed");

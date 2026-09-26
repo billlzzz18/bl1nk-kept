@@ -17,13 +17,13 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::mcp::core::{
-    invalid_args, McpError, McpResult, RequestHandlerExtra, SchemaBuilder, ToolHandler, ToolInfo,
+    McpError, McpResult, RequestHandlerExtra, SchemaBuilder, ToolHandler, ToolInfo, invalid_args,
 };
 use crate::mcp::tools::watcher::RootWatcher;
 use kept_core::context::Judge;
 use kept_core::scanner::fff::{FffAcquisitionMode, FffScanner};
 use kept_core::scanner::types::FileRecord;
-use kept_core::{apply_refresh_plan, plan_incremental_refresh, ScanIndex};
+use kept_core::{ScanIndex, apply_refresh_plan, plan_incremental_refresh};
 
 /// Status report for an active filesystem root.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -328,8 +328,8 @@ impl FffManager {
             if !Self::is_within_workspace(&full_path, &canonical, &state.allowed_roots) {
                 continue;
             }
-            if let Ok(obs) = state.scanner.acquire(&r.path, FffAcquisitionMode::View) {
-                if let Some(content) = obs.content {
+            if let Ok(obs) = state.scanner.acquire(&r.path, FffAcquisitionMode::View)
+                && let Some(content) = obs.content {
                     for (idx, line) in content.lines().enumerate() {
                         for &pat in patterns {
                             if line.contains(pat) {
@@ -346,7 +346,6 @@ impl FffManager {
                         }
                     }
                 }
-            }
         }
 
         let total = matches.len();

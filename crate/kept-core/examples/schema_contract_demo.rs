@@ -1,8 +1,8 @@
 use kept_core::schema::{
-    export_keyword_registry_schema, KeywordRegistry, Metadata, ValidationConfig,
+    KeywordRegistry, Metadata, ValidationConfig, export_keyword_registry_schema,
 };
-use kept_core::{load_registry, migrate_registry, Validator};
-use serde_json::{json, Value};
+use kept_core::{Validator, load_registry, migrate_registry};
+use serde_json::{Value, json};
 use std::error::Error;
 use std::fs;
 use std::time::{SystemTime, UNIX_EPOCH};

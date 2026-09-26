@@ -285,11 +285,7 @@ fn node_text_bytes<'a>(node: Node<'a>, source_bytes: &'a [u8]) -> &'a str {
 fn extract_name(node: Node, source_bytes: &[u8]) -> Option<String> {
     // node ใน query จะชี้ที่ identifier node โดยตรง (ไม่ใช่ parent item)
     let text = node_text_bytes(node, source_bytes).trim().to_string();
-    if text.is_empty() {
-        None
-    } else {
-        Some(text)
-    }
+    if text.is_empty() { None } else { Some(text) }
 }
 
 /// ข้อความของ node จาก source

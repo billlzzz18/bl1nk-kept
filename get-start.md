@@ -2,48 +2,15 @@
 
 หลังติดตั้ง binary `kept` ให้สร้าง user configuration หนึ่งครั้ง, กำหนด scope ที่เป็น absolute path ด้วยคำสั่ง task-level แล้วจึง scan directory นั้น. `setup` สร้าง `config.yaml` ที่ตำแหน่งของระบบปฏิบัติการเพียงครั้งเดียวและไม่เขียนทับไฟล์เดิมของผู้ใช้.
 
-```bash
-kept setup
-kept config scope add reports "$HOME/work/reports" --priority 100
-kept scan "$HOME/work/reports"
-```
-
-เมื่อรันใน terminal `scan` จะสรุปจำนวนไฟล์ ขนาดรวม และ scan issues ก่อนเปิดเมนูให้เลือกดู **ก้อนพื้นที่ใหญ่**, **หาไฟล์**, **duplicate**, **scan issues** หรือ **naming rules**. ใช้ลูกศรขึ้นลง หรือ `j`/`k` แล้วกด Enter.
-
 ## ตั้งค่า kept
 
 `kept config` เป็นหน้าสรุป config, profiles, scopes และคำสั่งถัดไป. `kept config edit` เปิด `nano` ตามค่าเริ่มต้นและเป็นทางเลือกสำหรับแก้ YAML ขั้นสูงเท่านั้น; กำหนด `KEPT_EDITOR` เป็น path ของ editor executable เพื่อใช้ editor อื่น.
-
-```bash
-kept config
-kept config fields
-kept config defaults show
-kept config defaults set separator kebab
-kept config defaults unset separator
-kept config edit
-```
 
 `config fields` แสดง key, type, ค่าที่รองรับ และ default value ที่ใช้อยู่จริง. ห้ามเดาชื่อ field หรือค่าที่รองรับจาก YAML.
 
 ### Profiles
 
 Profile รวม naming rules ที่นำกลับมาใช้กับหลายโฟลเดอร์. Profile ใหม่เริ่มจาก defaults; `unset` ทำให้ field นั้นกลับไปใช้ defaults.
-
-```bash
-kept config profile list
-kept config profile add invoices --description "เอกสารบัญชี"
-kept config profile set invoices case lower
-kept config profile set invoices separator kebab
-kept config profile set invoices extensions pdf,xlsx
-kept config profile set invoices shortcuts.inv invoice
-kept config profile set invoices aliases.qtr quarter
-kept config profile set invoices variables.project kept
-kept config profile set invoices prefix.required '{{project}}'
-kept config profile set invoices similarity.name.threshold 0.85
-kept config profile show invoices
-kept config profile unset invoices shortcuts.inv
-kept config profile remove invoices
-```
 
 ใช้ `kept config fields` เป็นรายการ key ที่ตั้งได้ทั้งหมด รวม boolean, numbers, words, length, whitespace, prefix, aliases, shortcuts, variables, similarity, replacements, reposition และ `stemRegex`. ค่า `replacements` และ `reposition` รับ YAML list เป็น argument เดียว; ใช้ `config edit` เฉพาะเมื่อชุด rule ยาวจนอ่านใน command line ไม่สะดวก.
 
@@ -200,5 +167,3 @@ kept convert --help
 kept evidence --help
 kept corpus --help
 ```
-
-คำสั่ง compatibility จากรุ่นก่อนยังรับได้สำหรับ script เดิม แต่ไม่อยู่ในหน้า help หลักและไม่ใช่แนวทางเริ่มใช้งานใหม่.

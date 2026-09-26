@@ -30,12 +30,12 @@
 //! document is well-formed.
 
 use crate::api::markdown_frontmatter::{
-    detect_frontmatter, FrontmatterBlock, FrontmatterError as ApiFrontmatterError,
+    FrontmatterBlock, FrontmatterError as ApiFrontmatterError, detect_frontmatter,
 };
 use crate::converter::markdown::MarkdownConverter;
 use crate::converter::{ConverterError, FromPlatform, ToPlatform};
 use crate::ir::frontmatter::{
-    parse_frontmatter_to_properties, properties_to_yaml, FrontmatterError as IrFrontmatterError,
+    FrontmatterError as IrFrontmatterError, parse_frontmatter_to_properties, properties_to_yaml,
 };
 use crate::ir::{Platform, UniversalDocument};
 

@@ -2,12 +2,12 @@
 
 use async_trait::async_trait;
 use serde::Deserialize;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::mcp::core::{
-    invalid_args, McpResult, RequestHandlerExtra, SchemaBuilder, ToolHandler, ToolInfo,
+    McpResult, RequestHandlerExtra, SchemaBuilder, ToolHandler, ToolInfo, invalid_args,
 };
-use kept_doc::api::markdown::{parse_markdown, ToMarkdown};
+use kept_doc::api::markdown::{ToMarkdown, parse_markdown};
 use kept_doc::models::block::Block;
 
 #[derive(Debug, Deserialize)]

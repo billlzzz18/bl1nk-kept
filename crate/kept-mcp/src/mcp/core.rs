@@ -3,12 +3,12 @@
 //! Ships as an in-crate module so the whole project builds as a single crate
 //! with one MCP server binary (`bl1nk-kept-mcp`).
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 // Re-export the pmcp types the tool handlers need, so individual tool modules
 // only have to depend on `crate::mcp::core`.
-pub use pmcp::types::capabilities::ServerCapabilities;
 pub use pmcp::types::ToolInfo;
+pub use pmcp::types::capabilities::ServerCapabilities;
 pub use pmcp::{Error as McpError, RequestHandlerExtra, Result as McpResult, Server, ToolHandler};
 
 /// Re-export the pmcp crate for direct access to less common types.

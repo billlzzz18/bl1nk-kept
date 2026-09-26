@@ -3,7 +3,7 @@
 //! Converts between DOCX binary format and Universal IR.
 
 use crate::converter::{ConvertError, ConverterError, FromPlatform, Reader, ToPlatform, Writer};
-use crate::ir::{inline::text, DocumentMetadata, Platform, UniversalBlock, UniversalDocument};
+use crate::ir::{DocumentMetadata, Platform, UniversalBlock, UniversalDocument, inline::text};
 use docx_rs::*;
 
 /// DOCX Document Adapter

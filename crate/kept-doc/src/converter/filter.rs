@@ -137,8 +137,7 @@ impl MarkdownAlertFilter {
     ) -> Option<(&'static str, &'static str, crate::ir::UniversalBlock)> {
         if let Some(crate::ir::UniversalBlock::Paragraph { content: inlines, style }) =
             content.first()
-        {
-            if let Some(crate::ir::inline::InlineElement::TextRun {
+            && let Some(crate::ir::inline::InlineElement::TextRun {
                 content: text_str,
                 style: text_style,
             }) = inlines.first()
@@ -176,7 +175,6 @@ impl MarkdownAlertFilter {
                     }
                 }
             }
-        }
         None
     }
 }
@@ -184,7 +182,7 @@ impl MarkdownAlertFilter {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ir::{inline::text, UniversalBlock, UniversalDocument};
+    use crate::ir::{UniversalBlock, UniversalDocument, inline::text};
 
     #[test]
     fn test_markdown_alert_filter_converts_note_to_callout() {

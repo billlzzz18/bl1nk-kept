@@ -2,7 +2,7 @@
 //!
 //! Canonical block types covering Notion API 2026-03-11, CommonMark, GFM, Lark, Google Docs block types
 
-use crate::ir::{inline, style, table, Platform};
+use crate::ir::{Platform, inline, style, table};
 use serde::{Deserialize, Serialize};
 
 /// List item with nested blocks

@@ -2,10 +2,10 @@
 
 use crate::error::{NotionError, Result};
 use governor::{Quota, RateLimiter};
-use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
+use reqwest::header::{AUTHORIZATION, CONTENT_TYPE, HeaderMap, HeaderValue};
 use reqwest::{Client as HttpClient, Method, Response};
-use serde::de::DeserializeOwned;
 use serde::Serialize;
+use serde::de::DeserializeOwned;
 use std::num::NonZeroU32;
 use std::sync::Arc;
 use std::time::Duration;

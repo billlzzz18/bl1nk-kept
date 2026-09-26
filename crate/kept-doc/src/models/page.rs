@@ -70,11 +70,10 @@ fn title_from_properties_value(properties: &serde_json::Value) -> String {
     }
     if let Some(obj) = properties.as_object() {
         for prop in obj.values() {
-            if prop.get("type").and_then(|t| t.as_str()) == Some("title") {
-                if let Some(title) = extract(prop) {
+            if prop.get("type").and_then(|t| t.as_str()) == Some("title")
+                && let Some(title) = extract(prop) {
                     return title;
                 }
-            }
         }
     }
     "Untitled".to_string()

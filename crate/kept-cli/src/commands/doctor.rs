@@ -3,7 +3,7 @@
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
-use super::setup::{setup_user_config_at, SetupResult};
+use super::setup::{SetupResult, setup_user_config_at};
 use crate::helpers::{editor_is_available, resolve_config_editor};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -48,10 +48,7 @@ pub fn doctor_editor_at(editor: OsString) -> DoctorReport {
             findings: vec![DoctorFinding {
                 code: "CONFIG_EDITOR_MISSING",
                 status: DoctorStatus::Error,
-                message: format!(
-                    "config editor ไม่พบ: '{}'",
-                    Path::new(&editor).display()
-                ),
+                message: format!("config editor ไม่พบ: '{}'", Path::new(&editor).display()),
                 remediation: "Install nano with your OS package manager, or set KEPT_EDITOR to an editor executable path",
             }],
         }
@@ -115,8 +112,7 @@ pub fn doctor_config_at(path: &Path) -> DoctorReport {
                 code: "CONFIG_MISSING",
                 status: DoctorStatus::Error,
                 message: format!("ไม่พบ config.yaml ที่ '{}'", path.display()),
-                remediation:
-                    "Run `kept setup` or `kept doctor --fix` to create the default configuration",
+                remediation: "Run `kept setup` or `kept doctor --fix` to create the default configuration",
             }],
         };
     }

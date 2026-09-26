@@ -1,7 +1,7 @@
 //! Directory traversal and scan operations backed by FFF filesystem engine.
 
 use super::fff::FffScanner;
-use super::types::{unix_now, FileRecord, ScanIndex, ScanIssue, ScanOptions};
+use super::types::{FileRecord, ScanIndex, ScanIssue, ScanOptions, unix_now};
 use std::fs;
 use std::path::Path;
 

@@ -52,7 +52,7 @@ pub fn prepare_imported_registry(
 
 pub async fn handle_registry(cmd: RegistryCommands) -> anyhow::Result<()> {
     use kept_core::{
-        import_csv, load_registry, save_registry, KeywordSearch, RegistryAnalyzer, Validator,
+        KeywordSearch, RegistryAnalyzer, Validator, import_csv, load_registry, save_registry,
     };
 
     match cmd {

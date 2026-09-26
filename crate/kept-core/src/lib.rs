@@ -16,6 +16,7 @@ pub mod schema;
 pub mod search;
 pub mod semantic;
 pub mod source_graph;
+pub mod terminal;
 pub mod token_counter;
 pub mod validator;
 
@@ -23,50 +24,50 @@ pub use analyzer::RegistryAnalyzer;
 pub use error::ValidationError;
 pub use factory::{FactoryError, OperationFactory, UserIntent};
 pub use foundation::{
-    classify_evidence, decode_utf8, import_anonymized_jsonl, normalize_text,
+    AnonymizedEvidence, ClassificationDecision, ClassificationPolicy, ClassificationResult,
+    CorpusManifest, CorpusManifestEntry, DefaultCandidate, DimensionScores, DistributionSummary,
+    EvidenceKind, EvidenceRecord, FoundationError, GlossaryTerm, ImportRejection, ImportReport,
+    ProvenanceRecord, RegexRule, RegexScope, RegexTestVector, RuleSeverity, RunMeasurement,
+    SelectionConstraints, classify_evidence, decode_utf8, import_anonymized_jsonl, normalize_text,
     select_default_candidate, summarize_measurements, validate_corpus_manifest,
-    validate_glossary_term, validate_regex_rule, verify_corpus_bytes, AnonymizedEvidence,
-    ClassificationDecision, ClassificationPolicy, ClassificationResult, CorpusManifest,
-    CorpusManifestEntry, DefaultCandidate, DimensionScores, DistributionSummary, EvidenceKind,
-    EvidenceRecord, FoundationError, GlossaryTerm, ImportRejection, ImportReport, ProvenanceRecord,
-    RegexRule, RegexScope, RegexTestVector, RuleSeverity, RunMeasurement, SelectionConstraints,
+    validate_glossary_term, validate_regex_rule, verify_corpus_bytes,
 };
 pub use judgment::{AgentJudgment, JudgmentError, JudgmentResult};
-pub use migration::{migrate_registry, MigrationError, CURRENT_REGISTRY_VERSION};
+pub use migration::{CURRENT_REGISTRY_VERSION, MigrationError, migrate_registry};
 pub use operation::{
     ExpectedEffect, MoveChange, NamingIssueItem, ObservedState, OperationContract, RenameChange,
     ValidationError as OperationValidationError,
 };
 pub use policy::{
-    analyze_index_naming, analyze_naming, create_user_config_if_missing, default_user_config_path,
-    load_user_config, resolve_naming_rule, save_user_config, ConfigDefaults, LengthSettings,
-    NamingFinding, NamingIssue, NamingIssueKind, NamingProfile, NamingScope, NamingSettings,
-    NumberSettings, PolicyError, PrefixSettings, RangeLimit, ResolvedNamingRule, ScopeOverrides,
-    SemanticSearchSettings, SimilarityRule, SimilaritySettings, TokenPosition, TokenReplacement,
-    TokenReposition, UserConfig, WhitespaceSettings, WordSettings, USER_CONFIG_FILE_NAME,
-    USER_CONFIG_VERSION,
+    ConfigDefaults, LengthSettings, NamingFinding, NamingIssue, NamingIssueKind, NamingProfile,
+    NamingScope, NamingSettings, NumberSettings, PolicyError, PrefixSettings, RangeLimit,
+    ResolvedNamingRule, ScopeOverrides, SemanticSearchSettings, SimilarityRule, SimilaritySettings,
+    TokenPosition, TokenReplacement, TokenReposition, USER_CONFIG_FILE_NAME, USER_CONFIG_VERSION,
+    UserConfig, WhitespaceSettings, WordSettings, analyze_index_naming, analyze_naming,
+    create_user_config_if_missing, default_user_config_path, load_user_config, resolve_naming_rule,
+    save_user_config,
 };
 pub use scanner::{
+    ActionSimulation, BadExtensionIssue, CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION,
+    ContentDuplicateOptions, ContentDuplicateStats, CustomFilter, CustomOperator,
+    DuplicateActionKind, DuplicateAllowRule, DuplicateEvidence, DuplicateGroup,
+    DuplicateMutationPlan, DuplicateMutationPolicy, DuplicateOptions, DuplicatePlanAction,
+    DuplicateSearchStats, DuplicateSimulationResult, FileFilter, FileRecord, FilterSet,
+    IntegrityStatus, PersistentScanSnapshot, QueryClause, QueryPlan, RefreshPlan, RollbackEntry,
+    RollbackJournal, ScanIndex, ScanIssue, ScanIssueKind, ScanOptions, TreemapNode,
     apply_refresh_plan, build_treemap, check_file_extension_integrity, compile_query,
     create_duplicate_mutation_plan, create_persistent_snapshot, execute_duplicate_mutation,
     filter_allowed_duplicates, filter_index, find_content_duplicates, find_duplicates,
     find_duplicates_with_stats, migrate_snapshot, parse_size_to_bytes, plan_incremental_refresh,
     rollback_duplicate_mutation, scan_directory, scan_index_integrity, simulate_duplicate_mutation,
-    ActionSimulation, BadExtensionIssue, ContentDuplicateOptions, ContentDuplicateStats,
-    CustomFilter, CustomOperator, DuplicateActionKind, DuplicateAllowRule, DuplicateEvidence,
-    DuplicateGroup, DuplicateMutationPlan, DuplicateMutationPolicy, DuplicateOptions,
-    DuplicatePlanAction, DuplicateSearchStats, DuplicateSimulationResult, FileFilter, FileRecord,
-    FilterSet, IntegrityStatus, PersistentScanSnapshot, QueryClause, QueryPlan, RefreshPlan,
-    RollbackEntry, RollbackJournal, ScanIndex, ScanIssue, ScanIssueKind, ScanOptions, TreemapNode,
-    CURRENT_SCAN_SNAPSHOT_SCHEMA_VERSION,
 };
 pub use search::KeywordSearch;
 pub use source_graph::{
-    coalesce_file_events, load_index, save_index, DefinitionKind, FileEvent, FileEventKind,
-    GraphBuilder, GraphEvent, GraphIndex, GraphManager, ImplementationRecord, ImportRecord,
-    IndexBuilder, IndexBuilderConfig, IndexManager, IndexManagerConfig, KeptGraphIndexConfig,
-    ReferenceKind, ScopeGraphIndex, SourceFileEvent, SourceGraph, SourceGraphStats,
-    SymbolDefinition, SymbolReference,
+    DefinitionKind, FileEvent, FileEventKind, GraphBuilder, GraphEvent, GraphIndex, GraphManager,
+    ImplementationRecord, ImportRecord, IndexBuilder, IndexBuilderConfig, IndexManager,
+    IndexManagerConfig, KeptGraphIndexConfig, ReferenceKind, ScopeGraphIndex, SourceFileEvent,
+    SourceGraph, SourceGraphStats, SymbolDefinition, SymbolReference, coalesce_file_events,
+    load_index, save_index,
 };
 pub use validator::Validator;
 
@@ -103,12 +104,12 @@ pub fn load_registry<P: AsRef<Path>>(
     let migrated = migrate_registry(registry)?;
     let validator = Validator::new(migrated.clone());
     validator.validate_search_policy().map_err(|errors| {
-        let msg = errors
+        
+        errors
             .iter()
             .map(|e| e.to_string())
             .collect::<Vec<_>>()
-            .join("; ");
-        msg
+            .join("; ")
     })?;
 
     Ok(migrated)

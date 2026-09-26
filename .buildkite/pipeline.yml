@@ -4,11 +4,14 @@ steps:
     command:
       - "cargo fmt --all -- --check"
       - "cargo clippy --workspace --all-targets -- -D warnings"
+    skip: "previous_build_running"
 
   - label: ":test_tube: Workspace Tests"
     key: "test"
     command:
       - "cargo test --workspace"
+    depends_on: "lint"
+    skip: "previous_build_running"
 
   - label: ":white_check_mark: Full Quality Gate & Contracts"
     key: "contracts"
@@ -17,3 +20,16 @@ steps:
       - "test"
     command:
       - "just check"
+    skip: "previous_build_running"
+
+# Buildkite pipeline settings
+concurrency:
+  group: "${BUILDKITE_PIPELINE_SLUG}-${BUILDKITE_BRANCH}"
+  limit: 1
+
+# ── Critical: Cancel intermediate builds ──────────────────────────────────
+# In Buildkite Pipeline Settings UI:
+#   General → "Cancel intermediate builds" = true
+# This automatically cancels any running build on the same branch when a new
+# build starts. No API token or hook code needed — handled by Buildkite server.
+# See: https://buildkite.com/docs/pipelines/cancel-intermediate-builds

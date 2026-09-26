@@ -174,9 +174,7 @@ impl TerminalSink {
         let terminal = Arc::clone(&state.term);
         let processor = &mut state.processor;
         let mut guard = terminal.lock();
-        for &byte in bytes {
-            processor.advance(&mut *guard, byte);
-        }
+        processor.advance(&mut *guard, bytes);
         drop(guard);
         state.bytes += bytes.len();
     }

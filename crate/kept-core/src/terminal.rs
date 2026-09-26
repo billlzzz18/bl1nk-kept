@@ -38,18 +38,14 @@ pub struct ParsedAnsiText {
 pub fn parse_ansi_text(input: &[u8]) -> ParsedAnsiText {
     let mut handler = StyledAnsiTextHandler::default();
     let mut processor = Processor::<StdSyncHandler>::default();
-    for &byte in input {
-        processor.advance(&mut handler, byte);
-    }
+    processor.advance(&mut handler, input);
     handler.finish()
 }
 
 pub fn strip_ansi_text(input: &[u8]) -> String {
     let mut handler = PlainAnsiTextHandler::default();
     let mut processor = Processor::<StdSyncHandler>::default();
-    for &byte in input {
-        processor.advance(&mut handler, byte);
-    }
+    processor.advance(&mut handler, input);
     handler.text
 }
 
@@ -217,9 +213,7 @@ impl Terminal {
 
     pub fn write_bytes(&mut self, bytes: &[u8]) {
         let mut term = self.term.lock();
-        for &byte in bytes {
-            self.processor.advance(&mut *term, byte);
-        }
+        self.processor.advance(&mut *term, bytes);
     }
 
     pub fn get_text(&self) -> String {

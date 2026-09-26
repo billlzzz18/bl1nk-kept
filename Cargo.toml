@@ -77,7 +77,7 @@ tree-sitter-md-025 = "0.5.6"
 streaming-iterator = "0.1.9"
 
 # Terminal & Virtual Grid (TUI)
-alacritty_terminal = "0.24"
+alacritty_terminal = "0.26"
 vte = { version = "=0.13.1", default-features = false, features = ["ansi"] }
 parking_lot = "0.12"
 async-channel = "2"

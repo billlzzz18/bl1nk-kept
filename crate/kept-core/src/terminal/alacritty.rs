@@ -121,9 +121,7 @@ mod tests {
         let bytes = b"hello world\r\nsecond line";
         {
             let mut guard = term.lock();
-            for &b in bytes {
-                processor.advance(&mut *guard, b);
-            }
+            processor.advance(&mut *guard, bytes);
         }
         let lines = content_lines(&term);
         assert_eq!(lines[0], "hello world");

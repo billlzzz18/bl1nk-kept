@@ -202,6 +202,22 @@ just schema
 
 ---
 
+## 10. Prohibited Destructive Operations (Zero-Tolerance Ban)
+
+- **ABSOLUTE BAN on `git clean`:**
+  - ❌ `git clean` (`git clean -fd`, `git clean -f`, `git clean -xdf`) — ห้ามรันเด็ดขาดทุกกรณี
+  - ห้ามล้างไฟล์ untracked, scratch files, หรือ artifacts ใน workspace
+- **Prohibited Git Operations:**
+  - ❌ `git reset --hard` (ห้ามรันโดยไม่ได้รับการยืนยันอย่างชัดเจนจากผู้ใช้)
+  - ❌ `git push --force` / `git push -f`
+  - ❌ Blanket deletion commands (`rm -rf *`, `rmdir /s /q .`)
+- **Safe Alternatives:**
+  - ✅ ตรวจสอบสถานะก่อน: `git status --short`
+  - ✅ ดึงไฟล์เฉพาะจุด: `git checkout <commit> -- <path>`
+  - ✅ ลบเฉพาะไฟล์ที่ระบุชื่อและยืนยันแล้วเท่านั้น
+
+---
+
 ## Command output
 
 Command output here is condensed to save tokens, keeping every signal and

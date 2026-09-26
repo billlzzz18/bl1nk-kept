@@ -1,0 +1,21 @@
+.agents/skills/langfuse/SKILL.md
+  s_c7b7b64c58f102::t_4c6a0566a7a389 141-146,159
+Justfile
+  s_c7b7b64c58f102::t_769a4fc696be58 61-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0beaa07c91afb900fb0e211a929322f70b3a8772",
+  "prompts": {},
+  "sessions": {
+    "s_c7b7b64c58f102": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bfdea74e-bcfe-4805-974a-06bd022234d2",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
+      },
+      "human_author": "Test Runner <test@example.com>"
+    }
+  }
+}

@@ -11,6 +11,7 @@ pub mod markdown;
 pub mod mermaid;
 pub mod notion;
 pub mod notion_live;
+pub mod terminal;
 pub mod unified;
 pub mod watcher;
 

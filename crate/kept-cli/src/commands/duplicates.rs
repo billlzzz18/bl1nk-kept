@@ -275,8 +275,9 @@ pub fn handle_task_duplicates(
     }
 
     if is_interactive_terminal()
-        && let Some(action) = choose_duplicate_action()? {
-            run_duplicate_action(action, &canonical_root, &report, false, Some(&snapshot.index))?;
-        }
+        && let Some(action) = choose_duplicate_action()?
+    {
+        run_duplicate_action(action, &canonical_root, &report, false, Some(&snapshot.index))?;
+    }
     Ok(())
 }

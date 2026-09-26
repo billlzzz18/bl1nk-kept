@@ -375,3 +375,40 @@ diff/apply         outline          rerank
    - Time-to-completion (%)
    - Judge overhead latency (ms/call)
    - Task success rate (%)
+
+## 13. Headless Terminal Runner (Virtual Terminal Engine)
+
+`kept-core` ฝัง Virtual Terminal Engine แบบ headless (2D grid + ANSI parser) เพื่อให้ CLI และ MCP อ่านผลลัพธ์ของ process ในรูป **หน้าจอที่ render แล้ว** แทน raw escape sequence — progress bar ที่เขียนทับด้วย `\r`, การเลื่อน cursor และ alternate screen จะ collapse เหลือสถานะสุดท้ายที่มองเห็น
+
+### 13.1 ขอบเขต contract
+
+- Engine อยู่ใน `kept-core::terminal` เท่านั้น (single owner): CLI และ MCP เป็น transport layer ที่เรียกใช้ ไม่มี business logic ซ้ำ
+- Engine เป็น headless: ไม่มี window, rendering surface หรือ pixel mouse event
+- ไม่แก้ไขไฟล์ใด ๆ: `terminal run` และ `terminal render` เป็น read-only observation
+
+### 13.2 CLI surface
+
+```bash
+kept terminal run [options] <program> [args...]
+kept terminal render <input> [options]
+```
+
+Runner options ของ `terminal run` (`--cwd`, `--columns`, `--lines`, `--history`, `--timeout-ms`, `--json`) ต้องวางก่อน `<program>`; ทุกอย่างหลัง `<program>` ถูกส่งต่อให้โปรแกรมลูกทั้งก้อน
+
+- `terminal run` spawns process, ป้อน stdout และ stderr เข้า grid แยกกัน (deterministic; ไม่รับประกันลำดับสลับกัน), ปิด stdin ทันทีหลังเขียน และ kill เมื่อครบ `--timeout-ms`
+- exit code ของ `kept` สะท้อน exit code ของโปรแกรมลูก และเป็น `124` เมื่อหมดเวลา (ตาม `timeout(1)`) เพื่อให้ chain ใน script ได้
+- `terminal render` ไม่ spawn process: อ่าน byte stream ที่บันทึกไว้แล้ว render เป็น snapshot (ใช้ทดสอบแบบ deterministic)
+
+### 13.3 Snapshot contract
+
+`TerminalStreamSnapshot` คืน `screen` (buffer ที่ตัดบรรทัดว่างท้ายออก), `lines`, `total_lines`, `history_lines`, `columns`, `bytes` และ `truncated` (true เมื่อ output เกิน scrollback ที่กำหนด)
+
+`TerminalRunResult` คืน `program`, `args`, `exit_code`, `success`, `timed_out`, `duration_ms` พร้อม `stdout` และ `stderr` snapshot
+
+### 13.4 MCP surface
+
+- `terminal_run` — รับ `program`, `args`, `working_directory`, `environment`, `stdin`, `columns`, `lines`, `history_lines`, `timeout_ms`
+- `terminal_render` — รับ `content` (raw terminal byte stream) พร้อม geometry options
+
+ทั้งสอง tool ทำงานผ่าน `spawn_blocking` เพื่อไม่บล็อก MCP runtime
+

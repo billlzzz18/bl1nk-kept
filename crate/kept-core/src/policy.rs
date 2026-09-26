@@ -429,33 +429,35 @@ impl UserConfig {
 
 fn validate_naming_settings(naming: &NamingSettings) -> Result<(), PolicyError> {
     if let Some(value) = &naming.unicode
-        && value != "nfc" {
-            return Err(PolicyError::InvalidConfig(format!("unsupported unicode value {value}")));
-        }
+        && value != "nfc"
+    {
+        return Err(PolicyError::InvalidConfig(format!("unsupported unicode value {value}")));
+    }
     if let Some(value) = &naming.case
-        && !matches!(value.as_str(), "lower" | "upper" | "preserve") {
-            return Err(PolicyError::InvalidConfig(format!("unsupported case value {value}")));
-        }
+        && !matches!(value.as_str(), "lower" | "upper" | "preserve")
+    {
+        return Err(PolicyError::InvalidConfig(format!("unsupported case value {value}")));
+    }
     if let Some(value) = &naming.separator
-        && !matches!(value.as_str(), "kebab" | "snake" | "preserve") {
-            return Err(PolicyError::InvalidConfig(format!("unsupported separator value {value}")));
-        }
+        && !matches!(value.as_str(), "kebab" | "snake" | "preserve")
+    {
+        return Err(PolicyError::InvalidConfig(format!("unsupported separator value {value}")));
+    }
     if let Some(rule) = &naming.similarity.name
-        && !(0.0..=1.0).contains(&rule.threshold) {
-            return Err(PolicyError::InvalidConfig(format!(
-                "similarity threshold must be between 0.0 and 1.0: {}",
-                rule.threshold
-            )));
-        }
+        && !(0.0..=1.0).contains(&rule.threshold)
+    {
+        return Err(PolicyError::InvalidConfig(format!(
+            "similarity threshold must be between 0.0 and 1.0: {}",
+            rule.threshold
+        )));
+    }
     if let Some(range) = &naming.length.stem
         && range
             .min
             .is_some_and(|min| range.max.is_some_and(|max| min > max))
-        {
-            return Err(PolicyError::InvalidConfig(
-                "length.stem min cannot exceed max".to_string(),
-            ));
-        }
+    {
+        return Err(PolicyError::InvalidConfig("length.stem min cannot exceed max".to_string()));
+    }
     if naming
         .words
         .min
@@ -656,14 +658,14 @@ pub fn resolve_naming_rule(
     let (selected_scope, selected_naming) = matches.remove(0);
     if let Some((next_scope, _)) = matches.first()
         && scope_depth(&selected_scope.path) == scope_depth(&next_scope.path)
-            && selected_scope.priority == next_scope.priority
-        {
-            return Err(PolicyError::AmbiguousScope {
-                path: file_path.display().to_string(),
-                left: selected_scope.profile.clone(),
-                right: next_scope.profile.clone(),
-            });
-        }
+        && selected_scope.priority == next_scope.priority
+    {
+        return Err(PolicyError::AmbiguousScope {
+            path: file_path.display().to_string(),
+            left: selected_scope.profile.clone(),
+            right: next_scope.profile.clone(),
+        });
+    }
 
     Ok(Some(ResolvedNamingRule {
         scope_path: selected_scope.path.clone(),
@@ -1091,9 +1093,9 @@ fn append_constraint_issues(
         && split_tokens(stem)
             .iter()
             .any(|token| token.chars().filter(char::is_ascii_digit).count() > maximum)
-        {
-            issues.push(issue(NamingIssueKind::Number, "a number token exceeds maxDigitsPerToken"));
-        }
+    {
+        issues.push(issue(NamingIssueKind::Number, "a number token exceeds maxDigitsPerToken"));
+    }
     if naming.flag_portability_conflicts.unwrap_or(false) && contains_portability_conflict(stem) {
         issues.push(issue(
             NamingIssueKind::Portability,

@@ -25,6 +25,19 @@
 
 ---
 
+## Phase 0.5: Headless Terminal Runner (Virtual Terminal Engine)
+
+> **Exit Gate:** `kept terminal run` และ MCP `terminal_run` คืน rendered screen (2D grid) พร้อม exit code ของโปรแกรมลูกครบ
+
+- [x] Port Virtual Terminal Engine แบบ headless — `kept-core::terminal` ใช้ alacritty_terminal grid + vte ANSI parser; ตัด GPUI window/render/pixel-mouse ออก
+- [x] ทำ terminal runner: ป้อน stdout/stderr เข้า grid แยกกัน, ปิด stdin หลังเขียน, kill เมื่อครบ `--timeout-ms`, สะท้อน exit code (หมดเวลา = `124`) — `crate/kept-core/src/terminal/runner.rs`
+- [x] อ่าน buffer ทั้ง scrollback + viewport (`content_lines`) พร้อม `truncated` flag เมื่อ output เกิน scrollback ที่ตั้งไว้
+- [x] Wire CLI: `kept terminal run` / `kept terminal render` — `crate/kept-cli/src/commands/terminal.rs`
+- [x] Wire MCP: tools `terminal_run` / `terminal_render` บน `bl1nk-kept-mcp` — `crate/kept-mcp/src/mcp/tools/terminal.rs`
+- [ ] PTY mode: input/resize/hold ผ่าน `alacritty_terminal::tty` + `event_loop` (ยังไม่ทำ — ต้องมี public-contract decision ก่อน)
+
+---
+
 ## Phase 1: Plugin System — Zed Extension Compatible, Local-first (Git Clone Based)
 
 > **Exit Gate:** `kept plugin install <git-url>` โหลด manifest + ลงทะเบียน contributions ได้จริง, `kept plugin dev <path>` โหลดพัฒนาได้

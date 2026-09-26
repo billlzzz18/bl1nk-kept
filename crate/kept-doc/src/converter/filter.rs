@@ -141,40 +141,40 @@ impl MarkdownAlertFilter {
                 content: text_str,
                 style: text_style,
             }) = inlines.first()
-            {
-                let trimmed = text_str.trim_start();
-                let alerts = [
-                    ("[!NOTE]", "💡", "blue"),
-                    ("[!TIP]", "🎯", "green"),
-                    ("[!IMPORTANT]", "📌", "purple"),
-                    ("[!WARNING]", "⚠️", "yellow"),
-                    ("[!CAUTION]", "🛑", "red"),
-                ];
+        {
+            let trimmed = text_str.trim_start();
+            let alerts = [
+                ("[!NOTE]", "💡", "blue"),
+                ("[!TIP]", "🎯", "green"),
+                ("[!IMPORTANT]", "📌", "purple"),
+                ("[!WARNING]", "⚠️", "yellow"),
+                ("[!CAUTION]", "🛑", "red"),
+            ];
 
-                for (tag, icon, color) in alerts {
-                    if let Some(stripped) = trimmed.strip_prefix(tag) {
-                        let remainder = stripped.trim_start();
-                        let mut new_inlines = inlines.clone();
-                        if remainder.is_empty() && new_inlines.len() > 1 {
-                            new_inlines.remove(0);
-                        } else {
-                            new_inlines[0] = crate::ir::inline::InlineElement::TextRun {
-                                content: remainder.to_string(),
-                                style: text_style.clone(),
-                            };
-                        }
-
-                        return Some((
-                            icon,
-                            color,
-                            crate::ir::UniversalBlock::Paragraph {
-                                content: new_inlines,
-                                style: style.clone(),
-                            },
-                        ));
+            for (tag, icon, color) in alerts {
+                if let Some(stripped) = trimmed.strip_prefix(tag) {
+                    let remainder = stripped.trim_start();
+                    let mut new_inlines = inlines.clone();
+                    if remainder.is_empty() && new_inlines.len() > 1 {
+                        new_inlines.remove(0);
+                    } else {
+                        new_inlines[0] = crate::ir::inline::InlineElement::TextRun {
+                            content: remainder.to_string(),
+                            style: text_style.clone(),
+                        };
                     }
+
+                    return Some((
+                        icon,
+                        color,
+                        crate::ir::UniversalBlock::Paragraph {
+                            content: new_inlines,
+                            style: style.clone(),
+                        },
+                    ));
                 }
             }
+        }
         None
     }
 }

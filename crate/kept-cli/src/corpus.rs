@@ -110,9 +110,10 @@ pub fn handle_corpus(cmd: CorpusCommands) -> anyhow::Result<()> {
                         && let Some(candidate) = record
                             .get("normalizedCandidate")
                             .and_then(serde_json::Value::as_str)
-                            && !dictionary.iter().any(|v| v == candidate) {
-                                dictionary.push(candidate.to_string());
-                            }
+                        && !dictionary.iter().any(|v| v == candidate)
+                    {
+                        dictionary.push(candidate.to_string());
+                    }
                 }
             }
             if json {

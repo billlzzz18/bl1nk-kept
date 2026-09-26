@@ -71,6 +71,9 @@ kept review ./workspace
 
 # ค้นหาคำใน Keyword Registry ด้วย Thai BM25 / Fuzzy search
 kept search "คำค้นหา"
+
+# รันโปรแกรมแล้วอ่านหน้าจอที่ render แล้ว (progress rewrite / cursor collapse)
+kept terminal run cargo test --workspace
 ```
 
 ### Stdio MCP Server

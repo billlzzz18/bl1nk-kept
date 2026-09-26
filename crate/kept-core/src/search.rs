@@ -100,15 +100,15 @@ impl Bm25Index {
                 if let Some(semantic) = entry.get("semanticContext")
                     && let Ok(context) =
                         serde_json::from_value::<SemanticMetadata>(semantic.clone())
+                {
+                    for value in [context.root_word, context.definition_th]
+                        .into_iter()
+                        .flatten()
                     {
-                        for value in [context.root_word, context.definition_th]
-                            .into_iter()
-                            .flatten()
-                        {
-                            content.push_str(&value);
-                            content.push(' ');
-                        }
+                        content.push_str(&value);
+                        content.push(' ');
                     }
+                }
 
                 fuzzy_terms.retain(|term| !term.is_empty());
                 fuzzy_terms.sort();

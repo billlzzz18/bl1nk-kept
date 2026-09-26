@@ -10,6 +10,7 @@ pub mod group;
 pub mod registry;
 pub mod scan;
 pub mod setup;
+pub mod terminal;
 
 pub use agent::{AgentSubcommand, handle_agent};
 pub use config::{
@@ -38,3 +39,4 @@ pub use scan::{
 pub use setup::{
     SetupAction, SetupResult, handle_setup, setup_action_from_selection, setup_user_config_at,
 };
+pub use terminal::{TerminalCommands, handle_terminal};

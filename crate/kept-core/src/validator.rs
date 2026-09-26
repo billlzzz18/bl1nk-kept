@@ -60,16 +60,17 @@ impl Validator {
 
     pub fn validate_search_policy(&self) -> Result<(), Vec<ValidationError>> {
         if let Some(policy) = &self.registry.search_policy
-            && !valid_search_policy(policy) {
-                return Err(vec![ValidationError {
-                    code: "INVALID_SEARCH_POLICY".into(),
-                    message: format!(
-                        "Search policy requires fuzzyMinSimilarity from 0.0 to 1.0 (found {}) and fuzzyNgramSize above zero",
-                        policy.fuzzy_min_similarity
-                    ),
-                    field: Some("searchPolicy".into()),
-                }]);
-            }
+            && !valid_search_policy(policy)
+        {
+            return Err(vec![ValidationError {
+                code: "INVALID_SEARCH_POLICY".into(),
+                message: format!(
+                    "Search policy requires fuzzyMinSimilarity from 0.0 to 1.0 (found {}) and fuzzyNgramSize above zero",
+                    policy.fuzzy_min_similarity
+                ),
+                field: Some("searchPolicy".into()),
+            }]);
+        }
         Ok(())
     }
 
@@ -367,23 +368,24 @@ fn validate_field(
             }
         }
         if let Some(values) = &schema.values
-            && !values.iter().any(|allowed| allowed == text) {
-                errors.push(ValidationError {
-                    code: "INVALID_ENUM".into(),
-                    message: format!("Field '{}' must be one of: {}", name, values.join(", ")),
-                    field: Some(name.into()),
-                });
-            }
+            && !values.iter().any(|allowed| allowed == text)
+        {
+            errors.push(ValidationError {
+                code: "INVALID_ENUM".into(),
+                message: format!("Field '{}' must be one of: {}", name, values.join(", ")),
+                field: Some(name.into()),
+            });
+        }
         if let Some(max) = schema.max_length.or_else(|| {
             (name == "description").then_some(registry.validation.rules.description_max_length)
-        })
-            && text.chars().count() > max {
-                errors.push(ValidationError {
-                    code: "DESCRIPTION_TOO_LONG".into(),
-                    message: format!("Field '{}' exceeds {} characters", name, max),
-                    field: Some(name.into()),
-                });
-            }
+        }) && text.chars().count() > max
+        {
+            errors.push(ValidationError {
+                code: "DESCRIPTION_TOO_LONG".into(),
+                message: format!("Field '{}' exceeds {} characters", name, max),
+                field: Some(name.into()),
+            });
+        }
         if name == "description"
             && text.chars().count() < registry.validation.rules.description_min_length
         {

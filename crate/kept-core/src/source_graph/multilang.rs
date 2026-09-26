@@ -231,7 +231,7 @@ mod tests {
         let path = concat!(env!("CARGO_MANIFEST_DIR"), "/src/source_graph/multilang.rs");
         let content = std::fs::read_to_string(path).expect("multilang.rs must be readable");
         let index = parse_source(Language::Rust, path, &content);
-        // NOTE: parse_source may return None if parser/query fails — log for debug
+        // NOTE-023: parse_source อาจคืน None หาก parser หรือ query ผิดพลาด ให้ debug เทียบกับ syntax parser
         let index = match index {
             Some(idx) => idx,
             None => {

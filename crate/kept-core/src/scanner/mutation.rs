@@ -175,23 +175,24 @@ pub fn simulate_duplicate_mutation(
             let target_allowed = policy.allow_list.iter().any(|rule| {
                 // เช็ค sha256
                 if let Some(rule_hash) = &rule.sha256
-                    && rule_hash.eq_ignore_ascii_case(&action.expected_sha256) {
-                        return true;
-                    }
+                    && rule_hash.eq_ignore_ascii_case(&action.expected_sha256)
+                {
+                    return true;
+                }
                 // เช็ค path_a/path_b
                 if let (Some(a), Some(b)) = (&rule.path_a, &rule.path_b)
                     && ((a == &action.canonical_path && b == &action.target_path)
                         || (a == &action.target_path && b == &action.canonical_path))
-                    {
-                        return true;
-                    }
+                {
+                    return true;
+                }
                 // เช็ค glob_pattern — ตรงกับ canonical หรือ target
                 if let Some(pattern) = &rule.glob_pattern
                     && (action.canonical_path.contains(pattern.as_str())
                         || action.target_path.contains(pattern.as_str()))
-                    {
-                        return true;
-                    }
+                {
+                    return true;
+                }
                 false
             });
             if target_allowed {
@@ -246,33 +247,35 @@ pub fn simulate_duplicate_mutation(
         // 3. Stale index check against memory index
         let record = index.files.iter().find(|f| f.path == action.target_path);
         if let Some(record) = record
-            && record.size != action.expected_size {
-                blocked_actions.push(ActionSimulation {
-                    action: action.clone(),
-                    allowed: false,
-                    rejection_reason: Some(format!(
-                        "File size mismatch: index has {} bytes, plan expects {} bytes",
-                        record.size, action.expected_size
-                    )),
-                });
-                continue;
-            }
+            && record.size != action.expected_size
+        {
+            blocked_actions.push(ActionSimulation {
+                action: action.clone(),
+                allowed: false,
+                rejection_reason: Some(format!(
+                    "File size mismatch: index has {} bytes, plan expects {} bytes",
+                    record.size, action.expected_size
+                )),
+            });
+            continue;
+        }
 
         // 4. File existence & on-disk verification
         if target_full.is_file()
             && let Ok(metadata) = fs::metadata(&target_full)
-                && metadata.len() != action.expected_size {
-                    blocked_actions.push(ActionSimulation {
-                        action: action.clone(),
-                        allowed: false,
-                        rejection_reason: Some(format!(
-                            "On-disk file size {} differs from plan expectation {}",
-                            metadata.len(),
-                            action.expected_size
-                        )),
-                    });
-                    continue;
-                }
+            && metadata.len() != action.expected_size
+        {
+            blocked_actions.push(ActionSimulation {
+                action: action.clone(),
+                allowed: false,
+                rejection_reason: Some(format!(
+                    "On-disk file size {} differs from plan expectation {}",
+                    metadata.len(),
+                    action.expected_size
+                )),
+            });
+            continue;
+        }
 
         valid_actions.push(action.clone());
         total_reclaimable_bytes += action.reclaimed_bytes;

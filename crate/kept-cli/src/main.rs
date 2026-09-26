@@ -103,6 +103,11 @@ pub enum Commands {
         #[arg(long)]
         fix: bool,
     },
+    /// Run a program inside a headless virtual terminal and render its screen.
+    Terminal {
+        #[command(subcommand)]
+        cmd: TerminalCommands,
+    },
     /// Open the interactive review menu for an existing scan index.
     Review {
         root: PathBuf,
@@ -233,6 +238,7 @@ async fn main() -> anyhow::Result<()> {
         Commands::Setup => handle_setup()?,
         Commands::Config { cmd } => handle_config(cmd)?,
         Commands::Doctor { fix } => handle_doctor(fix)?,
+        Commands::Terminal { cmd } => handle_terminal(cmd)?,
         Commands::Review { root, index } => handle_task_review(root, index, true)?,
         Commands::Duplicates { root, json, index, action, yes } => {
             handle_task_duplicates(root, index, json, action, yes)?

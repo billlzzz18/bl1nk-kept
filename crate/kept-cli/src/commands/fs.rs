@@ -153,10 +153,12 @@ pub fn handle_duplicate_scan(cmd: DuplicateCommands) -> anyhow::Result<()> {
         }
         return run_duplicate_action(action, &root, &report, yes, Some(&index));
     }
-    if !json && crate::helpers::is_interactive_terminal()
-        && let Some(action) = super::duplicates::choose_duplicate_action()? {
-            run_duplicate_action(action, &root, &report, false, Some(&index))?;
-        }
+    if !json
+        && crate::helpers::is_interactive_terminal()
+        && let Some(action) = super::duplicates::choose_duplicate_action()?
+    {
+        run_duplicate_action(action, &root, &report, false, Some(&index))?;
+    }
     Ok(())
 }
 

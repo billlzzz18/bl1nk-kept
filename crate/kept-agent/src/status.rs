@@ -28,7 +28,7 @@ pub struct UpdatePreview {
 mod tests {
     use super::*;
 
-    // NOTE-001: StatusCheck enum must round-trip through JSON for MCP transport
+    // NOTE-001: StatusCheck enum ต้อง serialize/deserialize ไปกลับผ่าน JSON ได้สำหรับ MCP transport
     #[test]
     fn status_check_serde_roundtrip() {
         let cases =
@@ -54,7 +54,7 @@ mod tests {
         assert_eq!(a, b);
     }
 
-    // NOTE-002: UpdatePreview carries label + version pair for CLI display
+    // NOTE-002: UpdatePreview เก็บ label และ version pair สำหรับการแสดงผลบน CLI
     #[test]
     fn update_preview_serde_roundtrip() {
         let preview = UpdatePreview {

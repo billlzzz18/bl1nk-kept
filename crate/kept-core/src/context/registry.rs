@@ -105,9 +105,9 @@ impl ContextRegistry {
                     .iter()
                     .min_by_key(|(_, e)| e.last_seen_unix)
                     .map(|(k, _)| k.clone())
-                {
-                    guard.remove(&oldest_key);
-                }
+            {
+                guard.remove(&oldest_key);
+            }
 
             let key = observation.source.target.to_string();
             let now = std::time::SystemTime::now()

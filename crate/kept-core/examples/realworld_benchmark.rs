@@ -89,13 +89,14 @@ fn run_kept_fff_search(scanner: &mut FffScanner, pattern: &str) -> (usize, f64) 
                 continue;
             }
             if let Ok(observation) = scanner.acquire(&record.path, FffAcquisitionMode::View)
-                && let Some(content) = observation.content {
-                    for line in content.lines() {
-                        if line.contains(pattern) {
-                            matches += 1;
-                        }
+                && let Some(content) = observation.content
+            {
+                for line in content.lines() {
+                    if line.contains(pattern) {
+                        matches += 1;
                     }
                 }
+            }
         }
     }
 

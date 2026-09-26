@@ -329,23 +329,24 @@ impl FffManager {
                 continue;
             }
             if let Ok(obs) = state.scanner.acquire(&r.path, FffAcquisitionMode::View)
-                && let Some(content) = obs.content {
-                    for (idx, line) in content.lines().enumerate() {
-                        for &pat in patterns {
-                            if line.contains(pat) {
-                                matches.push(GrepMatch {
-                                    path: r.path.clone(),
-                                    line_number: idx + 1,
-                                    column: line.find(pat).unwrap_or(0) + 1,
-                                    line_content: line.to_string(),
-                                    context_before: Vec::new(),
-                                    context_after: Vec::new(),
-                                });
-                                break;
-                            }
+                && let Some(content) = obs.content
+            {
+                for (idx, line) in content.lines().enumerate() {
+                    for &pat in patterns {
+                        if line.contains(pat) {
+                            matches.push(GrepMatch {
+                                path: r.path.clone(),
+                                line_number: idx + 1,
+                                column: line.find(pat).unwrap_or(0) + 1,
+                                line_content: line.to_string(),
+                                context_before: Vec::new(),
+                                context_after: Vec::new(),
+                            });
+                            break;
                         }
                     }
                 }
+            }
         }
 
         let total = matches.len();

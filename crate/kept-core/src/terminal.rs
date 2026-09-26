@@ -3,6 +3,7 @@
 
 pub mod alacritty;
 pub mod pty_info;
+pub mod runner;
 pub mod terminal_settings;
 
 use std::cmp;
@@ -14,8 +15,14 @@ pub use alacritty_terminal::vte::ansi::{Color, NamedColor, Rgb};
 use serde::{Deserialize, Serialize};
 
 pub use self::alacritty::{
-    clear_saved_screen, content_text, default_term_config, new_term, resize, screen_lines,
-    total_lines, AlacrittyCell, AlacrittyTerm, AlacrittyTermConfig, AlacrittyTermLock,
+    AlacrittyCell, AlacrittyTerm, AlacrittyTermConfig, AlacrittyTermLock, clear_saved_screen,
+    content_lines, content_text, default_term_config, history_size, new_term, resize, screen_lines,
+    total_lines,
+};
+pub use self::runner::{
+    DEFAULT_COLUMNS, DEFAULT_HISTORY_LINES, DEFAULT_LINES, TIMEOUT_EXIT_CODE, TerminalRunOptions,
+    TerminalRunRequest, TerminalRunResult, TerminalSink, TerminalStreamSnapshot,
+    render_terminal_bytes, run_terminal_command,
 };
 pub use self::terminal_settings::{AlternateScroll, CursorShape, TerminalSettings};
 

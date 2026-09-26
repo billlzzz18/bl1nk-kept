@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # bl1nk-kept — Developer & Agent Guide
 
 คู่มือหลักสำหรับ Claude Code, AI Agents และ Developers ในการพัฒนา, ทดสอบ และดูแลระบบ `bl1nk-kept`
@@ -24,7 +28,7 @@
 | Crate | Binary / Lib | บทบาทและหน้าที่หลัก |
 |---|---|---|
 | `kept-core` | Library | Central Hub: Observation Model, Judge Engine, Foundation Registry, Scanner/FFF Adapter, Policy Engine, Source Graph (AST), Semantic Search, Token Counter |
-| `kept-grammar` | Library | Grammar Types, Keyword Validation Rules, Naming Profiles, Config Resolution |
+| `kept-grammars` | Library | Grammar Types, Keyword Validation Rules, Naming Profiles, Config Resolution |
 | `kept-doc` | Library Only | Universal IR (Intermediate Representation) และตัวแปลงเอกสาร (Notion, Markdown, PDF, DOCX) — ไม่มี Binary |
 | `kept-cli` | Binary (`kept`) | User CLI Surface: `kept scan`, `kept find`, `kept review`, `kept duplicates`, `kept search`, `kept doctor`, `kept plugin` |
 | `kept-mcp` | Binary (`bl1nk-kept-mcp`) | Long-running stdio MCP Server: Tools สำหรับ Filesystem, Document IR, Notion Live, Diagrams, และ Watcher |
@@ -66,6 +70,7 @@ Context Admission Gate ทำหน้าที่ตัดสินใจกา
 - ทุก Path ต้องอิงจาก Canonical Root และส่งคืนผลลัพธ์เป็น Deterministic Relative Path
 
 ### 3.5 Duplicate Verification Pipeline
+
 การตรวจหาไฟล์ซ้ำต้องผ่านลำดับขั้นตอนที่แน่นอน:
 
 ```text
@@ -78,6 +83,14 @@ Context Admission Gate ทำหน้าที่ตัดสินใจกา
 
 - ใช้ `tree-sitter` ในการสกัด Symbol Outline (Rust, Python, JavaScript, TypeScript, Go)
 - Fallback ด้วย Regex เมื่อโครงสร้างไฟล์ยังไม่สมบูรณ์
+
+### 3.7 Headless Virtual Terminal Engine
+
+- Virtual 2D Grid + ANSI Parser (`alacritty_terminal` + `vte`) ฝังอยู่ใน `kept-core::terminal` (Single Owner Invariant)
+- บันทึกและ render process output ในรูปหน้าจอที่ collapse แล้ว (progress bar `\r`, cursor movement, alternate screen)
+- CLI (`kept terminal run <program> [args...]`, `kept terminal render <input>`)
+- MCP Tools (`terminal_run`, `terminal_render`) ทำงานผ่าน `spawn_blocking`
+- Execution Contract: runner options (`--cwd`, `--timeout-ms`, etc.) ต้องวางก่อน `<program>`; โปรแกรมลูกจะถูก forward args ทั้งก้อน; หมดเวลาคืน exit code `124`
 
 ---
 
@@ -104,14 +117,24 @@ Context Admission Gate ทำหน้าที่ตัดสินใจกา
 # Quality Gate ทั้งหมด (รันก่อนส่งมอบงาน / PR)
 just check
 
-# Build & Test
+# Build Workspace
 cargo build --workspace
+
+# Run All Tests
 cargo test --workspace
+
+# Run Tests per Crate
 cargo test -p kept-core
 cargo test -p kept-cli
 cargo test -p kept-mcp
 cargo test -p kept-doc
-cargo test -p kept-grammar
+cargo test -p kept-grammars
+
+# Run a Single Test (Function or Filter)
+cargo test -p kept-core duplicate_detection
+cargo test -p kept-core --test source_graph_ast
+cargo test -p kept-core --test source_graph_ast test_rust_symbol_outline -- --exact
+cargo test -p kept-cli --test cli_fff_contract -- --nocapture
 
 # Linter & Formatting
 cargo clippy --workspace --all-targets -- -D warnings
@@ -153,6 +176,7 @@ just schema
 - **Public Rustdoc (`///`):** **ภาษาอังกฤษล้วน** สำหรับ Public APIs, Structs, CLI Help
 - **Error Messages:** **ภาษาอังกฤษล้วน**
 - **Project Docs & Guidelines:** **ภาษาไทย**
+- **Agent Communication Style (.github/copilot-instructions.md):** สื่อสารกระชับ ตรงประเด็น (Terse, no fluff), คงชื่อ identifier/path/technical terms ตรงตามจริง, สลับโหมดอธิบายละเอียดเมื่อพบ security warning หรือ irreversible action
 
 ---
 

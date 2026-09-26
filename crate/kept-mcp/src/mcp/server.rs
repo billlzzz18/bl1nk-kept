@@ -53,6 +53,9 @@ pub fn build() -> Result<Server, Box<dyn std::error::Error>> {
                 manager: fff_manager.clone(),
             },
         )
+        // Headless Virtual Terminal (rendered screen capture)
+        .tool("terminal_run", tools::terminal::TerminalRunTool)
+        .tool("terminal_render", tools::terminal::TerminalRenderTool)
         // Unified Document & Table Pipelines
         .tool("search_documents", tools::unified::SearchDocumentsTool)
         .tool("convert_document", tools::unified::ConvertDocumentTool)

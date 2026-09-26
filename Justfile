@@ -9,6 +9,9 @@ python := if os() == "windows" { "python" } else { "python3" }
 _default:
     @just --list
 
+list:
+    @just --list
+
 fmt:
     cargo fmt --all -- --check
 
@@ -217,8 +220,7 @@ destroy name:
 # ── Info / diagnostics ────────────────────────────────────────────
 
 # List all claude containers
-list:
-    #!/usr/bin/env bash
+docker-list:
     docker ps -a --filter "name=^{{prefix}}" --format "table {{'{{'}}.Names{{'}}'}}\t{{'{{'}}.Status{{'}}'}}\t{{'{{'}}.Image{{'}}'}}"
 
 # Show container logs

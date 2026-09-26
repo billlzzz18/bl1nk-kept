@@ -145,6 +145,19 @@ kept corpus replay gold.snapshot.json --json
 kept convert source.md result.json
 ```
 
+## รันโปรแกรมใน virtual terminal
+
+`terminal run` รันโปรแกรมแล้วป้อน stdout/stderr เข้า virtual terminal grid ก่อนพิมพ์ผล เพื่อให้ output ที่มีการเขียนทับด้วย `\r`, การเลื่อน cursor หรือ alternate screen ถูก collapse เหลือหน้าจอสุดท้ายที่อ่านได้ทันที. คำสั่งนี้ **ไม่แก้ไขไฟล์** และสะท้อน exit code ของโปรแกรมลูกกลับเป็น exit code ของ `kept` (หมดเวลา = `124`).
+
+```bash
+kept terminal run cargo test --workspace
+kept terminal run --columns 120 --lines 40 npm test
+kept terminal run --timeout-ms 5000 --json ping -n 20 127.0.0.1
+kept terminal render capture.bin --json
+```
+
+`terminal render` ใช้เมื่อมี byte stream ที่บันทึกไว้แล้ว (เช่นผลจาก `script`): ไม่ spawn process และให้ผลแบบ deterministic เหมาะกับ regression test.
+
 ## ดู option ที่ใช้ได้
 
 ```bash
@@ -166,4 +179,7 @@ kept search --help
 kept convert --help
 kept evidence --help
 kept corpus --help
+kept terminal --help
+kept terminal run --help
+kept terminal render --help
 ```

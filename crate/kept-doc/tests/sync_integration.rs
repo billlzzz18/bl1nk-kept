@@ -38,9 +38,10 @@ fn test_filter_and_sync_workflow() {
 
     // ตรวจสอบว่า Filter ทำงาน (ช่องว่างถูกลดเหลือ 1)
     if let UniversalBlock::Paragraph { content, .. } = &local_doc.blocks[0]
-        && let kept_doc::ir::inline::InlineElement::TextRun { content, .. } = &content[0] {
-            assert_eq!(content, "สวัสดี ชาวโลก");
-        }
+        && let kept_doc::ir::inline::InlineElement::TextRun { content, .. } = &content[0]
+    {
+        assert_eq!(content, "สวัสดี ชาวโลก");
+    }
 
     // 4. คำนวณความแตกต่าง (M5)
     let changeset = Reconciler::diff(&local_doc, &remote_doc).unwrap();

@@ -104,7 +104,6 @@ pub fn load_registry<P: AsRef<Path>>(
     let migrated = migrate_registry(registry)?;
     let validator = Validator::new(migrated.clone());
     validator.validate_search_policy().map_err(|errors| {
-        
         errors
             .iter()
             .map(|e| e.to_string())
@@ -412,7 +411,7 @@ mod foundation_normalization_tests {
 mod foundation_release_version_tests {
     #[test]
     fn foundation_release_uses_workspace_version() {
-        // NOTE: test verifies version sync between Cargo.toml and compile-time env
+        // NOTE-006: ตรวจสอบความสอดคล้องของเวอร์ชันระหว่าง Cargo.toml และ compile-time environment
         let expected = env!("CARGO_PKG_VERSION");
         assert_eq!(expected, "0.4.0");
     }

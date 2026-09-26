@@ -3,6 +3,10 @@
 เอกสารนี้ยึดแนวคิดของ [Keep a Changelog](https://keepachangelog.com/) และใช้ semantic versioning. Public API, schema, corpus revision และค่า default ที่เปลี่ยนต้องมี release entry และหลักฐานทดสอบเสมอ.
 
 ## [Unreleased]
+### Added
+- CLI: `kept terminal run <program> [args...]` และ `kept terminal render <input>` — รันโปรแกรมหรือ byte stream ผ่าน Virtual Terminal Engine แบบ headless ใน `kept-core::terminal` แล้วพิมพ์หน้าจอที่ render แล้ว (`--columns`, `--lines`, `--history`, `--timeout-ms`, `--json`); `terminal run` สะท้อน exit code ของโปรแกรมลูก และคืน `124` เมื่อหมดเวลา — evidence: `kept-core` unit tests 13 cases (`terminal::runner::tests`) + CLI parser tests 2 cases (`commands::terminal::tests`) + `tests/test_public_cli_smoke.py`
+- MCP: tools `terminal_run` และ `terminal_render` บน `bl1nk-kept-mcp` สำหรับอ่านผลลัพธ์ process ในรูป rendered screen (geometry options: `columns`, `lines`, `history_lines`) — evidence: `kept-mcp` unit tests 5 cases (`mcp::tools::terminal::tests`) และ `SchemaBuilder::optional_integer_param` test ใน `mcp::core::tests`
+- `kept-core::terminal::runner` เป็น single owner ของ terminal runner logic (ใช้ร่วมโดย CLI และ MCP)
 
 ## [0.4.0] - 2026-09-10
 ### Changed

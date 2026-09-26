@@ -50,6 +50,15 @@ impl SchemaBuilder {
         self.insert(name, description, "boolean", false)
     }
 
+    /// Add an optional integer parameter.
+    pub fn optional_integer_param(
+        self,
+        name: impl Into<String>,
+        description: impl Into<String>,
+    ) -> Self {
+        self.insert(name, description, "integer", false)
+    }
+
     /// Add an optional array-of-objects parameter.
     pub fn optional_array_param(
         mut self,
@@ -134,11 +143,13 @@ mod tests {
         let schema = SchemaBuilder::new()
             .param("name", "The name")
             .optional_param("description", "Optional description")
+            .optional_integer_param("limit", "Optional row limit")
             .object_param("data", "Data object")
             .build();
 
         assert!(schema["properties"]["name"].is_object());
         assert!(schema["properties"]["description"].is_object());
+        assert_eq!(schema["properties"]["limit"]["type"], "integer");
         assert!(schema["properties"]["data"].is_object());
         // name + data are required, description is not.
         assert_eq!(schema["required"].as_array().unwrap().len(), 2);

@@ -3,7 +3,7 @@
 //! Covers: validate_naming_settings edge cases, config I/O roundtrip,
 //! starter config YAML parsing, create_user_config_if_missing behavior.
 
-use kept_grammar::{
+use kept_grammars::{
     LengthSettings, NamingSettings, RangeLimit, SimilarityRule, SimilaritySettings, UserConfig,
     WordSettings, create_user_config_if_missing, load_user_config, save_user_config,
     starter_config_yaml, validate_naming_settings,
@@ -370,4 +370,94 @@ fn naming_settings_default_all_none() {
     assert!(settings.stem_regex.is_none());
     assert!(settings.replacements.is_empty());
     assert!(settings.reposition.is_empty());
+}
+
+// ─── grammars module tests ──────────────────────────────────────────────────
+
+#[test]
+fn builtin_languages_covers_standard_languages() {
+    let languages = kept_grammars::builtin_languages();
+    assert!(languages.len() >= 10);
+    assert!(
+        languages
+            .iter()
+            .any(|l| l.name == "rust" && l.matches_extension("rs"))
+    );
+    assert!(
+        languages
+            .iter()
+            .any(|l| l.name == "python" && l.matches_extension("py"))
+    );
+    assert!(
+        languages
+            .iter()
+            .any(|l| l.name == "typescript" && l.matches_extension("tsx"))
+    );
+    assert!(
+        languages
+            .iter()
+            .any(|l| l.name == "markdown" && l.matches_extension("md"))
+    );
+}
+
+#[test]
+fn find_language_by_name_and_extension() {
+    let rust = kept_grammars::find_language("rust").expect("rust language must exist");
+    assert_eq!(rust.grammar, "rust");
+    assert!(rust.matches_extension("rs"));
+    assert!(!rust.matches_extension("py"));
+
+    let py =
+        kept_grammars::find_language_by_extension("py").expect("py extension must match python");
+    assert_eq!(py.name, "python");
+
+    let tsx =
+        kept_grammars::find_language_by_extension(".tsx").expect(".tsx must match typescript");
+    assert_eq!(tsx.name, "typescript");
+
+    assert!(kept_grammars::find_language("nonexistent").is_none());
+    assert!(kept_grammars::find_language_by_extension("unknown_ext_xyz").is_none());
+}
+
+#[test]
+fn language_config_from_toml_parsing() {
+    let toml_str = r#"
+name = "custom_lang"
+grammar = "custom"
+path_suffixes = ["cst", "custom"]
+line_comments = ["//", "--"]
+tab_size = 2
+hard_tabs = true
+"#;
+    let config =
+        kept_grammars::LanguageConfig::from_toml(toml_str).expect("toml parsing must succeed");
+    assert_eq!(config.name, "custom_lang");
+    assert_eq!(config.grammar, "custom");
+    assert!(config.matches_extension("cst"));
+    assert_eq!(config.line_comments, vec!["//", "--"]);
+    assert_eq!(config.tab_size, Some(2));
+    assert_eq!(config.hard_tabs, Some(true));
+}
+
+#[test]
+fn load_config_and_feature_flags() {
+    let config = kept_grammars::load_config("rust").expect("load_config for rust must succeed");
+    assert_eq!(config.name, "rust");
+
+    let stripped = kept_grammars::load_config_for_feature("rust", false).unwrap();
+    assert!(stripped.path_suffixes.is_empty());
+
+    let unstripped = kept_grammars::load_config_for_feature("rust", true).unwrap();
+    assert!(!unstripped.path_suffixes.is_empty());
+
+    let err = kept_grammars::load_config("unknown_lang");
+    assert!(err.is_err());
+}
+
+#[test]
+fn supported_grammar_names_not_empty() {
+    let names = kept_grammars::supported_grammar_names();
+    assert!(names.contains(&"rust"));
+    assert!(names.contains(&"python"));
+    assert!(names.contains(&"go"));
 }

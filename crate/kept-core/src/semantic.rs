@@ -127,11 +127,12 @@ pub fn validate_semantic_settings(
     settings: &crate::policy::SemanticSearchSettings,
 ) -> Result<(), crate::policy::PolicyError> {
     if let Some(endpoint) = &settings.endpoint
-        && !(endpoint.starts_with("http://") || endpoint.starts_with("https://")) {
-            return Err(crate::policy::PolicyError::InvalidConfig(format!(
-                "semantic.endpoint must be an http(s) URL: {endpoint}"
-            )));
-        }
+        && !(endpoint.starts_with("http://") || endpoint.starts_with("https://"))
+    {
+        return Err(crate::policy::PolicyError::InvalidConfig(format!(
+            "semantic.endpoint must be an http(s) URL: {endpoint}"
+        )));
+    }
     let empty = |value: Option<&String>| value.is_some_and(|text| text.trim().is_empty());
     if empty(settings.embedding_model_id.as_ref()) || empty(settings.rerank_model_id.as_ref()) {
         return Err(crate::policy::PolicyError::InvalidConfig(

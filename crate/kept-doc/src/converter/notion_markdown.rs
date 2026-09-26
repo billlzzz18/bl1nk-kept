@@ -444,45 +444,47 @@ fn parse_blocks_at_indent(
             continue;
         }
 
-        if line.chars().next().is_some_and(|c| c.is_ascii_digit()) && line.contains(". ")
-            && let Some(pos) = line.find(". ") {
-                let rest = &line[pos + 2..];
-                let (text, color, _) = parse_block_attributes(rest);
-                let inlines = parse_inline_rich_text(text);
-                *idx += 1;
+        if line.chars().next().is_some_and(|c| c.is_ascii_digit())
+            && line.contains(". ")
+            && let Some(pos) = line.find(". ")
+        {
+            let rest = &line[pos + 2..];
+            let (text, color, _) = parse_block_attributes(rest);
+            let inlines = parse_inline_rich_text(text);
+            *idx += 1;
 
-                let mut child_lines = Vec::new();
-                while *idx < lines.len() {
-                    let next_line = lines[*idx];
-                    let next_indent = get_indent_level(next_line);
-                    if next_line.trim().is_empty() {
-                        *idx += 1;
-                        continue;
-                    }
-                    if next_indent > indent {
-                        child_lines.push(next_line);
-                        *idx += 1;
-                    } else {
-                        break;
-                    }
+            let mut child_lines = Vec::new();
+            while *idx < lines.len() {
+                let next_line = lines[*idx];
+                let next_indent = get_indent_level(next_line);
+                if next_line.trim().is_empty() {
+                    *idx += 1;
+                    continue;
                 }
-                let mut c_idx = 0;
-                let mut children = vec![UniversalBlock::Paragraph {
-                    content: inlines,
-                    style: color.clone().map(StyleRef::new),
-                }];
-                children.extend(parse_blocks_at_indent(&child_lines, &mut c_idx, indent + 1));
-
-                blocks.push(UniversalBlock::OrderedList {
-                    items: vec![ListItem {
-                        content: children,
-                        style: color.map(StyleRef::new),
-                    }],
-                    start: 1,
-                    style: None,
-                });
-                continue;
+                if next_indent > indent {
+                    child_lines.push(next_line);
+                    *idx += 1;
+                } else {
+                    break;
+                }
             }
+            let mut c_idx = 0;
+            let mut children = vec![UniversalBlock::Paragraph {
+                content: inlines,
+                style: color.clone().map(StyleRef::new),
+            }];
+            children.extend(parse_blocks_at_indent(&child_lines, &mut c_idx, indent + 1));
+
+            blocks.push(UniversalBlock::OrderedList {
+                items: vec![ListItem {
+                    content: children,
+                    style: color.map(StyleRef::new),
+                }],
+                start: 1,
+                style: None,
+            });
+            continue;
+        }
 
         if let Some(rest) = line.strip_prefix("> ") {
             let (text, color, _) = parse_block_attributes(rest);
@@ -605,19 +607,21 @@ fn parse_block_attributes(line: &str) -> (&str, Option<String>, bool) {
     let mut text = line;
 
     if let Some(attr_start) = line.rfind('{')
-        && line.ends_with('}') {
-            let attr_body = &line[attr_start + 1..line.len() - 1];
-            if attr_body.contains("color=") || attr_body.contains("toggle=") {
-                text = line[..attr_start].trim_end();
-                if let Some(c) = extract_attribute(attr_body, "color") {
-                    color = Some(c);
-                }
-                if let Some(t) = extract_attribute(attr_body, "toggle")
-                    && t == "true" {
-                        is_toggle = true;
-                    }
+        && line.ends_with('}')
+    {
+        let attr_body = &line[attr_start + 1..line.len() - 1];
+        if attr_body.contains("color=") || attr_body.contains("toggle=") {
+            text = line[..attr_start].trim_end();
+            if let Some(c) = extract_attribute(attr_body, "color") {
+                color = Some(c);
+            }
+            if let Some(t) = extract_attribute(attr_body, "toggle")
+                && t == "true"
+            {
+                is_toggle = true;
             }
         }
+    }
 
     (text, color, is_toggle)
 }
@@ -643,98 +647,106 @@ pub fn parse_inline_rich_text(input: &str) -> Vec<InlineElement> {
         }
 
         if cur.starts_with("$`")
-            && let Some(end) = cur[2..].find("`$") {
-                let expr = &cur[2..2 + end];
-                inlines.push(InlineElement::Equation {
-                    expression: expr.to_string(),
-                    style: None,
-                });
-                cur = &cur[2 + end + 2..];
-                continue;
-            }
+            && let Some(end) = cur[2..].find("`$")
+        {
+            let expr = &cur[2..2 + end];
+            inlines.push(InlineElement::Equation {
+                expression: expr.to_string(),
+                style: None,
+            });
+            cur = &cur[2 + end + 2..];
+            continue;
+        }
 
         if cur.starts_with("<span")
-            && let Some(close_tag) = cur.find('>') {
-                let tag_str = &cur[..close_tag + 1];
-                let color = extract_attribute(tag_str, "color");
-                let underline = extract_attribute(tag_str, "underline").map(|v| v == "true");
+            && let Some(close_tag) = cur.find('>')
+        {
+            let tag_str = &cur[..close_tag + 1];
+            let color = extract_attribute(tag_str, "color");
+            let underline = extract_attribute(tag_str, "underline").map(|v| v == "true");
 
-                if let Some(end_span) = cur[close_tag + 1..].find("</span>") {
-                    let inner = &cur[close_tag + 1..close_tag + 1 + end_span];
-                    inlines.push(InlineElement::TextRun {
-                        content: unescape_nfm(inner),
-                        style: Some(TextStyle {
-                            bold: None,
-                            italic: None,
-                            strikethrough: None,
-                            underline,
-                            code: None,
-                            color,
-                            link: None,
-                        }),
-                    });
-                    cur = &cur[close_tag + 1 + end_span + 7..];
-                    continue;
-                }
+            if let Some(end_span) = cur[close_tag + 1..].find("</span>") {
+                let inner = &cur[close_tag + 1..close_tag + 1 + end_span];
+                inlines.push(InlineElement::TextRun {
+                    content: unescape_nfm(inner),
+                    style: Some(TextStyle {
+                        bold: None,
+                        italic: None,
+                        strikethrough: None,
+                        underline,
+                        code: None,
+                        color,
+                        link: None,
+                    }),
+                });
+                cur = &cur[close_tag + 1 + end_span + 7..];
+                continue;
             }
+        }
 
         if cur.starts_with("**")
-            && let Some(end) = cur[2..].find("**") {
-                let inner = &cur[2..2 + end];
-                inlines.push(InlineElement::TextRun {
-                    content: unescape_nfm(inner),
-                    style: Some(TextStyle::new().bold()),
-                });
-                cur = &cur[2 + end + 2..];
-                continue;
-            }
+            && let Some(end) = cur[2..].find("**")
+        {
+            let inner = &cur[2..2 + end];
+            inlines.push(InlineElement::TextRun {
+                content: unescape_nfm(inner),
+                style: Some(TextStyle::new().bold()),
+            });
+            cur = &cur[2 + end + 2..];
+            continue;
+        }
 
-        if cur.starts_with('*') && !cur.starts_with("**")
-            && let Some(end) = cur[1..].find('*') {
-                let inner = &cur[1..1 + end];
-                inlines.push(InlineElement::TextRun {
-                    content: unescape_nfm(inner),
-                    style: Some(TextStyle::new().italic()),
-                });
-                cur = &cur[1 + end + 1..];
-                continue;
-            }
+        if cur.starts_with('*')
+            && !cur.starts_with("**")
+            && let Some(end) = cur[1..].find('*')
+        {
+            let inner = &cur[1..1 + end];
+            inlines.push(InlineElement::TextRun {
+                content: unescape_nfm(inner),
+                style: Some(TextStyle::new().italic()),
+            });
+            cur = &cur[1 + end + 1..];
+            continue;
+        }
 
         if cur.starts_with("~~")
-            && let Some(end) = cur[2..].find("~~") {
-                let inner = &cur[2..2 + end];
-                inlines.push(InlineElement::TextRun {
-                    content: unescape_nfm(inner),
-                    style: Some(TextStyle::new().strikethrough()),
-                });
-                cur = &cur[2 + end + 2..];
-                continue;
-            }
+            && let Some(end) = cur[2..].find("~~")
+        {
+            let inner = &cur[2..2 + end];
+            inlines.push(InlineElement::TextRun {
+                content: unescape_nfm(inner),
+                style: Some(TextStyle::new().strikethrough()),
+            });
+            cur = &cur[2 + end + 2..];
+            continue;
+        }
 
         if cur.starts_with('`')
-            && let Some(end) = cur[1..].find('`') {
-                let inner = &cur[1..1 + end];
-                inlines.push(InlineElement::TextRun {
-                    content: inner.replace("<br>", "\n"),
-                    style: Some(TextStyle::new().code()),
-                });
-                cur = &cur[1 + end + 1..];
-                continue;
-            }
+            && let Some(end) = cur[1..].find('`')
+        {
+            let inner = &cur[1..1 + end];
+            inlines.push(InlineElement::TextRun {
+                content: inner.replace("<br>", "\n"),
+                style: Some(TextStyle::new().code()),
+            });
+            cur = &cur[1 + end + 1..];
+            continue;
+        }
 
         if cur.starts_with('[')
             && let Some(close_bracket) = cur.find(']')
-                && cur[close_bracket + 1..].starts_with('(')
-                    && let Some(close_paren) = cur[close_bracket + 2..].find(')') {
-                        let label = &cur[1..close_bracket];
-                        let url = &cur[close_bracket + 2..close_bracket + 2 + close_paren];
-                        inlines.push(InlineElement::TextRun {
-                            content: unescape_nfm(label),
-                            style: Some(TextStyle::new().link(url)),
-                        });
-                        cur = &cur[close_bracket + 2 + close_paren + 1..];
-                        continue;
-                    }
+            && cur[close_bracket + 1..].starts_with('(')
+            && let Some(close_paren) = cur[close_bracket + 2..].find(')')
+        {
+            let label = &cur[1..close_bracket];
+            let url = &cur[close_bracket + 2..close_bracket + 2 + close_paren];
+            inlines.push(InlineElement::TextRun {
+                content: unescape_nfm(label),
+                style: Some(TextStyle::new().link(url)),
+            });
+            cur = &cur[close_bracket + 2 + close_paren + 1..];
+            continue;
+        }
 
         let next_delim = cur
             .find(['*', '`', '~', '<', '$', '['])
@@ -767,17 +779,17 @@ fn unescape_nfm(s: &str) -> String {
     let mut chars = s.chars().peekable();
     while let Some(ch) = chars.next() {
         if ch == '\\'
-            && let Some(&next) = chars.peek() {
-                match next {
-                    '\\' | '*' | '~' | '`' | '$' | '[' | ']' | '<' | '>' | '{' | '}' | '|'
-                    | '^' => {
-                        out.push(next);
-                        chars.next();
-                        continue;
-                    }
-                    _ => {}
+            && let Some(&next) = chars.peek()
+        {
+            match next {
+                '\\' | '*' | '~' | '`' | '$' | '[' | ']' | '<' | '>' | '{' | '}' | '|' | '^' => {
+                    out.push(next);
+                    chars.next();
+                    continue;
                 }
+                _ => {}
             }
+        }
         out.push(ch);
     }
     out

@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "crate/kept-grammar",
+    "crate/kept-grammars",
     "crate/kept-core",
     "crate/kept-doc",
     "crate/kept-cli",
@@ -62,7 +62,8 @@ pmcp = "2.10"
 # Source: D:\01work\Active\references\campbellr\sqz
 
 # Grammar types (keyword validation, naming profiles, config resolution)
-kept-grammar = { path = "crate/kept-grammar" }
+kept-grammar = { package = "kept-grammars", path = "crate/kept-grammars" }
+kept-grammars = { path = "crate/kept-grammars" }
 
 # AST parsing (Phase 1.1: tree-sitter symbol extraction)
 # NOTE-004: 0.25.10 คือเวอร์ชันที่ verified กับ tree-sitter-rust 0.24 (TODO Phase 1.1) — ห้าม bump runtime แยกจาก grammar crates เพราะ Language type จะไม่ตรงกัน

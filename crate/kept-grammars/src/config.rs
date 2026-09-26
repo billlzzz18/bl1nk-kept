@@ -62,12 +62,12 @@ pub fn create_user_config_if_missing(path: &Path) -> Result<bool, PolicyError> {
 pub fn load_user_config(path: &Path) -> Result<UserConfig, PolicyError> {
     let content = fs::read_to_string(path)?;
     let config: UserConfig = serde_yaml::from_str(&content)?;
-    // NOTE: validation stays in kept-core (depends on semantic module)
+    // NOTE-001: การตรวจสอบความถูกต้อง (validation) แยกไปอยู่ที่ kept-core เพื่อไม่ให้เกิด dependency ซ้ำซ้อนกับโมดูล semantic
     Ok(config)
 }
 
 pub fn save_user_config(path: &Path, config: &UserConfig) -> Result<(), PolicyError> {
-    // NOTE: validation stays in kept-core (depends on semantic module)
+    // NOTE-002: การตรวจสอบคอนฟิกก่อนบันทึกถูกจัดการที่ระดับ kept-core ก่อนส่งเข้ามายัง I/O
     let content = serde_yaml::to_string(config)?;
     fs::write(path, content)?;
     Ok(())
@@ -129,33 +129,35 @@ profiles:
 /// Validate naming settings (grammar rules).
 pub fn validate_naming_settings(naming: &NamingSettings) -> Result<(), PolicyError> {
     if let Some(value) = &naming.unicode
-        && value != "nfc" {
-            return Err(PolicyError::InvalidConfig(format!("unsupported unicode value {value}")));
-        }
+        && value != "nfc"
+    {
+        return Err(PolicyError::InvalidConfig(format!("unsupported unicode value {value}")));
+    }
     if let Some(value) = &naming.case
-        && !matches!(value.as_str(), "lower" | "upper" | "preserve") {
-            return Err(PolicyError::InvalidConfig(format!("unsupported case value {value}")));
-        }
+        && !matches!(value.as_str(), "lower" | "upper" | "preserve")
+    {
+        return Err(PolicyError::InvalidConfig(format!("unsupported case value {value}")));
+    }
     if let Some(value) = &naming.separator
-        && !matches!(value.as_str(), "kebab" | "snake" | "preserve") {
-            return Err(PolicyError::InvalidConfig(format!("unsupported separator value {value}")));
-        }
+        && !matches!(value.as_str(), "kebab" | "snake" | "preserve")
+    {
+        return Err(PolicyError::InvalidConfig(format!("unsupported separator value {value}")));
+    }
     if let Some(rule) = &naming.similarity.name
-        && !(0.0..=1.0).contains(&rule.threshold) {
-            return Err(PolicyError::InvalidConfig(format!(
-                "similarity threshold must be between 0.0 and 1.0: {}",
-                rule.threshold
-            )));
-        }
+        && !(0.0..=1.0).contains(&rule.threshold)
+    {
+        return Err(PolicyError::InvalidConfig(format!(
+            "similarity threshold must be between 0.0 and 1.0: {}",
+            rule.threshold
+        )));
+    }
     if let Some(range) = &naming.length.stem
         && range
             .min
             .is_some_and(|min| range.max.is_some_and(|max| min > max))
-        {
-            return Err(PolicyError::InvalidConfig(
-                "length.stem min cannot exceed max".to_string(),
-            ));
-        }
+    {
+        return Err(PolicyError::InvalidConfig("length.stem min cannot exceed max".to_string()));
+    }
     if naming
         .words
         .min

@@ -1,4 +1,4 @@
-# kept-grammar
+# kept-grammars
 
 Grammar types, keyword validation rules, naming profiles, และ config resolution สำหรับ `bl1nk-kept`
 
@@ -33,8 +33,8 @@ Grammar types, keyword validation rules, naming profiles, และ config resol
 ## คำสั่งทดสอบ
 
 ```bash
-cargo test -p kept-grammar
-cargo test -p kept-grammar --test grammar_comprehensive
+cargo test -p kept-grammars
+cargo test -p kept-grammars --test grammar_comprehensive
 ```
 
 ---

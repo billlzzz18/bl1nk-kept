@@ -33,12 +33,13 @@ pub async fn handle_doc(cmd: DocCommands) -> anyhow::Result<()> {
                 .map_err(|e| anyhow::anyhow!("Failed to read markdown: {}", e))?;
 
             if let Some(ext) = output.extension().and_then(|e| e.to_str())
-                && ext.eq_ignore_ascii_case("json") {
-                    let json = serde_json::to_string_pretty(&doc)?;
-                    std::fs::write(output, json)?;
-                    println!("Converted successfully to JSON IR!");
-                    return Ok(());
-                }
+                && ext.eq_ignore_ascii_case("json")
+            {
+                let json = serde_json::to_string_pretty(&doc)?;
+                std::fs::write(output, json)?;
+                println!("Converted successfully to JSON IR!");
+                return Ok(());
+            }
 
             let md = MarkdownConverter::from_universal(&doc)
                 .map_err(|e| anyhow::anyhow!("Failed to write markdown: {}", e))?;

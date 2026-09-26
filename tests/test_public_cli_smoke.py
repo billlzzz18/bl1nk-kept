@@ -64,6 +64,7 @@ class PublicCliSmokeTests(unittest.TestCase):
             "duplicates",
             "evidence",
             "corpus",
+            "terminal",
         ):
             self.assertIn(command, result.stdout)
         self.assertNotIn("NOTE-001", result.stdout)
@@ -92,6 +93,9 @@ class PublicCliSmokeTests(unittest.TestCase):
             ("duplicates", "--help"),
             ("evidence", "--help"),
             ("corpus", "--help"),
+            ("terminal", "--help"),
+            ("terminal", "run", "--help"),
+            ("terminal", "render", "--help"),
         ):
             command_help = self.run_kept(*command, environment=environment)
             self.assertEqual(command_help.returncode, 0, command_help.stderr)
@@ -604,6 +608,38 @@ class PublicCliSmokeTests(unittest.TestCase):
         report = self.run_kept("corpus", "validate", str(corpus), "--report", "json", environment=environment)
         self.assertEqual(report.returncode, 0, report.stderr)
         self.assertEqual(json.loads(report.stdout)["accepted"], 1)
+
+    def test_terminal_run_renders_child_output_and_mirrors_exit_code(self) -> None:
+        environment = os.environ.copy()
+        if os.name == "nt":
+            success_arguments = ["terminal", "run", "cmd.exe", "/C", "echo terminal-runner"]
+            failure_arguments = ["terminal", "run", "cmd.exe", "/C", "exit 3"]
+        else:
+            success_arguments = [
+                "terminal", "run", "sh", "-c", "printf 'terminal-runner\\n'",
+            ]
+            failure_arguments = ["terminal", "run", "sh", "-c", "exit 3"]
+
+        success = self.run_kept(*success_arguments, environment=environment)
+        self.assertEqual(success.returncode, 0, success.stderr)
+        self.assertIn("exit_code: 0", success.stdout)
+        self.assertIn("terminal-runner", success.stdout)
+
+        failure = self.run_kept(*failure_arguments, environment=environment)
+        self.assertEqual(failure.returncode, 3, failure.stderr)
+        self.assertIn("exit_code: 3", failure.stdout)
+
+    def test_terminal_render_collapses_progress_rewrites(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            capture = Path(temporary_directory) / "capture.bin"
+            capture.write_bytes(b"downloading 10%\rdownloading 100%\n")
+            environment = os.environ.copy()
+
+            result = self.run_kept("terminal", "render", str(capture), environment=environment)
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("downloading 100%", result.stdout)
+        self.assertNotIn("downloading 10%", result.stdout)
 
 
 if __name__ == "__main__":

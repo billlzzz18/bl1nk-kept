@@ -1,0 +1,218 @@
+crate/kept-core/src/lib.rs
+  s_1845870a29c35f::t_bb99f6ba784f61 19
+  s_1845870a29c35f::t_c250365b24570d 27-31,33,36,42-48,51-57,66-70,107-108,112
+crate/kept-core/src/terminal.rs
+  s_1845870a29c35f::t_ef5f4bf66cb2a6 84-89,95-100
+  s_1845870a29c35f::t_b9a36121928957 1-2,4-5,8-10,12-13,16-18,20,34-36,43-45,161,168,173-174,176,179-181,184-185,188-189,193-197,200-205,207,211-215,218-219,222-224,227-228,231-234,237-238,241-242,246-248,250-253,256-261,264-270
+crate/kept-core/Cargo.toml
+  s_1845870a29c35f::t_df04f916f497de 45-46
+  s_1845870a29c35f::t_302db9f5ec72ad 40-41
+  s_1845870a29c35f::t_a2c81ff34a6f6d 42-44
+  s_1845870a29c35f::t_0c2ffd8cca1231 47-48
+Cargo.toml
+  s_1845870a29c35f::t_76aee3fb0db7cc 79-80,82-84
+  s_1845870a29c35f::t_fd4cba3ce28161 87-88
+  s_1845870a29c35f::t_273fe92a24f0ab 85-86
+  s_1845870a29c35f::t_138e37590b8d21 14
+  s_1845870a29c35f::t_20db06b24381ba 81
+  s_1845870a29c35f::t_914d259cc51269 89
+  s_1845870a29c35f::t_c8126b61979792 50
+.github/workflows/ci.yml
+  s_2cc378ca6a23eb::t_24d018983daea7 39-40
+Cargo.lock
+  s_1845870a29c35f::t_f907603ee436e6 45-68,135,146,155-160,167-178,518-526,535,698-703,724-729,882-911,971,973,995,997,1001,1003,1063-1068,1098,1268,1493-1498,1644,1794-1809,1864-1872,2044,2046,2050,2053,2056-2057,2068,2081,2083,2160-2171,2349,2351,2354,2359,2364,2411-2419,2432,2434-2437,2501-2509,2516,2662-2667,2745-2750,2757-2767,2836-2858,3008,3265-3290,3311-3319,3368,3371,3384-3395,3452,3479-3496,3689-3698,3731-3739,3777,3813-3821,3866-3875,3933-3946,3978,4089-4114,4497-4508,4536-4553,4590-4617,4676-4699,4864,4873-4894,4901-4902,4904,4908-4918,4930-4940,4965,4969-4977,5014-5022,5251-5256
+benchmarks/RESULTS.md
+  s_2cc378ca6a23eb::t_6e00b5e2441719 1,3-5,9-13
+crate/kept-agent/src/antigravity.rs
+  s_49b90b2dd6b728::t_a6dd8e86cac5f7 1-7,11-14,16-144,153,155-168,174-177,181-182,184-192,195-200,205-210,213-214,218-230,234-243,247-256,264-419,425-435,438,440-455,459-480,484-505,509-523,527-534
+crate/kept-agent/src/claude.rs
+  s_2cc378ca6a23eb::t_4603fc1a828c84 147-156,336-341
+crate/kept-agent/src/detect.rs
+  s_49b90b2dd6b728::t_f4efae93f8e523 36-47
+crate/kept-agent/src/json_config.rs
+  s_49b90b2dd6b728::t_a5f9b34cff922a 151,153-154,169-174
+crate/kept-cli/src/commands.rs
+  s_1845870a29c35f::t_510996c3b27df3 14,17-18,20,23,26-27,29-31,33-36,39
+crate/kept-cli/src/commands/agent.rs
+  s_49b90b2dd6b728::t_4a1baaa77ea8ac 5
+crate/kept-cli/src/commands/config.rs
+  s_1845870a29c35f::t_de1b7077f477e9 683-684,687
+crate/kept-cli/src/commands/doctor.rs
+  s_1845870a29c35f::t_c2833df80b28fb 6,51,115
+crate/kept-cli/src/commands/registry.rs
+  s_1845870a29c35f::t_f493104021bf2e 55
+crate/kept-cli/src/commands/scan.rs
+  s_1845870a29c35f::t_b5e1d74acc703d 94-95,136,392
+crate/kept-cli/src/main.rs
+  s_1845870a29c35f::t_1bd2e636ab5a29 5,13-14,218-228,237-239,246-248,255,263,327,375,439,480,563,927-940,1023-1029
+crate/kept-core/examples/benchmark.rs
+  s_1845870a29c35f::t_1340e68300cc13 6,68-70
+crate/kept-core/examples/foundation_experiment.rs
+  s_1845870a29c35f::t_1ce1b44cc98b14 2-4
+crate/kept-core/examples/realworld_benchmark.rs
+  s_1845870a29c35f::t_c0ff0f5a8990f8 56,91-92
+crate/kept-core/examples/schema_contract_demo.rs
+  s_1845870a29c35f::t_4704ddcde1bca1 2,4-5
+crate/kept-core/src/context/correction_ledger.rs
+  s_1845870a29c35f::t_6bd603a516dbf0 4
+crate/kept-core/src/context/judge.rs
+  s_1845870a29c35f::t_4db9f5567e7d31 203-204
+crate/kept-core/src/factory.rs
+  s_1845870a29c35f::t_04784522d6c991 6
+crate/kept-core/src/foundation.rs
+  s_1845870a29c35f::t_3a79e24cee8747 49-51,721,735,768-769,801,832-835,848,869,899,933,978
+crate/kept-core/src/policy.rs
+  s_1845870a29c35f::t_c98ea561503800 431-432,435-436,439-440,443-444,450-451,657-658,791,1090-1091
+crate/kept-core/src/scanner.rs
+  s_1845870a29c35f::t_53667cd99c8f04 19-21,25,28,31-32,34,36,39-41,349-354,474-475,478-479,537-541,573-577,617-621,830,874
+crate/kept-core/src/scanner/query.rs
+  s_1845870a29c35f::t_d11d1b641cd81f 142
+crate/kept-core/src/scanner/scan.rs
+  s_1845870a29c35f::t_484886cf487f03 4
+crate/kept-core/src/scanner/types.rs
+  s_1845870a29c35f::t_d2bbe03a8fa308 260-262,265-266,476-485
+crate/kept-core/src/schema.rs
+  s_1845870a29c35f::t_9cafe1b7e678dc 432-433,442-448
+crate/kept-core/src/source_graph/syntax.rs
+  s_2cc378ca6a23eb::t_ddfab209e6f033 288
+crate/kept-core/tests/duplicate_comprehensive.rs
+  s_1845870a29c35f::t_83f9b235e72014 10-11
+crate/kept-core/tests/fff_scanner_contract.rs
+  s_1845870a29c35f::t_0765c92b3b8b1b 7
+crate/kept-core/tests/mutation_comprehensive.rs
+  s_1845870a29c35f::t_2fd7a24f8ba10b 8-10,42-46,206-212,235-241,267-273
+crate/kept-core/tests/naming_config_contract.rs
+  s_1845870a29c35f::t_308c5b538429c3 3,84-95,130,196-201
+crate/kept-core/tests/policy_comprehensive.rs
+  s_1845870a29c35f::t_25dc6cd0a425f3 10-11,25-31,46-52,69-75,115-118,149-152,160-163,171-174,214-217,402-407,422-427,441-446,460-465,479-484,497-502,515-520,535-540,555-560,573-578,594-599,615-620,634-639,652-657,672-677
+crate/kept-core/tests/source_graph_contract.rs
+  s_1845870a29c35f::t_71eda45ab5bc06 1
+crate/kept-doc/src/api/markdown.rs
+  s_1845870a29c35f::t_e74ed7691c3cb4 342-343
+crate/kept-doc/src/api/trash.rs
+  s_1845870a29c35f::t_4d84f64013cec6 16
+crate/kept-doc/src/api/webhooks.rs
+  s_1845870a29c35f::t_5d388e2a868e7b 238-239
+crate/kept-doc/src/client.rs
+  s_1845870a29c35f::t_97c909fbaeeef7 5,8
+crate/kept-doc/src/converter/docx.rs
+  s_1845870a29c35f::t_0d3dea36ee41c0 6
+crate/kept-doc/src/converter/lark_sheets.rs
+  s_1845870a29c35f::t_184b67726aa706 7-8
+crate/kept-doc/src/converter/markdown_frontmatter.rs
+  s_1845870a29c35f::t_8138073984279f 33,38
+crate/kept-doc/src/converter/notion.rs
+  s_1845870a29c35f::t_4715fdb7d17d68 5
+crate/kept-doc/src/converter/obsidian_base.rs
+  s_1845870a29c35f::t_7d16ba8b63b72a 7
+crate/kept-doc/src/converter/pdf.rs
+  s_1845870a29c35f::t_acb9ca6869e3cd 6
+crate/kept-doc/src/ir.rs
+  s_1845870a29c35f::t_1df2248e105a28 16-17
+crate/kept-doc/src/ir/blocks.rs
+  s_1845870a29c35f::t_3d52bf5a808355 5
+crate/kept-doc/src/ir/frontmatter.rs
+  s_1845870a29c35f::t_e03397eb201b12 23,124,136,153,167,206,237,253
+crate/kept-doc/src/sync/json_schema.rs
+  s_1845870a29c35f::t_d855cc56776a56 3,92-103
+crate/kept-grammar/src/config.rs
+  s_1845870a29c35f::t_b1a2217aa39023 131-132,135-136,139-140,143-144,150-151
+crate/kept-grammar/tests/grammar_comprehensive.rs
+  s_1845870a29c35f::t_4fbe7efc8c03be 7-9,145-148,187-190
+crate/kept-mcp/Cargo.toml
+  s_1845870a29c35f::t_b3c19618e05488 20,25
+crate/kept-mcp/src/mcp/core.rs
+  s_1845870a29c35f::t_2c6ffedf794632 6,11
+crate/kept-mcp/src/mcp/server.rs
+  s_1845870a29c35f::t_31444a44618108 9
+crate/kept-mcp/src/mcp/tools/doc_to_diagram.rs
+  s_1845870a29c35f::t_0e53da1cac888e 10,13
+crate/kept-mcp/src/mcp/tools/lark.rs
+  s_1845870a29c35f::t_6f188c3c8e28f8 5,9
+crate/kept-mcp/src/mcp/tools/markdown.rs
+  s_1845870a29c35f::t_ebed183390ec48 5,8,10
+crate/kept-mcp/src/mcp/tools/mermaid.rs
+  s_1845870a29c35f::t_335de0b7ccb29c 5,8
+crate/kept-mcp/src/mcp/tools/notion.rs
+  s_1845870a29c35f::t_fd72784273b76f 5,9
+crate/kept-mcp/src/mcp/tools/notion_live.rs
+  s_1845870a29c35f::t_3e3b0139117c88 13,16
+crate/kept-mcp/src/mcp/tools/unified.rs
+  s_1845870a29c35f::t_caeea2a51499b8 12,16
+crate/kept-mcp/tests/filesystem_mcp_contract.rs
+  s_1845870a29c35f::t_2efe0a11b247cc 72-77,84-89
+.rtk/filters.toml
+  s_1845870a29c35f::t_917e522d1c9dc8 7-33
+CLAUDE.md
+  s_1845870a29c35f::t_968feb7e37d443 1,3,7,9,11,13-22,24-33,37,39,41-46,48,50-72,75,77,79-80,84,86-97,101,103-105,107-114,116-118,120-124,128,130-146,150,152-155,159,161-166,170-177,179,181
+TODO.md
+  s_1845870a29c35f::t_597f27832a37ac 35,56,58
+benchmarks/README.md
+  s_1845870a29c35f::t_47c47010d36796 16,26-28
+crate/kept-cli/src/commands/doc.rs
+  s_1845870a29c35f::t_7411a0030fb027 35-36
+crate/kept-cli/src/commands/duplicates.rs
+  s_1845870a29c35f::t_ac1d7663bd0e99 73-75,212,277-278
+crate/kept-cli/src/commands/fs.rs
+  s_1845870a29c35f::t_537ec3586ba02e 6,54,122,156-157
+crate/kept-cli/src/corpus.rs
+  s_1845870a29c35f::t_cdc0a8081748b2 110,113
+crate/kept-core/src/context/registry.rs
+  s_1845870a29c35f::t_730eb1114d9b5d 103-104
+crate/kept-core/src/scanner/duplicate.rs
+  s_1845870a29c35f::t_6fb25744aa466b 65-67
+crate/kept-core/src/scanner/mutation.rs
+  s_1845870a29c35f::t_aa9f2218307249 3-4,177-178,182-184,189-191,248-249,262-264
+crate/kept-core/src/search.rs
+  s_1845870a29c35f::t_1088100104b89b 5,100-101
+crate/kept-core/src/semantic.rs
+  s_1845870a29c35f::t_cad57951821d2b 129-130
+crate/kept-core/src/source_graph.rs
+  s_1845870a29c35f::t_342475aff1ded9 487-488,642-643
+crate/kept-core/src/validator.rs
+  s_1845870a29c35f::t_25ed1665d22358 62-63,369-370,379-380,536-540,547-552,587-591,618-622,652-656,710-714
+crate/kept-doc/src/converter/filter.rs
+  s_1845870a29c35f::t_efe4ff09907c46 140,185
+crate/kept-doc/src/converter/notion_markdown.rs
+  s_1845870a29c35f::t_abc92560cc9ea3 447-448,607-608,615-616,645-646,656-657,681-682,692-693,703-704,714-715,725-728,769-770
+crate/kept-doc/src/models/page.rs
+  s_1845870a29c35f::t_92e13c5206ca92 73-74
+crate/kept-doc/tests/sync_integration.rs
+  s_1845870a29c35f::t_2f0fadcab195d7 40-41
+crate/kept-mcp/src/mcp/tools.rs
+  s_1845870a29c35f::t_747238ffafd1f3 17,21,37
+crate/kept-mcp/src/mcp/tools/filesystem.rs
+  s_1845870a29c35f::t_fa71ed3594dc43 20,26,331-332
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8351e88b320bb545681e8e79be7f429ba179bcb5",
+  "prompts": {},
+  "sessions": {
+    "s_1845870a29c35f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6dc5690c-c625-4849-8f13-7fb1aad4decb",
+        "model": "gemini-3.8-flash"
+      },
+      "human_author": "Test Runner <test@example.com>"
+    },
+    "s_2cc378ca6a23eb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3f148dc8-9ab2-4940-9323-023160125ba9",
+        "model": "unknown"
+      },
+      "human_author": "Test Runner <test@example.com>"
+    },
+    "s_49b90b2dd6b728": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8658ceb9-d159-4dc5-ae75-205baf76504c",
+        "model": "unknown"
+      },
+      "human_author": "Test Runner <test@example.com>"
+    }
+  }
+}

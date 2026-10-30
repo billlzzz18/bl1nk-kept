@@ -7,6 +7,9 @@
 //! - `filesystem_rescan`: Trigger on-demand index rescan.
 //! - `filesystem_status`: Status of indexed root, files count, readiness.
 
+/// Context window size for grep results (lines before/after match).
+const CONTEXT_WINDOW: usize = 2;
+
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -255,15 +258,24 @@ impl FffManager {
                 match eval.decision {
                     kept_core::context::AdmissionDecision::Pass(admitted_obs) => {
                         if let Some(content) = admitted_obs.content {
-                            for (idx, line) in content.lines().enumerate() {
+                            let lines: Vec<&str> = content.lines().collect();
+                            for (idx, line) in lines.iter().enumerate() {
                                 if line.contains(pattern) {
+                                    let start = idx.saturating_sub(CONTEXT_WINDOW);
+                                    let end = (idx + CONTEXT_WINDOW + 1).min(lines.len());
                                     matches.push(GrepMatch {
                                         path: r.path.clone(),
                                         line_number: idx + 1,
                                         column: line.find(pattern).unwrap_or(0) + 1,
                                         line_content: line.to_string(),
-                                        context_before: Vec::new(),
-                                        context_after: Vec::new(),
+                                        context_before: lines[start..idx]
+                                            .iter()
+                                            .map(|s| s.to_string())
+                                            .collect(),
+                                        context_after: lines[idx + 1..end]
+                                            .iter()
+                                            .map(|s| s.to_string())
+                                            .collect(),
                                     });
                                 }
                             }
@@ -276,15 +288,24 @@ impl FffManager {
                     } => {
                         // Memoization hit: in production, context stream avoids re-delivering duplicate raw content
                         if let Some(content) = obs.content {
-                            for (idx, line) in content.lines().enumerate() {
+                            let lines: Vec<&str> = content.lines().collect();
+                            for (idx, line) in lines.iter().enumerate() {
                                 if line.contains(pattern) {
+                                    let start = idx.saturating_sub(CONTEXT_WINDOW);
+                                    let end = (idx + CONTEXT_WINDOW + 1).min(lines.len());
                                     matches.push(GrepMatch {
                                         path: r.path.clone(),
                                         line_number: idx + 1,
                                         column: line.find(pattern).unwrap_or(0) + 1,
                                         line_content: line.to_string(),
-                                        context_before: Vec::new(),
-                                        context_after: Vec::new(),
+                                        context_before: lines[start..idx]
+                                            .iter()
+                                            .map(|s| s.to_string())
+                                            .collect(),
+                                        context_after: lines[idx + 1..end]
+                                            .iter()
+                                            .map(|s| s.to_string())
+                                            .collect(),
                                     });
                                 }
                             }
@@ -331,16 +352,25 @@ impl FffManager {
             if let Ok(obs) = state.scanner.acquire(&r.path, FffAcquisitionMode::View)
                 && let Some(content) = obs.content
             {
-                for (idx, line) in content.lines().enumerate() {
+                let lines: Vec<&str> = content.lines().collect();
+                for (idx, line) in lines.iter().enumerate() {
                     for &pat in patterns {
                         if line.contains(pat) {
+                            let start = idx.saturating_sub(CONTEXT_WINDOW);
+                            let end = (idx + CONTEXT_WINDOW + 1).min(lines.len());
                             matches.push(GrepMatch {
                                 path: r.path.clone(),
                                 line_number: idx + 1,
                                 column: line.find(pat).unwrap_or(0) + 1,
                                 line_content: line.to_string(),
-                                context_before: Vec::new(),
-                                context_after: Vec::new(),
+                                context_before: lines[start..idx]
+                                    .iter()
+                                    .map(|s| s.to_string())
+                                    .collect(),
+                                context_after: lines[idx + 1..end]
+                                    .iter()
+                                    .map(|s| s.to_string())
+                                    .collect(),
                             });
                             break;
                         }

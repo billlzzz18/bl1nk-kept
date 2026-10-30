@@ -1,0 +1,9 @@
+{
+  "format": "devdesk.flowchart",
+  "version": 1,
+  "direction": "topToBottom",
+  "snapToGrid": true,
+  "showGrid": true,
+  "nodes": [],
+  "edges": []
+}

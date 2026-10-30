@@ -8,6 +8,42 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
+## 0. Mandatory Context Reconciliation
+
+ก่อนวิเคราะห์หรือแก้ไขงานทุกครั้ง ต้องอ่านตามลำดับนี้:
+
+1. `CLAUDE.md` — กฎถาวรและข้อห้าม
+2. `SPEC.md` — เป้าหมายผลิตภัณฑ์และสัญญาหลัก
+3. `TODO.md` — ลำดับงานและ acceptance status
+4. `HANDOFF.md` — สถานะงานที่ตรวจสอบแล้วและช่องว่างปัจจุบัน
+5. `.agents/MEMORY.md` — ดัชนี feedback/บทเรียนถาวร
+6. memory เฉพาะเรื่องที่เกี่ยวข้องเท่านั้น
+
+### Context Hierarchy
+
+จัดบริบทตามหน้าที่ ห้ามยัดทุกอย่างลง `CLAUDE.md`:
+
+- **Rule:** ข้อกำหนดถาวรที่ต้องทำทุกครั้ง — อยู่ใน `CLAUDE.md`
+- **Forbidden:** ข้อห้ามและ safety boundary — อยู่ใน `CLAUDE.md`
+- **Process:** ขั้นตอนทำงานซ้ำได้ — อยู่ใน `CLAUDE.md` แบบสั้น หรือ skill เฉพาะงาน
+- **Product contract:** เป้าหมาย/ขอบเขต/สัญญา — อยู่ใน `SPEC.md`
+- **Priority/state:** งานค้าง สถานะ และหลักฐาน — อยู่ใน `TODO.md`
+- **Handoff:** ความเข้าใจปัจจุบัน ช่องว่าง และประเด็นส่งต่อ — อยู่ใน `HANDOFF.md`
+- **Learning:** ความผิดพลาดและ feedback ที่ใช้ป้องกันอนาคต — อยู่ใน `.agents/learnings/` และ memory index
+- **Ephemeral:** รายละเอียดเฉพาะเซสชัน — ห้ามบันทึกถาวร เว้นแต่เปลี่ยนความเข้าใจหรือกฎ
+
+ก่อนเพิ่มข้อความลง `CLAUDE.md` ให้ถาม: เป็นกฎถาวรหรือข้อห้ามที่ทุก agent ต้องรู้จริงหรือไม่ หากไม่ใช่ ให้เก็บไว้ในเอกสารชั้นที่เหมาะสมหรือไม่ต้องบันทึก
+
+เมื่อพบความขัดแย้งระหว่าง context, เอกสาร, หรือโค้ด:
+- หยุดการแก้โค้ดก่อน
+- ระบุ source ที่ขัดแย้งและระดับความสำคัญ
+- อัปเดตเอกสารต้นทาง/learning ที่เกี่ยวข้องก่อน implementation
+- ห้ามใช้ test หรือโค้ดปัจจุบันลบล้าง `SPEC.md` โดยอัตโนมัติ
+
+หลังจบแต่ละงานต้อง reconcile เฉพาะเอกสารที่เปลี่ยนความหมาย: สถานะลง `TODO.md`, ความเข้าใจลง `HANDOFF.md`, feedback/error ลง learning และแก้ `CLAUDE.md` เฉพาะเมื่อเป็นกฎถาวร
+
+---
+
 ## 1. Overview & Core Mission
 
 `bl1nk-kept` คือ Local-first Context Engine & Cognitive Guardrail สำหรับ AI Agents และ Knowledge Management พัฒนาด้วยภาษา Rust (Workspace version: `0.4.0`)
@@ -177,6 +213,7 @@ just schema
 - **Error Messages:** **ภาษาอังกฤษล้วน**
 - **Project Docs & Guidelines:** **ภาษาไทย**
 - **Agent Communication Style (.github/copilot-instructions.md):** สื่อสารกระชับ ตรงประเด็น (Terse, no fluff), คงชื่อ identifier/path/technical terms ตรงตามจริง, สลับโหมดอธิบายละเอียดเมื่อพบ security warning หรือ irreversible action
+- **HANDOFF.md, TODO.md, CHANGELOG.md, REPORT.md:** **ภาษาไทยล้วน** (ผู้ใช้จัดการเอกสารและตัดสินใจในภาษาไทย ห้ามเขียนเป็นภาษาอังกฤษ)
 
 ---
 

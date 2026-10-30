@@ -1,0 +1,18 @@
+{
+  "format": "devdesk.workspace",
+  "knowledge": {
+    "okf": "detect",
+    "roots": [
+      "."
+    ]
+  },
+  "name": "bl1nk-kept",
+  "projectId": "19f94cf6-032b-419d-bcc7-7c068edecac7",
+  "root": ".",
+  "schemaVersion": 1,
+  "tools": {
+    "markdown": {
+      "enabled": true
+    }
+  }
+}

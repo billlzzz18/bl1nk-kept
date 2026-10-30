@@ -56,7 +56,7 @@ async fn test_fff_manager_lifecycle_and_tools() {
     use kept_mcp::mcp::tools::filesystem::FffManager;
 
     let fixture = McpFixture::new("mcp-fff-test");
-    fixture.write_file("src/lib.rs", b"pub fn add(a: i32, b: i32) -> i32 { a + b }\n");
+    fixture.write_file("src/lib.rs", b"pub fn add(a: i32, b: i32) -> i32 { a + b }\n\nfn subtract(a: i32, b: i32) -> i32 { a - b }\n");
     fixture.write_file("docs/readme.md", b"# Welcome to kept\n");
 
     let manager = FffManager::new();
@@ -86,6 +86,17 @@ async fn test_fff_manager_lifecycle_and_tools() {
             .matches
             .iter()
             .any(|m| m.path.contains("src/lib.rs") && m.line_content.contains("pub fn add"))
+    );
+
+    // 3.1 Verify Context Window Invariant (Red Phase: ต้องคืน context จริง ไม่ใช่ Vec::new())
+    let add_match = grep_res
+        .matches
+        .iter()
+        .find(|m| m.path.contains("src/lib.rs") && m.line_content.contains("pub fn add"))
+        .expect("must find match for pub fn add");
+    assert!(
+        !add_match.context_after.is_empty(),
+        "context_after must not be empty when subsequent lines exist"
     );
 
     // 4. filesystem_multi_grep
